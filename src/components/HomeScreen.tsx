@@ -15,8 +15,10 @@ export function HomeScreen({ curriculum, onOpenSkill }: {
     const a = document.createElement('a')
     a.href = URL.createObjectURL(blob)
     a.download = 'sql-quest-progress.json'
+    document.body.appendChild(a)
     a.click()
-    URL.revokeObjectURL(a.href)
+    a.remove()
+    setTimeout(() => URL.revokeObjectURL(a.href), 0)
   }
 
   async function importFile(f: File) {
