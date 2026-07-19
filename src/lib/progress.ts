@@ -69,21 +69,20 @@ function normalize(s: ProgressState): ProgressState {
   const today = todayString()
   const skills: Record<string, SkillProgress> = {}
   for (const [id, sp] of Object.entries(s.skills ?? {})) {
+    if (id === 'arena-movies') continue
     skills[id] =
       sp.completed && (!sp.interval || !sp.due)
         ? { ...sp, interval: FIRST_INTERVAL, due: today }
         : sp
   }
-  const collection: CollectionEntry[] = Array.isArray(s.collection)
-    ? s.collection.map(e =>
-        typeof e === 'string' ? { world: 'pokemon', name: e, label: '' } : (e as CollectionEntry),
-      )
-    : []
+  const collection: CollectionEntry[] = (Array.isArray(s.collection) ? s.collection : [])
+    .map(e => (typeof e === 'string' ? { world: 'pokemon', name: e, label: '' } : (e as CollectionEntry)))
+    .filter(e => e.world !== 'movies')
   return {
     ...s,
     skills,
     collection,
-    badges: Array.isArray(s.badges) ? s.badges : [],
+    badges: (Array.isArray(s.badges) ? s.badges : []).filter(b => b !== 'arena-movies'),
   }
 }
 

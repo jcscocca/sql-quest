@@ -131,6 +131,31 @@ test('legacy string collection entries migrate to pokemon-world entries', async 
   ])
 })
 
+test('movies world remnants are dropped on hydrate', async () => {
+  const { set: idbSet } = await import('idb-keyval')
+  await idbSet('sql-quest-progress', {
+    version: 1,
+    xp: 500,
+    streak: { count: 3, lastDay: '2026-07-18' },
+    skills: {
+      cte: { solved: ['cte-1'], completed: true, mastery: 3, interval: 2, due: '2099-01-01' },
+      'arena-movies': { solved: ['am-1'], completed: false, mastery: 0, interval: 2, due: '2099-01-01' },
+    },
+    collection: [
+      { world: 'pokemon', name: 'pikachu', label: 'electric' },
+      { world: 'movies', name: 'Toy Story', label: 'Adventure' },
+    ],
+    badges: ['cte', 'arena-movies'],
+  })
+  await useProgress.getState().hydrate()
+  const s = useProgress.getState()
+  expect(s.collection).toEqual([{ world: 'pokemon', name: 'pikachu', label: 'electric' }])
+  expect(s.skills['arena-movies']).toBeUndefined()
+  expect(s.skills['cte'].completed).toBe(true)
+  expect(s.badges).toEqual(['cte'])
+  expect(s.xp).toBe(500)
+})
+
 test('awardBadge is idempotent', () => {
   useProgress.getState().awardBadge('select-basics')
   useProgress.getState().awardBadge('select-basics')
