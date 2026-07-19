@@ -201,7 +201,7 @@ with store-interface signature `addCatches(world: string, entries: { name: strin
 **Files:**
 - Modify: `scripts/build-pokemon-world.ts`; regenerate `public/worlds/pokemon/{pokemon.parquet,type_matchups.parquet,schema.json}`
 
-- [ ] **Step 1:** Add `type_efficacy.csv` and `types.csv` (already fetched) to the builder; build `type_matchups`: `attacker_type` (name), `defender_type` (name), `multiplier` (damage_factor / 100.0 → 0.0/0.5/1.0/2.0). Add the table + COPY + schema.json entry (columns documented; multiplier DOUBLE). Keep table order [pokemon, type_matchups] in schema.json.
+- [ ] **Step 1:** Add `type_efficacy.csv` and `types.csv` (already fetched) to the builder; build `type_matchups`: `attacker_type` (name), `defender_type` (name), `multiplier` (damage_factor / 100.0 → 0.0/0.5/1.0/2.0). Add the table + COPY + schema.json entry (columns documented; multiplier DOUBLE). Keep table order [pokemon, type_matchups] in schema.json. Also add `labelColumn: 'type1'` to the pokemon entity (reconciles the A1 tile-color regression — new catches get type labels again; pre-labelColumn entries keep their empty label, acceptable).
 - [ ] **Step 2:** `npm run build:world`; pokemon.parquet must be byte-identical; new parquet ~small. `npm run validate` green (loader iterates schema tables — verify the new table loads).
 - [ ] **Step 3:** Sanity: `multiplier=2.0` for (water→fire); 18×18=324 rows.
 - [ ] **Step 4:** Commit — `feat: pokemon type matchup table for join exercises`
