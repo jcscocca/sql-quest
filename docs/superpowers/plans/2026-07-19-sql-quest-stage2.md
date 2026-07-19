@@ -1178,7 +1178,7 @@ export function ReviewScreen({ items, schemas, curriculum, onDone }: {
             <button onClick={() => void handleRun()} disabled={busy || !engineReady}>
               ▶ Run
             </button>
-            <button onClick={() => void handleSubmit()} disabled={busy || !engineReady} className="submit">
+            <button onClick={() => void handleSubmit()} disabled={busy || !engineReady || feedback?.kind === 'success'} className="submit">
               Submit
             </button>
             {!engineReady && <span className="engine-status">Loading SQL engine…</span>}
@@ -1220,7 +1220,22 @@ export function ReviewScreen({ items, schemas, curriculum, onDone }: {
       )}
 ```
 
-- [ ] **Step 3: App wiring.** In `src/App.tsx`: extend View with `| { screen: 'review'; items: ReviewItem[] }`; imports gain `assembleReview, displayedMastery, type ReviewItem` from `'../lib/review'` (path `./lib/review`), `todayString` from `'./lib/xp'`, ReviewScreen. Subscribe: `const skills = useProgress(s => s.skills)`. In the home branch:
+- [ ] **Step 3: App wiring.** In `src/App.tsx`: extend View with `| { screen: 'review'; items: ReviewItem[] }`; imports gain `assembleReview, displayedMastery, type ReviewItem` from `'../lib/review'` (path `./lib/review`), `todayString` from `'./lib/xp'`, ReviewScreen. Subscribe: `const skills = useProgress(s => s.skills)`. After the hydrate/loadContent effect, add a badge-backfill effect — badges shipped after Stage 1, so skills and regions completed before Stage 2 would otherwise never earn theirs (`awardBadge` is idempotent and persists only on change):
+
+```tsx
+  useEffect(() => {
+    if (!content || !hydrated) return
+    const store = useProgress.getState()
+    for (const region of content.curriculum.regions) {
+      for (const sk of region.skills)
+        if (store.skills[sk.id]?.completed) useProgress.getState().awardBadge(sk.id)
+      if (region.skills.every(sk => useProgress.getState().skills[sk.id]?.completed))
+        useProgress.getState().awardBadge(`region:${region.id}`)
+    }
+  }, [content, hydrated])
+```
+
+In the home branch:
 
 ```tsx
   const today = todayString()

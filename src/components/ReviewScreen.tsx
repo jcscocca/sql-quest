@@ -163,7 +163,7 @@ export function ReviewScreen({ items, schemas, curriculum, onDone }: {
             <button onClick={() => void handleRun()} disabled={busy || !engineReady}>
               ▶ Run
             </button>
-            <button onClick={() => void handleSubmit()} disabled={busy || !engineReady} className="submit">
+            <button onClick={() => void handleSubmit()} disabled={busy || !engineReady || feedback?.kind === 'success'} className="submit">
               Submit
             </button>
             {!engineReady && <span className="engine-status">Loading SQL engine…</span>}

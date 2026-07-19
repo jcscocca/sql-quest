@@ -190,7 +190,7 @@ export function ExerciseScreen({ skill, bank, schema, region, onBack }: {
           <div className="prompt">
             <span className="label">Exercise {idx + 1} of {bank.exercises.length}</span>
             <p>{ex.prompt}</p>
-            {exSolved && <p className="already-solved">Already solved — replaying is free practice.</p>}
+            {exSolved && !feedback && <p className="already-solved">Already solved — replaying is free practice.</p>}
           </div>
           <div className="hints">
             {ex.hints.slice(0, hintsShown).map((h, i) => (
