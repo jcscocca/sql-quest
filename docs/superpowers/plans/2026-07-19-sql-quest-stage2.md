@@ -496,6 +496,45 @@ test('stage 1 completed skills get a review schedule backfilled on hydrate', asy
   expect(sk.interval).toBe(2)
   expect(sk.due).toBe(todayString())
 })
+
+test('hydrate persists the backfilled schedule so due dates anchor once', async () => {
+  const { set: idbSet, get: idbGetRaw } = await import('idb-keyval')
+  await idbSet('sql-quest-progress', {
+    version: 1,
+    xp: 10,
+    streak: { count: 1, lastDay: '2026-07-18' },
+    skills: { 'select-basics': { solved: ['sb-1', 'sb-2'], completed: true, mastery: 3 } },
+  })
+  await useProgress.getState().hydrate()
+  const stored = (await idbGetRaw('sql-quest-progress')) as ProgressState
+  expect(stored.skills['select-basics'].interval).toBe(2)
+  expect(stored.skills['select-basics'].due).toBe(todayString())
+  expect(stored.collection).toEqual([])
+})
+
+test('bank growth preserves an evolved review schedule', () => {
+  useProgress.getState().recordSolve('select-basics', 'sb-1', 10, 0, 2)
+  useProgress.getState().recordSolve('select-basics', 'sb-2', 10, 0, 2)
+  useProgress.getState().recordReview('select-basics', true)
+  const before = useProgress.getState().skills['select-basics']
+  useProgress.getState().recordSolve('select-basics', 'sb-3', 10, 0, 4)
+  const after = useProgress.getState().skills['select-basics']
+  expect(after.interval).toBe(before.interval)
+  expect(after.due).toBe(before.due)
+})
+
+test('export round-trips collection, badges, and schedules', () => {
+  useProgress.getState().recordSolve('select-basics', 'sb-1', 10, 0, 1)
+  useProgress.getState().addCatches(['pikachu'])
+  useProgress.getState().awardBadge('select-basics')
+  const json = exportState(useProgress.getState())
+  useProgress.setState({ version: 1, xp: 0, streak: { count: 0, lastDay: '' }, skills: {}, collection: [], badges: [], hydrated: true })
+  useProgress.getState().importState(JSON.parse(json) as ProgressState)
+  const s = useProgress.getState()
+  expect(s.collection).toEqual(['pikachu'])
+  expect(s.badges).toEqual(['select-basics'])
+  expect(s.skills['select-basics'].interval).toBe(2)
+})
 ```
 
 - [ ] **Step 2: Run to verify fail.**
@@ -601,7 +640,13 @@ export const useProgress = create<ProgressStore>((set, get) => ({
       console.error('Failed to read saved progress', err)
     }
     if (saved && !isProgressState(saved)) console.warn('Ignoring unrecognized saved progress')
-    set({ ...(saved && isProgressState(saved) ? normalize(saved) : empty), hydrated: true })
+    if (saved && isProgressState(saved)) {
+      const normalized = normalize(saved)
+      if (JSON.stringify(normalized) !== JSON.stringify(saved)) persist(normalized)
+      set({ ...normalized, hydrated: true })
+    } else {
+      set({ ...empty, hydrated: true })
+    }
   },
 
   recordSolve(skillId, exerciseId, baseXp, hintsUsed, bankSize) {
@@ -712,7 +757,7 @@ export function exportState(s: ProgressState): string {
           .recordSolve(skill.id, ex.id, ex.xp, hintsShown, bank.exercises.length).gained
 ```
 
-- [ ] **Step 5: Run to verify pass** — progress suite 17; full `npm test` → 68 (13 compare + 13 xp + 12 errors + 17 progress + 8 review + 5 catches). `npm run build` green. Note: the new test file imports `todayString` from `'./xp'` — add it to the test file's imports.
+- [ ] **Step 5: Run to verify pass** — progress suite 20; full `npm test` → 71 (13 compare + 13 xp + 12 errors + 20 progress + 8 review + 5 catches). `npm run build` green. Note: the new test file imports `todayString` from `'./xp'` — add it to the test file's imports.
 
 - [ ] **Step 6: Spec sync** — in `docs/superpowers/specs/2026-07-18-sql-learning-app-design.md`, three wording fixes reflecting implemented behavior: (a) in the mastery bullet, replace "its **displayed** mastery drops 1 level per full overdue interval (floor 1)" with "its **displayed** mastery drops one level when it comes due, then one more per full overdue interval (floor 1)"; (b) in the Daily Review bullet, replace "assembles 5–8 exercises" with "assembles up to 8 exercises"; (c) append to the first mastery bullet: " Skills completed before scheduling existed are backfilled (interval 2, due immediately) on first load."
 
@@ -842,7 +887,7 @@ export function exportState(s: ProgressState): string {
 
 and add `region={region}` to the `<ExerciseScreen>` element.
 
-- [ ] **Step 7: Verify** — `npm run build`, `npm test` (68). Browser check (dev server): solve a fresh exercise → "Caught: …" chip; finish a bank → completion card with wrap-up; collection persists (check via export).
+- [ ] **Step 7: Verify** — `npm run build`, `npm test` (71). Browser check (dev server): solve a fresh exercise → "Caught: …" chip; finish a bank → completion card with wrap-up; collection persists (check via export).
 
 - [ ] **Step 8: Commit** — `feat: catching, badges, and node-complete moment in exercise flow`
 
@@ -1203,7 +1248,7 @@ Review branch:
     )
 ```
 
-- [ ] **Step 4: Verify** — build + tests (67). Browser: with a completed skill whose `due` is future, no callout; manually verify via export/import (edit a due date into the past, import) that the callout appears, review runs, summary shows, callout clears.
+- [ ] **Step 4: Verify** — build + tests (71). Browser: with a completed skill whose `due` is future, no callout; manually verify via export/import (edit a due date into the past, import) that the callout appears, review runs, summary shows, callout clears.
 
 - [ ] **Step 5: Commit** — `feat: daily review screen with home callout and mastery summary`
 
@@ -1410,7 +1455,7 @@ Notes: hints used → skill review fails → mastery 3→2 deterministically; th
 - Modify: `README.md`
 
 - [ ] **Step 1:** In README's feature intro paragraph, after "starting with Pokémon.", add: `Daily Review resurfaces rusty skills on an expanding schedule, and correct queries catch the Pokémon they return into your collection.`
-- [ ] **Step 2:** Full gate: `npm test && npm run validate && npm run build && npm run e2e` — all green (68 unit / 30 exercises / build / 5 e2e).
+- [ ] **Step 2:** Full gate: `npm test && npm run validate && npm run build && npm run e2e` — all green (71 unit / 30 exercises / build / 5 e2e).
 - [ ] **Step 3:** Commit — `docs: Stage 2 features in README`
 
 ---

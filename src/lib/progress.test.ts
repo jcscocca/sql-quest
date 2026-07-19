@@ -152,3 +152,42 @@ test('stage 1 completed skills get a review schedule backfilled on hydrate', asy
   expect(sk.interval).toBe(2)
   expect(sk.due).toBe(todayString())
 })
+
+test('hydrate persists the backfilled schedule so due dates anchor once', async () => {
+  const { set: idbSet, get: idbGetRaw } = await import('idb-keyval')
+  await idbSet('sql-quest-progress', {
+    version: 1,
+    xp: 10,
+    streak: { count: 1, lastDay: '2026-07-18' },
+    skills: { 'select-basics': { solved: ['sb-1', 'sb-2'], completed: true, mastery: 3 } },
+  })
+  await useProgress.getState().hydrate()
+  const stored = (await idbGetRaw('sql-quest-progress')) as ProgressState
+  expect(stored.skills['select-basics'].interval).toBe(2)
+  expect(stored.skills['select-basics'].due).toBe(todayString())
+  expect(stored.collection).toEqual([])
+})
+
+test('bank growth preserves an evolved review schedule', () => {
+  useProgress.getState().recordSolve('select-basics', 'sb-1', 10, 0, 2)
+  useProgress.getState().recordSolve('select-basics', 'sb-2', 10, 0, 2)
+  useProgress.getState().recordReview('select-basics', true)
+  const before = useProgress.getState().skills['select-basics']
+  useProgress.getState().recordSolve('select-basics', 'sb-3', 10, 0, 4)
+  const after = useProgress.getState().skills['select-basics']
+  expect(after.interval).toBe(before.interval)
+  expect(after.due).toBe(before.due)
+})
+
+test('export round-trips collection, badges, and schedules', () => {
+  useProgress.getState().recordSolve('select-basics', 'sb-1', 10, 0, 1)
+  useProgress.getState().addCatches(['pikachu'])
+  useProgress.getState().awardBadge('select-basics')
+  const json = exportState(useProgress.getState())
+  useProgress.setState({ version: 1, xp: 0, streak: { count: 0, lastDay: '' }, skills: {}, collection: [], badges: [], hydrated: true })
+  useProgress.getState().importState(JSON.parse(json) as ProgressState)
+  const s = useProgress.getState()
+  expect(s.collection).toEqual(['pikachu'])
+  expect(s.badges).toEqual(['select-basics'])
+  expect(s.skills['select-basics'].interval).toBe(2)
+})

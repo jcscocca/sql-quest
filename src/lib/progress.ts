@@ -96,7 +96,13 @@ export const useProgress = create<ProgressStore>((set, get) => ({
       console.error('Failed to read saved progress', err)
     }
     if (saved && !isProgressState(saved)) console.warn('Ignoring unrecognized saved progress')
-    set({ ...(saved && isProgressState(saved) ? normalize(saved) : empty), hydrated: true })
+    if (saved && isProgressState(saved)) {
+      const normalized = normalize(saved)
+      if (JSON.stringify(normalized) !== JSON.stringify(saved)) persist(normalized)
+      set({ ...normalized, hydrated: true })
+    } else {
+      set({ ...empty, hydrated: true })
+    }
   },
 
   recordSolve(skillId, exerciseId, baseXp, hintsUsed, bankSize) {
