@@ -43,16 +43,18 @@ Each skill node: short concept intro with a runnable example → 6–10 exercise
 - **Checking is results-diff**: the user's query and a hidden reference query both execute in DuckDB; matching result sets = correct. Order-insensitive unless the skill under test is ORDER BY. Column order-insensitive; float tolerance; NULL-aware.
 - **Hint ladder**: 3 steps (nudge → relevant syntax → full walkthrough), costs XP to use.
 
-### Mastery + spaced repetition
+### Mastery + spaced repetition (mechanics finalized 2026-07-19)
 
-- Each skill has mastery 0–5. Completing its node reaches ~3; higher levels come from review.
-- Mastery decays over days (SM-2-style-lite scheduling).
-- **Daily Review** assembles 5–8 quick exercises from the most-decayed skills, mixing worlds. This is the retention engine — the app is a gym, not just a course.
+- Each skill has mastery 0–5 plus SM-2-lite scheduling state: `interval` (days) and `due` (date). Completing a node sets mastery 3, interval 2, due = today + 2.
+- A skill past `due` is rusty: its **displayed** mastery drops 1 level per full overdue interval (floor 1). Stored mastery only changes on review — decay is pressure, not punishment.
+- **Daily Review** assembles 5–8 exercises from the most-overdue skills, round-robin so no skill dominates, re-serving exercises from their banks (mixing worlds once more exist). Reviewing a skill successfully (its session exercises correct without hints): mastery +1 (max 5), interval ×2 (cap 30 days), due = today + interval. Failing or leaning on hints: mastery −1 (min 1), interval resets to 2. Review solves award reduced XP (base 5) and count toward the streak. This is the retention engine — the app is a gym, not just a course.
 
 ### XP, streaks, collection
 
 - XP per exercise; bonus for hint-free solves. Daily streak counter.
-- **Collection mechanic**: solving exercises collects the entities queried (catch the Pokémon your query returned; collect Yu-Gi-Oh cards, movies, etc.). Collection page shows everything earned. Node/region completions award badges (gym-badge flavor).
+- **Collection mechanic (capped dynamic + authored, finalized 2026-07-19)**: on each exercise's FIRST correct solve, up to 3 random *new* Pokémon appearing in the user's actual result rows are caught (values matched against the world's name list), plus any authored `collectibles` bonuses. Re-solves and review solves don't catch — collection growth comes from progression and new content. Node completion awards a skill badge; completing a region awards a region badge.
+- **Collection page**: reached via the header collection count — grid of caught Pokémon as type-colored text tiles plus the badge shelf. No sprites (remote images would break offline; bundled sprites are a possible Stage 3 flourish).
+- **Node-complete moment**: solving a bank's final exercise shows a completion card — badge earned, the skill's `lesson.wrapUp` text, catches from this node — instead of bouncing straight to Home.
 
 ### Worlds
 
@@ -113,7 +115,7 @@ Header (streak · XP · collection count) / Daily Review callout with rusty-skil
 ## Build stages
 
 1. **Stage 1 (MVP)**: Pokémon world + Foundations region, full exercise loop with results-diff, hints, XP/streak, IndexedDB progress. No review scheduler yet.
-2. **Stage 2**: mastery decay + Daily Review; collection page + badges, plus the lesson wrap-up explanation (deferred from Stage 1).
+2. **Stage 2**: mastery decay + Daily Review (SM-2-lite mechanics above); collection page + badges with capped dynamic catching; node-complete moment with lesson wrap-ups (deferred from Stage 1; `lesson.wrapUp` authored for all 5 Foundations skills); Foundations bank top-up to 6–8 exercises per skill via authoring sessions through the validation harness. Progress schema stays version 1 — all new fields additive with defaults so Stage 1 saves survive untouched.
 3. **Stage 3**: remaining regions/worlds (Yu-Gi-Oh, movies/music, civic); Boss Arenas.
 4. **Later (optional)**: "Ask Claude about my query" button (bring-your-own-key, style feedback on correct-but-clunky SQL) — additive, no architecture change.
 
