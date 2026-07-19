@@ -7,7 +7,7 @@
       "referenceSql": "SELECT name, total FROM pokemon ORDER BY total DESC, name LIMIT 10",
       "orderMatters": true,
       "hints": [
-        "ORDER BY total DESC puts the highest totals first; LIMIT 10 keeps ten rows.",
+        "You need a sort (highest first) and a way to keep only the first ten rows.",
         "To break ties alphabetically, add a second sort column: ORDER BY total DESC, name.",
         "```sql\nSELECT name, total FROM pokemon ORDER BY total DESC, name LIMIT 10\n```"
       ],

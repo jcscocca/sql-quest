@@ -974,7 +974,7 @@ Five Foundations skills, two exercises each. Banks are append-only; later author
       "referenceSql": "SELECT name, total FROM pokemon ORDER BY total DESC, name LIMIT 10",
       "orderMatters": true,
       "hints": [
-        "ORDER BY total DESC puts the highest totals first; LIMIT 10 keeps ten rows.",
+        "You need a sort (highest first) and a way to keep only the first ten rows.",
         "To break ties alphabetically, add a second sort column: ORDER BY total DESC, name.",
         "```sql\nSELECT name, total FROM pokemon ORDER BY total DESC, name LIMIT 10\n```"
       ],
@@ -1036,13 +1036,13 @@ Five Foundations skills, two exercises each. Banks are append-only; later author
   "exercises": [
     {
       "id": "ag-1",
-      "prompt": "What is the average attack across all Pokémon? Return a single row.",
-      "referenceSql": "SELECT AVG(attack) AS avg_attack FROM pokemon",
+      "prompt": "What is the average attack across all Pokémon, rounded to 1 decimal place? Return a single row.",
+      "referenceSql": "SELECT ROUND(AVG(attack), 1) AS avg_attack FROM pokemon",
       "orderMatters": false,
       "hints": [
         "An aggregate with no GROUP BY collapses the whole table into one row.",
-        "The function you want is AVG(attack).",
-        "```sql\nSELECT AVG(attack) FROM pokemon\n```"
+        "Wrap the average in ROUND: ROUND(AVG(attack), 1).",
+        "```sql\nSELECT ROUND(AVG(attack), 1) FROM pokemon\n```"
       ],
       "xp": 12
     },

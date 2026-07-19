@@ -80,7 +80,7 @@ Pick node → lazy-load world Parquet into DuckDB → render exercise → **Run*
 
 1. **Dataset builders** — one script per world: PokéAPI, YGOPRODeck, Socrata export for civic; the exact movies/music source (TMDB, MusicBrainz, or similar free dump) gets chosen when that world is built in Stage 3. Output Parquet + `schema.json`. Built datasets are committed for reproducibility.
 2. **Curriculum skeleton** — `skills.json` drafted by hand (Claude drafts, Jacob reviews once). Pedagogy order is deliberate, not generated.
-3. **Exercise generation** — per skill × world, Claude authoring sessions generate banks in batches: real-question prompts, reference SQL, hints, collectible awards. Jacob spot-reviews samples, not every item.
+3. **Exercise generation** — per skill × world, Claude authoring sessions generate banks in batches: real-question prompts, reference SQL, hints, collectible awards. Jacob spot-reviews samples, not every item. Exercises whose answer is a computed decimal must specify the rounding in the prompt and apply it in the reference SQL (the comparator only tolerates representation noise, not rounding differences).
 4. **Validation harness** — Node script: loads every world into DuckDB, runs every reference SQL (must succeed, non-empty, deterministic), verifies hint snippets parse and collectible IDs exist. Gates all content changes.
 5. **Regeneration** — banks are append-only; top up any skill's bank with a new authoring session + harness run.
 
