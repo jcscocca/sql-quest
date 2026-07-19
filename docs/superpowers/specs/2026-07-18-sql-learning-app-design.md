@@ -113,7 +113,7 @@ Header (streak · XP · collection count) / Daily Review callout with rusty-skil
 ## Build stages
 
 1. **Stage 1 (MVP)**: Pokémon world + Foundations region, full exercise loop with results-diff, hints, XP/streak, IndexedDB progress. No review scheduler yet.
-2. **Stage 2**: mastery decay + Daily Review; collection page + badges.
+2. **Stage 2**: mastery decay + Daily Review; collection page + badges, plus the lesson wrap-up explanation (deferred from Stage 1).
 3. **Stage 3**: remaining regions/worlds (Yu-Gi-Oh, movies/music, civic); Boss Arenas.
 4. **Later (optional)**: "Ask Claude about my query" button (bring-your-own-key, style feedback on correct-but-clunky SQL) — additive, no architecture change.
 

@@ -1476,9 +1476,27 @@ export async function runQuery(sql: string): Promise<QueryResult> {
   const rows: unknown[][] = Array.from({ length: table.numRows }, () => [])
   for (let c = 0; c < columns.length; c++) {
     const vec = table.getChildAt(c)
-    for (let r = 0; r < table.numRows; r++) rows[r].push(vec?.get(r) ?? null)
+    const t = table.schema.fields[c].type as { scale?: number; precision?: number }
+    const scale = typeof t.scale === 'number' && typeof t.precision === 'number' ? t.scale : null
+    for (let r = 0; r < table.numRows; r++) {
+      const raw = vec?.get(r) ?? null
+      rows[r].push(scale !== null && raw !== null ? decimalToNumber(raw, scale) : raw)
+    }
   }
   return { columns, rows }
+}
+
+function decimalToNumber(raw: unknown, scale: number): number {
+  if (typeof raw === 'bigint') return Number(raw) / 10 ** scale
+  if (typeof raw === 'number') return raw / 10 ** scale
+  if (raw instanceof Uint32Array) {
+    let v = 0n
+    for (let i = raw.length - 1; i >= 0; i--) v = (v << 32n) | BigInt(raw[i])
+    const bits = BigInt(raw.length * 32)
+    if ((v >> (bits - 1n)) & 1n) v -= 1n << bits
+    return Number(v) / 10 ** scale
+  }
+  return Number(raw) / 10 ** scale
 }
 
 export async function restart(): Promise<void> {
@@ -1930,7 +1948,7 @@ export function ExerciseScreen({ skill, bank, schema, onBack }: {
           <SchemaBrowser schema={schema} />
         </aside>
         <main className="right-panel">
-          <Editor value={sqlText} onChange={setSqlText} schema={schema} />
+          <Editor key={ex.id} value={sqlText} onChange={setSqlText} schema={schema} />
           <div className="actions">
             <button onClick={() => void handleRun()} disabled={busy || !engineReady}>
               ▶ Run
@@ -2297,12 +2315,24 @@ test('read-only guard blocks mutations', async ({ page }) => {
   await page.getByRole('button', { name: '▶ Run' }).click()
   await expect(page.getByText(/read-only/)).toBeVisible({ timeout: 30_000 })
 })
+
+test('wrong answer shows feedback and the hint ladder opens', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('button', { name: /SELECT Basics/ }).click()
+  await page.getByRole('button', { name: 'Start exercises' }).click()
+  await page.locator('.cm-content').click()
+  await page.keyboard.type('SELECT type1 FROM pokemon')
+  await page.getByRole('button', { name: 'Submit' }).click()
+  await expect(page.getByText(/Not quite/)).toBeVisible({ timeout: 30_000 })
+  await page.getByRole('button', { name: /Hint 1/ }).click()
+  await expect(page.getByText(/Hint 1:/)).toBeVisible()
+})
 ```
 
 - [ ] **Step 3: Run the tests**
 
 Run: `npm run e2e`
-Expected: 2 tests PASS. If the engine is slow on first load, the generous timeouts cover WASM instantiation. If selectors fail, fix the component markup or the selector — whichever is wrong — and re-run.
+Expected: 3 tests PASS. If the engine is slow on first load, the generous timeouts cover WASM instantiation. If selectors fail, fix the component markup or the selector — whichever is wrong — and re-run.
 
 - [ ] **Step 4: Commit**
 

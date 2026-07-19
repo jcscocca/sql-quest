@@ -157,7 +157,7 @@ export function ExerciseScreen({ skill, bank, schema, onBack }: {
           <SchemaBrowser schema={schema} />
         </aside>
         <main className="right-panel">
-          <Editor value={sqlText} onChange={setSqlText} schema={schema} />
+          <Editor key={ex.id} value={sqlText} onChange={setSqlText} schema={schema} />
           <div className="actions">
             <button onClick={() => void handleRun()} disabled={busy || !engineReady}>
               ▶ Run

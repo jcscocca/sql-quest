@@ -59,9 +59,27 @@ export async function runQuery(sql: string): Promise<QueryResult> {
   const rows: unknown[][] = Array.from({ length: table.numRows }, () => [])
   for (let c = 0; c < columns.length; c++) {
     const vec = table.getChildAt(c)
-    for (let r = 0; r < table.numRows; r++) rows[r].push(vec?.get(r) ?? null)
+    const t = table.schema.fields[c].type as { scale?: number; precision?: number }
+    const scale = typeof t.scale === 'number' && typeof t.precision === 'number' ? t.scale : null
+    for (let r = 0; r < table.numRows; r++) {
+      const raw = vec?.get(r) ?? null
+      rows[r].push(scale !== null && raw !== null ? decimalToNumber(raw, scale) : raw)
+    }
   }
   return { columns, rows }
+}
+
+function decimalToNumber(raw: unknown, scale: number): number {
+  if (typeof raw === 'bigint') return Number(raw) / 10 ** scale
+  if (typeof raw === 'number') return raw / 10 ** scale
+  if (raw instanceof Uint32Array) {
+    let v = 0n
+    for (let i = raw.length - 1; i >= 0; i--) v = (v << 32n) | BigInt(raw[i])
+    const bits = BigInt(raw.length * 32)
+    if ((v >> (bits - 1n)) & 1n) v -= 1n << bits
+    return Number(v) / 10 ** scale
+  }
+  return Number(raw) / 10 ** scale
 }
 
 export async function restart(): Promise<void> {

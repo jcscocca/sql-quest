@@ -30,3 +30,15 @@ test('read-only guard blocks mutations', async ({ page }) => {
   await page.getByRole('button', { name: '▶ Run' }).click()
   await expect(page.getByText(/read-only/)).toBeVisible({ timeout: 30_000 })
 })
+
+test('wrong answer shows feedback and the hint ladder opens', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('button', { name: /SELECT Basics/ }).click()
+  await page.getByRole('button', { name: 'Start exercises' }).click()
+  await page.locator('.cm-content').click()
+  await page.keyboard.type('SELECT type1 FROM pokemon')
+  await page.getByRole('button', { name: 'Submit' }).click()
+  await expect(page.getByText(/Not quite/)).toBeVisible({ timeout: 30_000 })
+  await page.getByRole('button', { name: /Hint 1/ }).click()
+  await expect(page.getByText(/Hint 1:/)).toBeVisible()
+})
