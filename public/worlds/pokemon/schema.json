@@ -8,7 +8,7 @@
       "columns": [
         {
           "name": "id",
-          "type": "INTEGER",
+          "type": "BIGINT",
           "description": "National Pokédex number"
         },
         {
@@ -18,7 +18,7 @@
         },
         {
           "name": "generation",
-          "type": "INTEGER",
+          "type": "BIGINT",
           "description": "Game generation introduced (1–9)"
         },
         {
@@ -33,37 +33,37 @@
         },
         {
           "name": "hp",
-          "type": "INTEGER",
+          "type": "BIGINT",
           "description": "Base HP stat"
         },
         {
           "name": "attack",
-          "type": "INTEGER",
+          "type": "BIGINT",
           "description": "Base Attack stat"
         },
         {
           "name": "defense",
-          "type": "INTEGER",
+          "type": "BIGINT",
           "description": "Base Defense stat"
         },
         {
           "name": "special_attack",
-          "type": "INTEGER",
+          "type": "BIGINT",
           "description": "Base Special Attack stat"
         },
         {
           "name": "special_defense",
-          "type": "INTEGER",
+          "type": "BIGINT",
           "description": "Base Special Defense stat"
         },
         {
           "name": "speed",
-          "type": "INTEGER",
+          "type": "BIGINT",
           "description": "Base Speed stat"
         },
         {
           "name": "total",
-          "type": "INTEGER",
+          "type": "BIGINT",
           "description": "Sum of all six base stats"
         },
         {
