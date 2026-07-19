@@ -36,6 +36,7 @@ async function run(sql: string): Promise<QueryResult> {
 
 let checked = 0
 for (const skill of skills) {
+  if (!skill.lesson?.wrapUp?.trim()) failures.push(`${skill.id}: missing lesson.wrapUp`)
   let bank: ExerciseBank
   try {
     bank = JSON.parse(readFileSync(`public/content/exercises/${skill.id}.json`, 'utf8')) as ExerciseBank

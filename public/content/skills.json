@@ -11,7 +11,8 @@
           "requires": [],
           "lesson": {
             "intro": "Every query starts with SELECT (which columns you want) and FROM (which table they live in). SELECT * grabs every column, but naming columns explicitly — SELECT name, attack — is almost always better: you get exactly what you asked for, in the order you asked for it.",
-            "exampleSql": "SELECT name, type1, attack FROM pokemon"
+            "exampleSql": "SELECT name, type1, attack FROM pokemon",
+            "wrapUp": "You now own the two clauses every query starts with. SELECT chooses columns, FROM chooses the table — and explicit column lists beat SELECT * because they make intent obvious and results stable. Everything else in SQL decorates this skeleton."
           }
         },
         {
@@ -21,7 +22,8 @@
           "requires": ["select-basics"],
           "lesson": {
             "intro": "WHERE keeps only the rows that pass a test. Combine tests with AND / OR, compare with = <> > < >= <=, match text with LIKE. One trap: NULL never equals anything — use IS NULL / IS NOT NULL for missing values (many Pokémon have no second type).",
-            "exampleSql": "SELECT name, attack FROM pokemon WHERE type1 = 'fire' AND attack >= 100"
+            "exampleSql": "SELECT name, attack FROM pokemon WHERE type1 = 'fire' AND attack >= 100",
+            "wrapUp": "Filtering is half of analysis: WHERE keeps rows that pass your test, AND/OR combine tests, and NULL passes no test at all — remember IS NULL when data is missing. From here on, almost every query you write will carry a WHERE."
           }
         },
         {
@@ -31,7 +33,8 @@
           "requires": ["where-filtering"],
           "lesson": {
             "intro": "ORDER BY sorts the output (ASC by default, DESC for highest-first) and LIMIT keeps the first N rows — together they answer every 'top 10' question. Sort by multiple columns to break ties deterministically: ORDER BY total DESC, name means 'by total, then alphabetically among equals'.",
-            "exampleSql": "SELECT name, speed FROM pokemon ORDER BY speed DESC, name LIMIT 5"
+            "exampleSql": "SELECT name, speed FROM pokemon ORDER BY speed DESC, name LIMIT 5",
+            "wrapUp": "ORDER BY makes results deterministic; LIMIT keeps them digestible; together they answer every 'top N' question. The tiebreaker habit — ORDER BY total DESC, name — separates queries that are reproducible from ones that shuffle under your feet."
           }
         },
         {
@@ -41,7 +44,8 @@
           "requires": ["where-filtering"],
           "lesson": {
             "intro": "DISTINCT collapses duplicate rows in the result. SELECT DISTINCT type1 lists each primary type once; COUNT(DISTINCT type1) counts how many different values exist. DISTINCT applies to the whole selected row, not just the column it sits next to.",
-            "exampleSql": "SELECT DISTINCT type1 FROM pokemon ORDER BY type1"
+            "exampleSql": "SELECT DISTINCT type1 FROM pokemon ORDER BY type1",
+            "wrapUp": "DISTINCT collapses duplicate result rows, and COUNT(DISTINCT col) counts unique values — your go-to for 'how many different…' questions. Remember it applies to the whole selected row: DISTINCT a, b means unique combinations."
           }
         },
         {
@@ -51,7 +55,8 @@
           "requires": ["order-limit", "distinct"],
           "lesson": {
             "intro": "Aggregate functions squash many rows into one value: COUNT(*) counts rows, AVG/SUM/MIN/MAX do what they say. With no GROUP BY, the whole table becomes a single output row. COUNT(col) skips NULLs while COUNT(*) counts everything — that difference answers 'how many Pokémon have a second type?'",
-            "exampleSql": "SELECT COUNT(*) AS pokemon_count, AVG(attack) AS avg_attack FROM pokemon"
+            "exampleSql": "SELECT COUNT(*) AS pokemon_count, AVG(attack) AS avg_attack FROM pokemon",
+            "wrapUp": "Aggregates fold many rows into one: COUNT, AVG, SUM, MIN, MAX. Without GROUP BY the whole table becomes a single row, and COUNT(col) skips NULLs while COUNT(*) doesn't — the foundation for the grouping you'll meet in Shaping."
           }
         }
       ]
