@@ -287,6 +287,7 @@ Each region task follows the SAME structure — listed once here, executed per r
   - Boss Arena exercises are multi-step narratives: the prompt states a business goal and constraints; reference SQL may be 10–20 lines; hints outline the decomposition (nudge names the steps; syntax shows the skeleton; full answer complete). xp 20 each.
   - Window/date results: pin ordering (orderMatters with full tiebreakers) OR make the result a stable aggregate; NEVER depend on row order of an unordered window result.
   - seattle311 has no entity → NO collectibles on its exercises (harness enforces).
+  - Exercise ids must be globally unique across all banks — enforced by the harness (C3 review: window-frames ids renamed `wf-*` → `wfr-*`; `wf-*` belongs to where-filtering).
   - Data-authenticity note for authors: yugioh banlist statuses are 'Forbidden'/'Limited'/'Semi-Limited' (the API never says 'Banned'); reference SQL must use the real values.
 - [ ] **Step 3: verify** — `npm run validate` green with the growing exercise count (C1: 61 — gb-7 added in review, C2: 97, C3: 127, C4: 142); run every reference + hint-3 through the real comparator (throwaway script, like Stage 2 Task 11); `npm test` and `npm run build` unchanged-green; browser spot-check: open the region's first skill, solve one exercise for real, confirm the world loads and (where entity exists) catches work.
 - [ ] **Step 4: commit** — `feat: <Region> region (<n> skills, <m> exercises)`

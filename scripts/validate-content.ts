@@ -37,6 +37,7 @@ async function run(sql: string): Promise<QueryResult> {
 }
 
 let checked = 0
+const idBanks = new Map<string, string[]>()
 for (const skill of skills) {
   if (!skill.lesson?.wrapUp?.trim()) failures.push(`${skill.id}: missing lesson.wrapUp`)
   let bank: ExerciseBank
@@ -56,6 +57,7 @@ for (const skill of skills) {
     failures.push(`${skill.id}: duplicate exercise ids in bank`)
   for (const ex of bank.exercises) {
     checked++
+    idBanks.set(ex.id, [...(idBanks.get(ex.id) ?? []), skill.id])
     const tag = `${skill.id}/${ex.id}`
     if (ex.hints.length !== 3) failures.push(`${tag}: expected 3 hints, found ${ex.hints.length}`)
     try {
@@ -90,6 +92,9 @@ for (const skill of skills) {
     }
   }
 }
+
+for (const [id, banks] of idBanks)
+  if (banks.length > 1) failures.push(`duplicate exercise id "${id}" in banks ${banks.join(' and ')}`)
 
 if (failures.length > 0) {
   console.error(`✗ ${failures.length} problem(s):`)
