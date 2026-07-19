@@ -16,6 +16,8 @@ let db: duckdb.AsyncDuckDB | null = null
 let conn: duckdb.AsyncDuckDBConnection | null = null
 let loadedWorld: string | null = null
 let loadedTables: string[] = []
+let initPromise: Promise<void> | null = null
+let restartPromise: Promise<void> | null = null
 
 async function init(): Promise<void> {
   const bundle = await duckdb.selectBundle(BUNDLES)
@@ -25,8 +27,13 @@ async function init(): Promise<void> {
   conn = await db.connect()
 }
 
-export async function loadWorld(world: string, tables: string[]): Promise<void> {
-  if (!db || !conn) await init()
+async function doLoadWorld(world: string, tables: string[]): Promise<void> {
+  if (!initPromise)
+    initPromise = init().catch(err => {
+      initPromise = null
+      throw err
+    })
+  await initPromise
   if (loadedWorld === world) return
   for (const t of tables) {
     const res = await fetch(`${import.meta.env.BASE_URL}worlds/${world}/${t}.parquet`)
@@ -38,37 +45,51 @@ export async function loadWorld(world: string, tables: string[]): Promise<void> 
   loadedTables = tables
 }
 
+export async function loadWorld(world: string, tables: string[]): Promise<void> {
+  if (restartPromise) await restartPromise
+  return doLoadWorld(world, tables)
+}
+
 export async function runQuery(sql: string): Promise<QueryResult> {
   assertReadOnly(sql)
+  if (restartPromise) await restartPromise
   if (!conn) throw new TrainerError('The SQL engine is still starting — try again in a moment.')
   const table = await withTimeout(conn.query(sql))
   const columns = table.schema.fields.map(f => f.name)
-  const rows = table.toArray().map(row => {
-    const o = row.toJSON() as Record<string, unknown>
-    return columns.map(c => o[c] ?? null)
-  })
+  const rows: unknown[][] = Array.from({ length: table.numRows }, () => [])
+  for (let c = 0; c < columns.length; c++) {
+    const vec = table.getChildAt(c)
+    for (let r = 0; r < table.numRows; r++) rows[r].push(vec?.get(r) ?? null)
+  }
   return { columns, rows }
 }
 
 export async function restart(): Promise<void> {
-  const world = loadedWorld
-  const tables = loadedTables
-  try {
-    await db?.terminate()
-  } catch {
-    /* worker already gone */
-  }
-  db = null
-  conn = null
-  loadedWorld = null
-  if (world) await loadWorld(world, tables)
+  if (restartPromise) return restartPromise
+  restartPromise = (async () => {
+    const world = loadedWorld
+    const tables = loadedTables
+    try {
+      await db?.terminate()
+    } catch {
+      /* worker already gone */
+    }
+    db = null
+    conn = null
+    loadedWorld = null
+    initPromise = null
+    if (world) await doLoadWorld(world, tables)
+  })().finally(() => {
+    restartPromise = null
+  })
+  return restartPromise
 }
 
 async function withTimeout<T>(p: Promise<T>): Promise<T> {
   let timer: ReturnType<typeof setTimeout> | undefined
   const timeout = new Promise<never>((_, reject) => {
     timer = setTimeout(() => {
-      void restart()
+      void restart().catch(err => console.error('Engine restart failed', err))
       reject(
         new TrainerError(
           'Query ran past 5 seconds and was cancelled (accidental huge join?). The engine restarted — fix the query and run it again.',
