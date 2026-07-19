@@ -56,9 +56,18 @@ Each skill node: short concept intro with a runnable example → 6–10 exercise
 - **Collection page**: reached via the header collection count — grid of caught Pokémon as type-colored text tiles plus the badge shelf. No sprites (remote images would break offline; bundled sprites are a possible Stage 3 flourish).
 - **Node-complete moment**: solving a bank's final exercise shows a completion card — badge earned, the skill's `lesson.wrapUp` text, catches from this node — instead of bouncing straight to Home.
 
-### Worlds
+### Worlds (Stage 3 mapping finalized 2026-07-19)
 
-Datasets are "worlds": launch with **Pokémon** (flagship), then Yu-Gi-Oh, movies/music, civic (e.g., Seattle 311). Digimon is a candidate later world (same builder pattern). Skills are world-agnostic; each exercise declares its world. Worlds unlock as regions progress.
+Datasets are "worlds": each region introduces one, and access is gated purely by skill unlock edges (the world panel on Home is informational — skills are the gate). Digimon is a candidate later world (same builder pattern).
+
+| World | Region | Source | Tables | Entity (catching) |
+|---|---|---|---|---|
+| Pokémon | Foundations (live) | PokéAPI CSVs | pokemon; + `type_matchups` added in Stage 3 for joins | pokemon.name |
+| Yu-Gi-Oh | Shaping | YGOPRODeck static card dump | cards, card_sets, banlist | cards.name |
+| Movies | Combining | IMDb non-commercial TSVs (top ~5k titles) | movies, people, roles | movies.title |
+| Seattle 311 | Analyst Power | Seattle SODA CSV export | requests | none (no catching civic complaints) |
+
+Regions may use ANY earlier-unlocked world in exercises (e.g., Combining self-joins on pokemon.evolves_from; Analyst Power recursive CTEs on evolution chains). `entity` gains an optional `labelColumn` (pokemon: type1; yugioh: card type; movies: genre) so the collection page can tile any world; the collection groups by world. Harness collectible checks resolve against each world's declared entity rather than a hardcoded table.
 
 ## Architecture
 
@@ -116,7 +125,7 @@ Header (streak · XP · collection count) / Daily Review callout with rusty-skil
 
 1. **Stage 1 (MVP)**: Pokémon world + Foundations region, full exercise loop with results-diff, hints, XP/streak, IndexedDB progress. No review scheduler yet.
 2. **Stage 2**: mastery decay + Daily Review (SM-2-lite mechanics above); collection page + badges with capped dynamic catching; node-complete moment with lesson wrap-ups (deferred from Stage 1; `lesson.wrapUp` authored for all 5 Foundations skills); Foundations bank top-up to 6–8 exercises per skill via authoring sessions through the validation harness. Progress schema stays version 1 — all new fields additive with defaults so Stage 1 saves survive untouched.
-3. **Stage 3**: remaining regions/worlds (Yu-Gi-Oh, movies/music, civic); Boss Arenas.
+3. **Stage 3**: all remaining regions and worlds. Curriculum: **Shaping** (group-by, having, case-when, string-functions, null-handling — Pokémon + Yu-Gi-Oh), **Combining** (inner-join, left-join, self-join, set-operations, subqueries, correlated-subqueries — Yu-Gi-Oh + Pokémon), **Analyst Power** (cte, window-ranking, window-offsets, window-frames, recursive-cte — Movies + Seattle 311 + Pokémon evolution chains), **Boss Arenas** (three arena skills, one per new world; 4–6 multi-step business questions each, standard exercise mechanics — no new app machinery). Each skill: lesson intro + example + wrapUp, 6-exercise bank through the harness. App work: Home active-world panel, collection page world grouping via entity.labelColumn, harness generalization. First skill of each region requires the prior region's final skills (unlock edges in skills.json).
 4. **Later (optional)**: "Ask Claude about my query" button (bring-your-own-key, style feedback on correct-but-clunky SQL) — additive, no architecture change.
 
 ## Out of scope
