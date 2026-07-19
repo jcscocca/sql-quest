@@ -24,6 +24,54 @@
         "```sql\nSELECT COUNT(DISTINCT generation) FROM pokemon\n```"
       ],
       "xp": 12
+    },
+    {
+      "id": "d-3",
+      "prompt": "How many distinct primary types (type1) appear across all Pokémon? Return a single number.",
+      "referenceSql": "SELECT COUNT(DISTINCT type1) AS type_count FROM pokemon",
+      "orderMatters": false,
+      "hints": [
+        "You want the count of unique type1 values, not the number of rows.",
+        "Put DISTINCT inside COUNT: COUNT(DISTINCT type1).",
+        "```sql\nSELECT COUNT(DISTINCT type1) FROM pokemon\n```"
+      ],
+      "xp": 12
+    },
+    {
+      "id": "d-4",
+      "prompt": "List every distinct primary type (type1) that at least one legendary Pokémon has, in alphabetical order.",
+      "referenceSql": "SELECT DISTINCT type1 FROM pokemon WHERE is_legendary ORDER BY type1",
+      "orderMatters": true,
+      "hints": [
+        "Filter to legendary Pokémon first, then collapse duplicate types with DISTINCT.",
+        "SELECT DISTINCT type1 ... WHERE is_legendary, then ORDER BY type1.",
+        "```sql\nSELECT DISTINCT type1 FROM pokemon WHERE is_legendary ORDER BY type1\n```"
+      ],
+      "xp": 13
+    },
+    {
+      "id": "d-5",
+      "prompt": "List every distinct combination of primary and secondary type — one row per unique (type1, type2) pair. Show type1 and type2. Single-typed Pokémon have a NULL type2; include those combinations too.",
+      "referenceSql": "SELECT DISTINCT type1, type2 FROM pokemon",
+      "orderMatters": false,
+      "hints": [
+        "DISTINCT applies to the whole selected row, so listing two columns yields unique pairs.",
+        "SELECT DISTINCT type1, type2 FROM pokemon — no filtering needed.",
+        "```sql\nSELECT DISTINCT type1, type2 FROM pokemon\n```"
+      ],
+      "xp": 13
+    },
+    {
+      "id": "d-6",
+      "prompt": "For legendary Pokémon only, list every distinct combination of generation and primary type (type1). Show generation and type1, ordered by generation ascending, then type1 ascending.",
+      "referenceSql": "SELECT DISTINCT generation, type1 FROM pokemon WHERE is_legendary ORDER BY generation ASC, type1 ASC",
+      "orderMatters": true,
+      "hints": [
+        "Filter to legendary Pokémon, take the unique generation/type1 pairs, then order by both columns.",
+        "SELECT DISTINCT generation, type1 ... WHERE is_legendary, then ORDER BY generation ASC, type1 ASC.",
+        "```sql\nSELECT DISTINCT generation, type1 FROM pokemon WHERE is_legendary ORDER BY generation ASC, type1 ASC\n```"
+      ],
+      "xp": 14
     }
   ]
 }

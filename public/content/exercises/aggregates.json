@@ -24,6 +24,54 @@
         "```sql\nSELECT COUNT(*), MAX(total) FROM pokemon\n```"
       ],
       "xp": 12
+    },
+    {
+      "id": "ag-3",
+      "prompt": "What is the combined total of the hp stat across all Pokémon? Return a single number.",
+      "referenceSql": "SELECT SUM(hp) AS total_hp FROM pokemon",
+      "orderMatters": false,
+      "hints": [
+        "SUM adds up a column's values across every row.",
+        "Use SUM(hp) with no GROUP BY to total the whole table.",
+        "```sql\nSELECT SUM(hp) FROM pokemon\n```"
+      ],
+      "xp": 12
+    },
+    {
+      "id": "ag-4",
+      "prompt": "In one row, show the lowest and the highest speed found among all Pokémon.",
+      "referenceSql": "SELECT MIN(speed) AS min_speed, MAX(speed) AS max_speed FROM pokemon",
+      "orderMatters": false,
+      "hints": [
+        "Two aggregates can sit side by side in a single SELECT.",
+        "MIN(speed) gives the lowest, MAX(speed) gives the highest.",
+        "```sql\nSELECT MIN(speed), MAX(speed) FROM pokemon\n```"
+      ],
+      "xp": 12
+    },
+    {
+      "id": "ag-5",
+      "prompt": "How many Pokémon have a secondary type? Count only those whose type2 is present (not NULL). Return a single number.",
+      "referenceSql": "SELECT COUNT(type2) AS with_second_type FROM pokemon",
+      "orderMatters": false,
+      "hints": [
+        "COUNT of a specific column ignores rows where that column is NULL — unlike COUNT(*).",
+        "COUNT(type2) counts only the Pokémon that have a secondary type.",
+        "```sql\nSELECT COUNT(type2) FROM pokemon\n```"
+      ],
+      "xp": 13
+    },
+    {
+      "id": "ag-6",
+      "prompt": "Among fire-type (type1) Pokémon, how many are there and what is their average attack rounded to 1 decimal place? Return one row with the count and the rounded average.",
+      "referenceSql": "SELECT COUNT(*) AS fire_count, ROUND(AVG(attack), 1) AS avg_attack FROM pokemon WHERE type1 = 'fire'",
+      "orderMatters": false,
+      "hints": [
+        "Filter to fire types first, then compute two aggregates over the survivors in one SELECT.",
+        "WHERE type1 = 'fire', then COUNT(*) and ROUND(AVG(attack), 1).",
+        "```sql\nSELECT COUNT(*), ROUND(AVG(attack), 1) FROM pokemon WHERE type1 = 'fire'\n```"
+      ],
+      "xp": 14
     }
   ]
 }

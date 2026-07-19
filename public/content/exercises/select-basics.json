@@ -24,6 +24,54 @@
         "```sql\nSELECT name, type1, total FROM pokemon\n```"
       ],
       "xp": 10
+    },
+    {
+      "id": "sb-3",
+      "prompt": "Show each Pokémon's name and both of its type columns: type1 and type2.",
+      "referenceSql": "SELECT name, type1, type2 FROM pokemon",
+      "orderMatters": false,
+      "hints": [
+        "Same two clauses as before — SELECT the columns you want, FROM the pokemon table.",
+        "List all three columns after SELECT: name, type1, type2.",
+        "```sql\nSELECT name, type1, type2 FROM pokemon\n```"
+      ],
+      "xp": 10
+    },
+    {
+      "id": "sb-4",
+      "prompt": "Show each Pokémon's name, height in meters (height_m), and weight in kilograms (weight_kg).",
+      "referenceSql": "SELECT name, height_m, weight_kg FROM pokemon",
+      "orderMatters": false,
+      "hints": [
+        "Pick the three columns the question names; the table is still pokemon.",
+        "The columns are name, height_m, and weight_kg.",
+        "```sql\nSELECT name, height_m, weight_kg FROM pokemon\n```"
+      ],
+      "xp": 10
+    },
+    {
+      "id": "sb-5",
+      "prompt": "Show each Pokémon's name along with its six individual base stats: hp, attack, defense, special_attack, special_defense, and speed.",
+      "referenceSql": "SELECT name, hp, attack, defense, special_attack, special_defense, speed FROM pokemon",
+      "orderMatters": false,
+      "hints": [
+        "The six base stats are each their own column — list them all after name, comma-separated.",
+        "Select name, hp, attack, defense, special_attack, special_defense, and speed.",
+        "```sql\nSELECT name, hp, attack, defense, special_attack, special_defense, speed FROM pokemon\n```"
+      ],
+      "xp": 12
+    },
+    {
+      "id": "sb-6",
+      "prompt": "Show each Pokémon's name, the generation it was introduced in, and the name of the Pokémon it evolves from (evolves_from).",
+      "referenceSql": "SELECT name, generation, evolves_from FROM pokemon",
+      "orderMatters": false,
+      "hints": [
+        "Choose the three requested columns; evolves_from is just another column name.",
+        "The columns are name, generation, and evolves_from.",
+        "```sql\nSELECT name, generation, evolves_from FROM pokemon\n```"
+      ],
+      "xp": 12
     }
   ]
 }

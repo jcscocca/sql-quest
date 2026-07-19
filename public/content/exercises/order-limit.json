@@ -24,6 +24,55 @@
         "```sql\nSELECT name, weight_kg FROM pokemon ORDER BY weight_kg DESC, name LIMIT 5\n```"
       ],
       "xp": 15
+    },
+    {
+      "id": "ol-3",
+      "prompt": "Show the 5 Pokémon with the lowest total stats — name and total, lowest first. Break ties alphabetically by name.",
+      "referenceSql": "SELECT name, total FROM pokemon ORDER BY total ASC, name LIMIT 5",
+      "orderMatters": true,
+      "hints": [
+        "This time the smallest totals come first — sort ascending, then keep the first five rows.",
+        "Ascending is the default direction, but be explicit and add the tiebreaker: ORDER BY total ASC, name — then LIMIT 5.",
+        "```sql\nSELECT name, total FROM pokemon ORDER BY total ASC, name LIMIT 5\n```"
+      ],
+      "xp": 15
+    },
+    {
+      "id": "ol-4",
+      "prompt": "List the name, attack, and defense of every dragon-type (type1) Pokémon, sorted by attack descending, then by defense descending, then by name ascending.",
+      "referenceSql": "SELECT name, attack, defense FROM pokemon WHERE type1 = 'dragon' ORDER BY attack DESC, defense DESC, name ASC",
+      "orderMatters": true,
+      "hints": [
+        "When two Pokémon tie on the first sort column, add more sort columns to decide the order.",
+        "Filter to type1 = 'dragon', then ORDER BY attack DESC, defense DESC, name ASC.",
+        "```sql\nSELECT name, attack, defense FROM pokemon WHERE type1 = 'dragon' ORDER BY attack DESC, defense DESC, name ASC\n```"
+      ],
+      "xp": 15
+    },
+    {
+      "id": "ol-5",
+      "prompt": "Among legendary Pokémon, show the 5 with the highest attack — name and attack, highest first. Break ties alphabetically by name.",
+      "referenceSql": "SELECT name, attack FROM pokemon WHERE is_legendary ORDER BY attack DESC, name LIMIT 5",
+      "orderMatters": true,
+      "hints": [
+        "First keep only legendary Pokémon, then sort by attack and take the top five.",
+        "WHERE is_legendary, then ORDER BY attack DESC, name LIMIT 5.",
+        "```sql\nSELECT name, attack FROM pokemon WHERE is_legendary ORDER BY attack DESC, name LIMIT 5\n```"
+      ],
+      "xp": 15,
+      "collectibles": ["mewtwo"]
+    },
+    {
+      "id": "ol-6",
+      "prompt": "Among Pokémon with a total stat score of at least 600, show the 10 highest — name, total, and speed — sorted by total descending, then speed descending, then name ascending.",
+      "referenceSql": "SELECT name, total, speed FROM pokemon WHERE total >= 600 ORDER BY total DESC, speed DESC, name ASC LIMIT 10",
+      "orderMatters": true,
+      "hints": [
+        "Filter to the high-total Pokémon first, then apply a three-level sort and cap the rows.",
+        "WHERE total >= 600, then ORDER BY total DESC, speed DESC, name ASC LIMIT 10.",
+        "```sql\nSELECT name, total, speed FROM pokemon WHERE total >= 600 ORDER BY total DESC, speed DESC, name ASC LIMIT 10\n```"
+      ],
+      "xp": 15
     }
   ]
 }

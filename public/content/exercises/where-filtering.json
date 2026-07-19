@@ -25,6 +25,54 @@
         "```sql\nSELECT name, attack FROM pokemon WHERE type1 = 'water' AND attack > 100\n```"
       ],
       "xp": 10
+    },
+    {
+      "id": "wf-3",
+      "prompt": "List the name and type1 of every Pokémon whose primary type (type1) is either dragon or fairy.",
+      "referenceSql": "SELECT name, type1 FROM pokemon WHERE type1 = 'dragon' OR type1 = 'fairy'",
+      "orderMatters": false,
+      "hints": [
+        "You want rows matching either of two type1 values — combine the two tests with OR.",
+        "Each test is a text comparison: type1 = 'dragon' OR type1 = 'fairy'.",
+        "```sql\nSELECT name, type1 FROM pokemon WHERE type1 = 'dragon' OR type1 = 'fairy'\n```"
+      ],
+      "xp": 12
+    },
+    {
+      "id": "wf-4",
+      "prompt": "List the names of Pokémon that have no secondary type — that is, their type2 is missing (NULL).",
+      "referenceSql": "SELECT name FROM pokemon WHERE type2 IS NULL",
+      "orderMatters": false,
+      "hints": [
+        "Missing values can't be matched with = ; SQL has a dedicated test for NULL.",
+        "Use WHERE type2 IS NULL (note: type2 = NULL does not work).",
+        "```sql\nSELECT name FROM pokemon WHERE type2 IS NULL\n```"
+      ],
+      "xp": 12
+    },
+    {
+      "id": "wf-5",
+      "prompt": "List the names of Pokémon whose name starts with the letters 'char'. (Names are stored in lowercase.)",
+      "referenceSql": "SELECT name FROM pokemon WHERE name LIKE 'char%'",
+      "orderMatters": false,
+      "hints": [
+        "For 'starts with' matching, use the LIKE operator with a wildcard.",
+        "The % wildcard matches any characters that follow: name LIKE 'char%'.",
+        "```sql\nSELECT name FROM pokemon WHERE name LIKE 'char%'\n```"
+      ],
+      "xp": 13
+    },
+    {
+      "id": "wf-6",
+      "prompt": "List the name, type1, and type2 of Pokémon that have a secondary type (type2 is not NULL) and whose total stat score is between 580 and 620 inclusive.",
+      "referenceSql": "SELECT name, type1, type2 FROM pokemon WHERE type2 IS NOT NULL AND total BETWEEN 580 AND 620",
+      "orderMatters": false,
+      "hints": [
+        "Two conditions joined by AND: one checks that type2 is present, the other checks a numeric range.",
+        "Use type2 IS NOT NULL for the first, and total BETWEEN 580 AND 620 for the inclusive range.",
+        "```sql\nSELECT name, type1, type2 FROM pokemon WHERE type2 IS NOT NULL AND total BETWEEN 580 AND 620\n```"
+      ],
+      "xp": 13
     }
   ]
 }
