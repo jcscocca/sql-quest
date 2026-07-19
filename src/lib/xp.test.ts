@@ -34,3 +34,15 @@ test('a gap resets the streak to 1', () => {
 test('todayString formats as YYYY-MM-DD', () => {
   expect(todayString(new Date(2026, 6, 18))).toBe('2026-07-18')
 })
+
+test('future lastDay (clock rollback) resets to 1', () => {
+  expect(updateStreak({ count: 4, lastDay: '2026-07-20' }, '2026-07-18')).toEqual({ count: 1, lastDay: '2026-07-18' })
+})
+
+test('malformed lastDay resets to 1', () => {
+  expect(updateStreak({ count: 4, lastDay: 'banana' }, '2026-07-18')).toEqual({ count: 1, lastDay: '2026-07-18' })
+})
+
+test('todayString pads single-digit day and month', () => {
+  expect(todayString(new Date(2026, 2, 5))).toBe('2026-03-05')
+})
