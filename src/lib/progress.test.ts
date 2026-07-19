@@ -54,3 +54,26 @@ test('exportState round-trips through importState', () => {
   useProgress.getState().importState(JSON.parse(json) as ProgressState)
   expect(useProgress.getState().xp).toBe(10)
 })
+
+test('completion is sticky when a bank grows', () => {
+  useProgress.getState().recordSolve('select-basics', 'sb-1', 10, 0, 2)
+  useProgress.getState().recordSolve('select-basics', 'sb-2', 10, 0, 2)
+  expect(useProgress.getState().skills['select-basics'].completed).toBe(true)
+  useProgress.getState().recordSolve('select-basics', 'sb-3', 10, 0, 4)
+  const sk = useProgress.getState().skills['select-basics']
+  expect(sk.completed).toBe(true)
+  expect(sk.mastery).toBe(3)
+  expect(sk.solved).toEqual(['sb-1', 'sb-2', 'sb-3'])
+})
+
+test('importState rejects malformed shapes', () => {
+  expect(() => useProgress.getState().importState({ version: 1 } as unknown as ProgressState)).toThrow()
+  expect(() => useProgress.getState().importState({ version: 1, xp: 'lots', streak: { count: 1, lastDay: '' }, skills: {} } as unknown as ProgressState)).toThrow()
+})
+
+test('hydrate treats a corrupt saved blob as empty', async () => {
+  const { set: idbSet } = await import('idb-keyval')
+  await idbSet('sql-quest-progress', { version: 1, xp: undefined })
+  await useProgress.getState().hydrate()
+  expect(useProgress.getState().xp).toBe(0)
+})
