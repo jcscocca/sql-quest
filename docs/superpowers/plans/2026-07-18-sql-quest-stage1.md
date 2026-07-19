@@ -94,7 +94,7 @@ export default defineConfig({
     "strict": true,
     "skipLibCheck": true,
     "noEmit": true,
-    "types": ["vite/client"]
+    "types": ["vite/client", "node"]
   },
   "include": ["src", "scripts", "e2e"]
 }

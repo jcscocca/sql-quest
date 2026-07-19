@@ -1,0 +1,92 @@
+{
+  "world": "pokemon",
+  "name": "Pokémon",
+  "tables": [
+    {
+      "name": "pokemon",
+      "description": "One row per Pokémon species (default form)",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "description": "National Pokédex number"
+        },
+        {
+          "name": "name",
+          "type": "VARCHAR",
+          "description": "Lowercase species name, e.g. pikachu"
+        },
+        {
+          "name": "generation",
+          "type": "INTEGER",
+          "description": "Game generation introduced (1–9)"
+        },
+        {
+          "name": "type1",
+          "type": "VARCHAR",
+          "description": "Primary type, e.g. fire"
+        },
+        {
+          "name": "type2",
+          "type": "VARCHAR",
+          "description": "Secondary type — NULL for single-typed Pokémon"
+        },
+        {
+          "name": "hp",
+          "type": "INTEGER",
+          "description": "Base HP stat"
+        },
+        {
+          "name": "attack",
+          "type": "INTEGER",
+          "description": "Base Attack stat"
+        },
+        {
+          "name": "defense",
+          "type": "INTEGER",
+          "description": "Base Defense stat"
+        },
+        {
+          "name": "special_attack",
+          "type": "INTEGER",
+          "description": "Base Special Attack stat"
+        },
+        {
+          "name": "special_defense",
+          "type": "INTEGER",
+          "description": "Base Special Defense stat"
+        },
+        {
+          "name": "speed",
+          "type": "INTEGER",
+          "description": "Base Speed stat"
+        },
+        {
+          "name": "total",
+          "type": "INTEGER",
+          "description": "Sum of all six base stats"
+        },
+        {
+          "name": "height_m",
+          "type": "DOUBLE",
+          "description": "Height in meters"
+        },
+        {
+          "name": "weight_kg",
+          "type": "DOUBLE",
+          "description": "Weight in kilograms"
+        },
+        {
+          "name": "is_legendary",
+          "type": "BOOLEAN",
+          "description": "True for legendary Pokémon"
+        },
+        {
+          "name": "evolves_from",
+          "type": "VARCHAR",
+          "description": "Name of the pre-evolution — NULL if none"
+        }
+      ]
+    }
+  ]
+}
