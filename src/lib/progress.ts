@@ -11,12 +11,18 @@ export interface SkillProgress {
   due?: string
 }
 
+export interface CollectionEntry {
+  world: string
+  name: string
+  label: string
+}
+
 export interface ProgressState {
   version: 1
   xp: number
   streak: Streak
   skills: Record<string, SkillProgress>
-  collection: string[]
+  collection: CollectionEntry[]
   badges: string[]
 }
 
@@ -29,7 +35,7 @@ interface ProgressStore extends ProgressState {
   hydrated: boolean
   hydrate(): Promise<void>
   recordSolve(skillId: string, exerciseId: string, baseXp: number, hintsUsed: number, bankSize: number): SolveResult
-  addCatches(names: string[]): string[]
+  addCatches(world: string, entries: { name: string; label: string }[]): CollectionEntry[]
   awardBadge(id: string): void
   recordReview(skillId: string, success: boolean): void
   recordReviewSolve(hintsUsed: number): number
@@ -68,10 +74,15 @@ function normalize(s: ProgressState): ProgressState {
         ? { ...sp, interval: FIRST_INTERVAL, due: today }
         : sp
   }
+  const collection: CollectionEntry[] = Array.isArray(s.collection)
+    ? s.collection.map(e =>
+        typeof e === 'string' ? { world: 'pokemon', name: e, label: '' } : (e as CollectionEntry),
+      )
+    : []
   return {
     ...s,
     skills,
-    collection: Array.isArray(s.collection) ? s.collection : [],
+    collection,
     badges: Array.isArray(s.badges) ? s.badges : [],
   }
 }
@@ -137,15 +148,16 @@ export const useProgress = create<ProgressStore>((set, get) => ({
     return { gained, newlyCompleted }
   },
 
-  addCatches(names) {
-    if (names.length === 0) return []
+  addCatches(world, entries) {
+    if (entries.length === 0) return []
     const s = get()
-    const fresh = names.filter(n => !s.collection.includes(n))
+    const fresh = entries.filter(e => !s.collection.some(c => c.world === world && c.name === e.name))
     if (fresh.length === 0) return []
-    const next: ProgressState = { ...dataOf(s), collection: [...s.collection, ...fresh] }
+    const tagged = fresh.map(e => ({ world, name: e.name, label: e.label }))
+    const next: ProgressState = { ...dataOf(s), collection: [...s.collection, ...tagged] }
     set(next)
     persist(next)
-    return fresh
+    return tagged
   },
 
   awardBadge(id) {

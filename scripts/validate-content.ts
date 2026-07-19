@@ -16,8 +16,10 @@ const db = await DuckDBInstance.create()
 const conn = await db.connect()
 
 const worlds = new Set(skills.map(s => s.world))
+const worldSchemas: Record<string, WorldSchema> = {}
 for (const w of worlds) {
   const schema = JSON.parse(readFileSync(`public/worlds/${w}/schema.json`, 'utf8')) as WorldSchema
+  worldSchemas[w] = schema
   for (const t of schema.tables)
     await conn.run(`CREATE OR REPLACE TABLE ${t.name} AS SELECT * FROM 'public/worlds/${w}/${t.name}.parquet'`)
   if (schema.entity) {
@@ -72,9 +74,16 @@ for (const skill of skills) {
             failures.push(`${tag}: hint SQL does not parse`),
           )
       }
-      for (const c of ex.collectibles ?? []) {
-        const hit = await run(`SELECT 1 FROM pokemon WHERE name = '${c.replace(/'/g, "''")}'`)
-        if (hit.rows.length === 0) failures.push(`${tag}: collectible "${c}" not found in world`)
+      if ((ex.collectibles ?? []).length > 0) {
+        const entity = worldSchemas[skill.world]?.entity
+        if (!entity) {
+          failures.push(`${tag}: world has no entity, collectibles not allowed`)
+        } else {
+          for (const c of ex.collectibles ?? []) {
+            const hit = await run(`SELECT 1 FROM ${entity.table} WHERE ${entity.column} = '${c.replace(/'/g, "''")}'`)
+            if (hit.rows.length === 0) failures.push(`${tag}: collectible "${c}" not found in world`)
+          }
+        }
       }
     } catch (e) {
       failures.push(`${tag}: reference query failed — ${e}`)

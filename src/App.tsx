@@ -55,7 +55,6 @@ export default function App() {
   if (view.screen === 'collection')
     return (
       <CollectionScreen
-        schema={content.schemas.pokemon}
         curriculum={content.curriculum}
         onBack={() => setView({ screen: 'home' })}
       />

@@ -1,31 +1,22 @@
-import { useEffect, useState } from 'react'
-import { loadWorld, runQuery } from '../lib/duckdb'
 import { useProgress } from '../lib/progress'
-import type { Curriculum, WorldSchema } from '../lib/content'
+import type { Curriculum } from '../lib/content'
 
-export function CollectionScreen({ schema, curriculum, onBack }: {
-  schema: WorldSchema
+const slugify = (s: string) =>
+  s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'unknown'
+
+export function CollectionScreen({ curriculum, onBack }: {
   curriculum: Curriculum
   onBack: () => void
 }) {
   const collection = useProgress(s => s.collection)
   const badges = useProgress(s => s.badges)
-  const [types, setTypes] = useState<Map<string, string> | null>(null)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    loadWorld(schema.world, schema.tables.map(t => t.name))
-      .then(async () => {
-        const r = await runQuery('SELECT name, type1 FROM pokemon')
-        setTypes(new Map(r.rows.map(row => [String(row[0]), String(row[1])])))
-      })
-      .catch(e => setError(String(e)))
-  }, [schema])
 
   const skillName = (id: string) =>
     curriculum.regions.flatMap(r => r.skills).find(s => s.id === id)?.name ?? id
   const regionName = (id: string) =>
     curriculum.regions.find(r => `region:${r.id}` === id)?.name ?? id.replace('region:', '')
+
+  const worlds = [...new Set(collection.map(e => e.world))].sort()
 
   return (
     <div className="collection">
@@ -42,17 +33,24 @@ export function CollectionScreen({ schema, curriculum, onBack }: {
           </span>
         ))}
       </section>
-      {error && <p className="muted">Could not load Pokémon details: {error}</p>}
-      <div className="collection-grid">
-        {[...collection].sort().map(name => (
-          <div key={name} className={`tile type-${types?.get(name) ?? 'unknown'}`}>
-            <span className="tile-name">{name}</span>
-            <span className="tile-type">{types?.get(name) ?? ''}</span>
+      {worlds.map(world => (
+        <section key={world} className="world-section">
+          <h3>{world.charAt(0).toUpperCase() + world.slice(1)}</h3>
+          <div className="collection-grid">
+            {collection
+              .filter(e => e.world === world)
+              .sort((a, b) => a.name.localeCompare(b.name))
+              .map(entry => (
+                <div key={`${entry.world}:${entry.name}`} className={`tile type-${slugify(entry.label)}`}>
+                  <span className="tile-name">{entry.name}</span>
+                  <span className="tile-type">{entry.label}</span>
+                </div>
+              ))}
           </div>
-        ))}
-      </div>
+        </section>
+      ))}
       {collection.length === 0 && (
-        <p className="muted">Solve exercises to catch the Pokémon your queries return.</p>
+        <p className="muted">Solve exercises to catch the collectibles your queries return.</p>
       )}
     </div>
   )

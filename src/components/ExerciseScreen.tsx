@@ -90,18 +90,29 @@ export function ExerciseScreen({ skill, bank, schema, region, onBack }: {
         let caught: string[] = []
         if (res.gained > 0 && schema.entity) {
           try {
-            let names = worldNames
-            if (!names) {
+            let nameSet = worldNames
+            if (!nameSet) {
               const r = await runQuery(
                 `SELECT DISTINCT ${schema.entity.column} FROM ${schema.entity.table}`,
               )
-              names = new Set(r.rows.map(row => String(row[0])))
-              setWorldNames(names)
+              nameSet = new Set(r.rows.map(row => String(row[0])))
+              setWorldNames(nameSet)
             }
-            const owned = new Set(useProgress.getState().collection)
-            caught = useProgress
-              .getState()
-              .addCatches(pickCatches(user, names, owned, ex.collectibles ?? []))
+            const owned = new Set(
+              useProgress.getState().collection.filter(c => c.world === skill.world).map(c => c.name),
+            )
+            const names = pickCatches(user, nameSet, owned, ex.collectibles ?? [])
+            let entries = names.map(n => ({ name: n, label: '' }))
+            if (names.length > 0 && schema.entity.labelColumn) {
+              const list = names.map(n => `'${n.replace(/'/g, "''")}'`).join(', ')
+              const lr = await runQuery(
+                `SELECT ${schema.entity.column}, ${schema.entity.labelColumn} FROM ${schema.entity.table} WHERE ${schema.entity.column} IN (${list})`,
+              )
+              const labels = new Map(lr.rows.map(r => [String(r[0]), String(r[1] ?? '')]))
+              entries = names.map(n => ({ name: n, label: labels.get(n) ?? '' }))
+            }
+            const tagged = useProgress.getState().addCatches(skill.world, entries)
+            caught = tagged.map(t => t.name)
             if (caught.length > 0) setSessionCatches(prev => [...prev, ...caught])
           } catch (err) {
             console.error('Catch check failed', err)

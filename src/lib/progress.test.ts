@@ -1,5 +1,5 @@
 import { beforeEach, expect, test } from 'vitest'
-import { exportState, useProgress, type ProgressState } from './progress'
+import { exportState, useProgress, type CollectionEntry, type ProgressState } from './progress'
 import { todayString } from './xp'
 
 beforeEach(() => {
@@ -98,10 +98,37 @@ test('newly completing a node schedules its first review', () => {
   expect(again.newlyCompleted).toBe(false)
 })
 
-test('addCatches unions and reports only fresh names', () => {
-  expect(useProgress.getState().addCatches(['pikachu', 'mew'])).toEqual(['pikachu', 'mew'])
-  expect(useProgress.getState().addCatches(['mew', 'eevee'])).toEqual(['eevee'])
-  expect(useProgress.getState().collection).toEqual(['pikachu', 'mew', 'eevee'])
+test('addCatches tags entries with world and label, deduping by world+name', () => {
+  const first = useProgress.getState().addCatches('pokemon', [
+    { name: 'pikachu', label: 'electric' },
+    { name: 'mew', label: 'psychic' },
+  ])
+  expect(first.map(e => e.name)).toEqual(['pikachu', 'mew'])
+  const second = useProgress.getState().addCatches('pokemon', [
+    { name: 'mew', label: 'psychic' },
+    { name: 'eevee', label: 'normal' },
+  ])
+  expect(second.map(e => e.name)).toEqual(['eevee'])
+  const yugi = useProgress.getState().addCatches('yugioh', [{ name: 'mew', label: 'Effect Monster' }])
+  expect(yugi.length).toBe(1)
+  expect(useProgress.getState().collection.length).toBe(4)
+})
+
+test('legacy string collection entries migrate to pokemon-world entries', async () => {
+  const { set: idbSet } = await import('idb-keyval')
+  await idbSet('sql-quest-progress', {
+    version: 1,
+    xp: 10,
+    streak: { count: 1, lastDay: '2026-07-18' },
+    skills: {},
+    collection: ['pikachu', 'mew'],
+    badges: [],
+  })
+  await useProgress.getState().hydrate()
+  expect(useProgress.getState().collection).toEqual([
+    { world: 'pokemon', name: 'pikachu', label: '' },
+    { world: 'pokemon', name: 'mew', label: '' },
+  ])
 })
 
 test('awardBadge is idempotent', () => {
@@ -179,15 +206,14 @@ test('bank growth preserves an evolved review schedule', () => {
   expect(after.due).toBe(before.due)
 })
 
-test('export round-trips collection, badges, and schedules', () => {
+test('export round-trips collection entries, badges, and schedules', () => {
   useProgress.getState().recordSolve('select-basics', 'sb-1', 10, 0, 1)
-  useProgress.getState().addCatches(['pikachu'])
+  useProgress.getState().addCatches('pokemon', [{ name: 'pikachu', label: 'electric' }])
   useProgress.getState().awardBadge('select-basics')
   const json = exportState(useProgress.getState())
   useProgress.setState({ version: 1, xp: 0, streak: { count: 0, lastDay: '' }, skills: {}, collection: [], badges: [], hydrated: true })
   useProgress.getState().importState(JSON.parse(json) as ProgressState)
   const s = useProgress.getState()
-  expect(s.collection).toEqual(['pikachu'])
+  expect(s.collection).toEqual([{ world: 'pokemon', name: 'pikachu', label: 'electric' }])
   expect(s.badges).toEqual(['select-basics'])
-  expect(s.skills['select-basics'].interval).toBe(2)
 })

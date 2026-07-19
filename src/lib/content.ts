@@ -2,7 +2,7 @@ export interface WorldSchema {
   world: string
   name: string
   tables: TableSchema[]
-  entity?: { table: string; column: string }
+  entity?: { table: string; column: string; labelColumn?: string }
 }
 
 export interface TableSchema {
@@ -18,6 +18,7 @@ export interface Curriculum {
 export interface Region {
   id: string
   name: string
+  world?: string
   skills: Skill[]
 }
 
