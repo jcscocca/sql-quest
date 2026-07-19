@@ -44,17 +44,24 @@ const raw = JSON.parse(readFileSync(rawPath, 'utf8')) as Ygoprodeck
 
 const cards = raw.data.filter(c => !EXCLUDED_TYPES.has(c.type))
 
-const cardsOut = cards.map(c => ({
-  id: c.id,
-  name: c.name,
-  type: c.type,
-  race: c.race,
-  attribute: c.attribute ?? null,
-  atk: c.atk ?? null,
-  def: c.def ?? null,
-  level: c.level ?? null,
-  archetype: c.archetype ?? null,
-}))
+// Upstream quirks cleaned so the schema's NULL invariants hold: Link Monsters
+// have no Level or DEF in the game but the API leaves legacy 0s on some; -1 is
+// the API's sentinel for the "?" variable stat.
+const cardsOut = cards.map(c => {
+  const isLink = c.type === 'Link Monster'
+  const stat = (v: number | null | undefined) => (v === -1 ? null : (v ?? null))
+  return {
+    id: c.id,
+    name: c.name,
+    type: c.type,
+    race: c.race,
+    attribute: c.attribute ?? null,
+    atk: stat(c.atk),
+    def: isLink ? null : stat(c.def),
+    level: isLink ? null : (c.level ?? null),
+    archetype: c.archetype ?? null,
+  }
+})
 
 const cardSetsOut: { card_id: number; set_name: string; set_code: string; rarity: string }[] = []
 for (const c of cards) {
@@ -129,8 +136,8 @@ const schema = {
           description: "Monster type for monsters (e.g. Spellcaster, Dragon) or subtype for Spell/Trap cards (e.g. Continuous, Quick-Play)",
         },
         { name: 'attribute', type: 'VARCHAR', description: 'Monster attribute, e.g. DARK, LIGHT — NULL for Spell/Trap cards' },
-        { name: 'atk', type: 'BIGINT', description: 'Attack points — NULL for Spell/Trap cards' },
-        { name: 'def', type: 'BIGINT', description: 'Defense points — NULL for Spell/Trap cards and Link Monsters (which have no DEF)' },
+        { name: 'atk', type: 'BIGINT', description: "Attack points — NULL for Spell/Trap cards and for '?' variable-ATK monsters" },
+        { name: 'def', type: 'BIGINT', description: "Defense points — NULL for Spell/Trap cards, Link Monsters, and '?' variable-DEF monsters" },
         { name: 'level', type: 'BIGINT', description: 'Level or Rank — NULL for Spell/Trap cards and Link Monsters' },
         { name: 'archetype', type: 'VARCHAR', description: "Card series/archetype, e.g. 'Dark Magician' — NULL if the card belongs to none" },
       ],

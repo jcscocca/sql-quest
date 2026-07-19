@@ -39,12 +39,12 @@
         {
           "name": "atk",
           "type": "BIGINT",
-          "description": "Attack points — NULL for Spell/Trap cards"
+          "description": "Attack points — NULL for Spell/Trap cards and for '?' variable-ATK monsters"
         },
         {
           "name": "def",
           "type": "BIGINT",
-          "description": "Defense points — NULL for Spell/Trap cards and Link Monsters (which have no DEF)"
+          "description": "Defense points — NULL for Spell/Trap cards, Link Monsters, and '?' variable-DEF monsters"
         },
         {
           "name": "level",
