@@ -1,0 +1,109 @@
+{
+  "world": "yugioh",
+  "name": "Yu-Gi-Oh!",
+  "entity": {
+    "table": "cards",
+    "column": "name",
+    "labelColumn": "type"
+  },
+  "tables": [
+    {
+      "name": "cards",
+      "description": "One row per Yu-Gi-Oh! trading card (excludes Tokens and Duel Links Skill Cards)",
+      "columns": [
+        {
+          "name": "id",
+          "type": "BIGINT",
+          "description": "Unique card passcode"
+        },
+        {
+          "name": "name",
+          "type": "VARCHAR",
+          "description": "Card name, e.g. Dark Magician"
+        },
+        {
+          "name": "type",
+          "type": "VARCHAR",
+          "description": "Card type, e.g. 'Normal Monster', 'Spell Card', 'Trap Card'"
+        },
+        {
+          "name": "race",
+          "type": "VARCHAR",
+          "description": "Monster type for monsters (e.g. Spellcaster, Dragon) or subtype for Spell/Trap cards (e.g. Continuous, Quick-Play)"
+        },
+        {
+          "name": "attribute",
+          "type": "VARCHAR",
+          "description": "Monster attribute, e.g. DARK, LIGHT — NULL for Spell/Trap cards"
+        },
+        {
+          "name": "atk",
+          "type": "BIGINT",
+          "description": "Attack points — NULL for Spell/Trap cards"
+        },
+        {
+          "name": "def",
+          "type": "BIGINT",
+          "description": "Defense points — NULL for Spell/Trap cards and Link Monsters (which have no DEF)"
+        },
+        {
+          "name": "level",
+          "type": "BIGINT",
+          "description": "Level or Rank — NULL for Spell/Trap cards and Link Monsters"
+        },
+        {
+          "name": "archetype",
+          "type": "VARCHAR",
+          "description": "Card series/archetype, e.g. 'Dark Magician' — NULL if the card belongs to none"
+        }
+      ]
+    },
+    {
+      "name": "card_sets",
+      "description": "One row per (card, printing) — a card reprinted in multiple sets or rarities has multiple rows",
+      "columns": [
+        {
+          "name": "card_id",
+          "type": "BIGINT",
+          "description": "References cards.id"
+        },
+        {
+          "name": "set_name",
+          "type": "VARCHAR",
+          "description": "Name of the set the card was printed in, e.g. Legend of Blue Eyes White Dragon"
+        },
+        {
+          "name": "set_code",
+          "type": "VARCHAR",
+          "description": "Print code, e.g. LOB-005"
+        },
+        {
+          "name": "rarity",
+          "type": "VARCHAR",
+          "description": "Print rarity, e.g. Ultra Rare"
+        }
+      ]
+    },
+    {
+      "name": "banlist",
+      "description": "Restricted-card list entries — only cards that are Forbidden, Limited, or Semi-Limited in a format appear here",
+      "columns": [
+        {
+          "name": "card_id",
+          "type": "BIGINT",
+          "description": "References cards.id"
+        },
+        {
+          "name": "format",
+          "type": "VARCHAR",
+          "description": "Competitive format: 'tcg' or 'ocg'"
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR",
+          "description": "Restriction status: 'Forbidden' (0 copies), 'Limited' (1 copy), or 'Semi-Limited' (2 copies)"
+        }
+      ]
+    }
+  ]
+}
