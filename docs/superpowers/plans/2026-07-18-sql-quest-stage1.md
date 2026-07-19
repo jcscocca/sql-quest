@@ -140,7 +140,15 @@ body { font-family: system-ui, sans-serif; }
 `src/test-setup.ts`:
 ```ts
 import 'fake-indexeddb/auto'
+import { clear } from 'idb-keyval'
+import { beforeEach } from 'vitest'
+
+beforeEach(async () => {
+  await clear()
+})
 ```
+
+The beforeEach clear gives every test file IndexedDB isolation — idb-keyval caches its connection as a module singleton, so swapping globalThis.indexedDB between tests does not work.
 
 Append to `.gitignore`:
 ```
