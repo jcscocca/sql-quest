@@ -61,9 +61,16 @@ export async function runQuery(sql: string): Promise<QueryResult> {
     const vec = table.getChildAt(c)
     const t = table.schema.fields[c].type as { scale?: number; precision?: number }
     const scale = typeof t.scale === 'number' && typeof t.precision === 'number' ? t.scale : null
+    const typeName = String(table.schema.fields[c].type)
+    const temporal = /^Date/.test(typeName) ? 'date' : /^Timestamp/.test(typeName) ? 'timestamp' : null
     for (let r = 0; r < table.numRows; r++) {
       const raw = vec?.get(r) ?? null
-      rows[r].push(scale !== null && raw !== null ? decimalToNumber(raw, scale) : raw)
+      if (raw === null) rows[r].push(null)
+      else if (scale !== null) rows[r].push(decimalToNumber(raw, scale))
+      else if (temporal === 'date') rows[r].push(new Date(Number(raw)).toISOString().slice(0, 10))
+      else if (temporal === 'timestamp')
+        rows[r].push(new Date(Number(raw)).toISOString().slice(0, 19).replace('T', ' '))
+      else rows[r].push(raw)
     }
   }
   return { columns, rows }
