@@ -5,18 +5,20 @@ import { SchemaBrowser } from './SchemaBrowser'
 import { compareResults, type QueryResult } from '../lib/compare'
 import { loadWorld, runQuery } from '../lib/duckdb'
 import { translateError, TrainerError } from '../lib/errors'
+import { pickCatches } from '../lib/catches'
 import { useProgress } from '../lib/progress'
-import type { ExerciseBank, Skill, WorldSchema } from '../lib/content'
+import type { ExerciseBank, Region, Skill, WorldSchema } from '../lib/content'
 
 type Feedback =
-  | { kind: 'success'; gained: number }
+  | { kind: 'success'; gained: number; caught: string[]; finished: boolean }
   | { kind: 'wrong'; message: string }
   | { kind: 'error'; friendly: string | null; raw: string }
 
-export function ExerciseScreen({ skill, bank, schema, onBack }: {
+export function ExerciseScreen({ skill, bank, schema, region, onBack }: {
   skill: Skill
   bank: ExerciseBank
   schema: WorldSchema
+  region: Region
   onBack: () => void
 }) {
   const progress = useProgress()
@@ -32,13 +34,22 @@ export function ExerciseScreen({ skill, bank, schema, onBack }: {
   const [feedback, setFeedback] = useState<Feedback | null>(null)
   const [hintsShown, setHintsShown] = useState(0)
   const refCache = useRef(new Map<string, QueryResult>())
+  const [worldNames, setWorldNames] = useState<Set<string> | null>(null)
+  const [sessionCatches, setSessionCatches] = useState<string[]>([])
+  const [completion, setCompletion] = useState<{ catches: string[] } | null>(null)
 
   const ex = bank.exercises[idx]
   const exSolved = solved.includes(ex.id)
 
   useEffect(() => {
     loadWorld(schema.world, schema.tables.map(t => t.name))
-      .then(() => setEngineReady(true))
+      .then(async () => {
+        setEngineReady(true)
+        if (schema.entity) {
+          const r = await runQuery(`SELECT DISTINCT ${schema.entity.column} FROM ${schema.entity.table}`)
+          setWorldNames(new Set(r.rows.map(row => String(row[0]))))
+        }
+      })
       .catch(e => setEngineError(String(e)))
   }, [schema])
 
@@ -73,10 +84,23 @@ export function ExerciseScreen({ skill, bank, schema, onBack }: {
       }
       const outcome = compareResults(user, ref, { orderMatters: ex.orderMatters })
       if (outcome.equal) {
-        const gained = useProgress
+        const res = useProgress
           .getState()
-          .recordSolve(skill.id, ex.id, ex.xp, hintsShown, bank.exercises.length).gained
-        setFeedback({ kind: 'success', gained })
+          .recordSolve(skill.id, ex.id, ex.xp, hintsShown, bank.exercises.length)
+        let caught: string[] = []
+        if (res.gained > 0 && worldNames) {
+          const owned = new Set(useProgress.getState().collection)
+          caught = useProgress
+            .getState()
+            .addCatches(pickCatches(user, worldNames, owned, ex.collectibles ?? []))
+          if (caught.length > 0) setSessionCatches(prev => [...prev, ...caught])
+        }
+        if (res.newlyCompleted) {
+          useProgress.getState().awardBadge(skill.id)
+          if (region.skills.every(sk => useProgress.getState().skills[sk.id]?.completed))
+            useProgress.getState().awardBadge(`region:${region.id}`)
+        }
+        setFeedback({ kind: 'success', gained: res.gained, caught, finished: res.newlyCompleted })
       } else {
         setFeedback({ kind: 'wrong', message: `Not quite — ${outcome.reason}. Check the grid and try again.` })
       }
@@ -126,6 +150,20 @@ export function ExerciseScreen({ skill, bank, schema, onBack }: {
     )
   }
 
+  if (completion) {
+    return (
+      <div className="lesson completion-card">
+        <h2>🏅 {skill.name} complete!</h2>
+        {skill.lesson.wrapUp && <p>{skill.lesson.wrapUp}</p>}
+        <p>
+          Badge earned: <strong>{skill.name}</strong>
+        </p>
+        {completion.catches.length > 0 && <p>Caught this node: {completion.catches.join(', ')}</p>}
+        <button onClick={onBack}>Back to map</button>
+      </div>
+    )
+  }
+
   return (
     <div className="exercise">
       <header className="topbar">
@@ -171,7 +209,14 @@ export function ExerciseScreen({ skill, bank, schema, onBack }: {
           {feedback?.kind === 'success' && (
             <div className="feedback success">
               ✓ Correct! {feedback.gained > 0 ? `+${feedback.gained} XP` : 'Already solved — no XP this time.'}
-              <button onClick={advance}>Next →</button>
+              {feedback.caught.length > 0 && (
+                <span className="catch-chip">Caught: {feedback.caught.join(', ')}!</span>
+              )}
+              {feedback.finished ? (
+                <button onClick={() => setCompletion({ catches: sessionCatches })}>Finish node →</button>
+              ) : (
+                <button onClick={advance}>Next →</button>
+              )}
             </div>
           )}
           {feedback?.kind === 'wrong' && <div className="feedback wrong">{feedback.message}</div>}

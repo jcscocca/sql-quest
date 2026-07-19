@@ -35,12 +35,14 @@ export default function App() {
   if (view.screen === 'exercise') {
     const skill = content.curriculum.regions.flatMap(r => r.skills).find(s => s.id === view.skillId)
     if (!skill) return <div className="load-error">Unknown skill: {view.skillId}</div>
+    const region = content.curriculum.regions.find(r => r.skills.some(s => s.id === view.skillId))!
     return (
       <ExerciseScreen
         key={skill.id}
         skill={skill}
         bank={content.banks[skill.id]}
         schema={content.schemas[skill.world]}
+        region={region}
         onBack={() => setView({ screen: 'home' })}
       />
     )
