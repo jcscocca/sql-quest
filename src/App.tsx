@@ -2,8 +2,11 @@ import { useEffect, useState } from 'react'
 import { HomeScreen } from './components/HomeScreen'
 import { ExerciseScreen } from './components/ExerciseScreen'
 import { CollectionScreen } from './components/CollectionScreen'
+import { ReviewScreen } from './components/ReviewScreen'
 import { loadJson, type Curriculum, type ExerciseBank, type WorldSchema } from './lib/content'
 import { useProgress } from './lib/progress'
+import { assembleReview, displayedMastery, type ReviewItem } from './lib/review'
+import { todayString } from './lib/xp'
 
 interface Content {
   curriculum: Curriculum
@@ -11,13 +14,18 @@ interface Content {
   schemas: Record<string, WorldSchema>
 }
 
-type View = { screen: 'home' } | { screen: 'exercise'; skillId: string } | { screen: 'collection' }
+type View =
+  | { screen: 'home' }
+  | { screen: 'exercise'; skillId: string }
+  | { screen: 'collection' }
+  | { screen: 'review'; items: ReviewItem[] }
 
 export default function App() {
   const [content, setContent] = useState<Content | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [view, setView] = useState<View>({ screen: 'home' })
   const hydrated = useProgress(s => s.hydrated)
+  const skills = useProgress(s => s.skills)
 
   useEffect(() => {
     void useProgress.getState().hydrate()
@@ -42,6 +50,16 @@ export default function App() {
       />
     )
 
+  if (view.screen === 'review')
+    return (
+      <ReviewScreen
+        items={view.items}
+        schemas={content.schemas}
+        curriculum={content.curriculum}
+        onDone={() => setView({ screen: 'home' })}
+      />
+    )
+
   if (view.screen === 'exercise') {
     const skill = content.curriculum.regions.flatMap(r => r.skills).find(s => s.id === view.skillId)
     if (!skill) return <div className="load-error">Unknown skill: {view.skillId}</div>
@@ -57,11 +75,25 @@ export default function App() {
       />
     )
   }
+  const today = todayString()
+  const reviewItems = assembleReview(skills, content.banks, today)
+  const allSkills = content.curriculum.regions.flatMap(r => r.skills)
+  let rustiest: { name: string; from: number; to: number } | null = null
+  for (const sk of allSkills) {
+    const sp = skills[sk.id]
+    if (!sp?.completed) continue
+    const shown = displayedMastery(sp, today)
+    if (shown < sp.mastery && (!rustiest || sp.mastery - shown > rustiest.from - rustiest.to))
+      rustiest = { name: sk.name, from: sp.mastery, to: shown }
+  }
   return (
     <HomeScreen
       curriculum={content.curriculum}
       onOpenSkill={skillId => setView({ screen: 'exercise', skillId })}
       onOpenCollection={() => setView({ screen: 'collection' })}
+      reviewCount={reviewItems.length}
+      rustiest={rustiest}
+      onStartReview={() => setView({ screen: 'review', items: reviewItems })}
     />
   )
 }

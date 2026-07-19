@@ -2,10 +2,13 @@ import { useRef } from 'react'
 import type { Curriculum } from '../lib/content'
 import { exportState, useProgress, type ProgressState } from '../lib/progress'
 
-export function HomeScreen({ curriculum, onOpenSkill, onOpenCollection }: {
+export function HomeScreen({ curriculum, onOpenSkill, onOpenCollection, reviewCount, rustiest, onStartReview }: {
   curriculum: Curriculum
   onOpenSkill: (skillId: string) => void
   onOpenCollection: () => void
+  reviewCount: number
+  rustiest: { name: string; from: number; to: number } | null
+  onStartReview: () => void
 }) {
   const progress = useProgress()
   const fileRef = useRef<HTMLInputElement>(null)
@@ -53,6 +56,17 @@ export function HomeScreen({ curriculum, onOpenSkill, onOpenCollection }: {
           />
         </div>
       </header>
+      {reviewCount > 0 && (
+        <div className="review-callout">
+          <strong>📅 Daily Review — {reviewCount} drill{reviewCount === 1 ? '' : 's'} ready</strong>
+          {rustiest && (
+            <span>
+              {' '}· {rustiest.name} is getting rusty ({rustiest.from}→{rustiest.to})
+            </span>
+          )}
+          <button onClick={onStartReview}>Start review</button>
+        </div>
+      )}
       {curriculum.regions.map(region => (
         <section key={region.id} className="region">
           <h2>{region.name}</h2>
