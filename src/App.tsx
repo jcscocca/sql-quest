@@ -56,6 +56,7 @@ export default function App() {
     return (
       <CollectionScreen
         curriculum={content.curriculum}
+        worldNames={Object.fromEntries(Object.entries(content.schemas).map(([w, s]) => [w, s.name]))}
         onBack={() => setView({ screen: 'home' })}
       />
     )

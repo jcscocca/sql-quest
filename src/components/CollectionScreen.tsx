@@ -4,8 +4,9 @@ import type { Curriculum } from '../lib/content'
 const slugify = (s: string) =>
   s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'unknown'
 
-export function CollectionScreen({ curriculum, onBack }: {
+export function CollectionScreen({ curriculum, worldNames, onBack }: {
   curriculum: Curriculum
+  worldNames: Record<string, string>
   onBack: () => void
 }) {
   const collection = useProgress(s => s.collection)
@@ -35,7 +36,7 @@ export function CollectionScreen({ curriculum, onBack }: {
       </section>
       {worlds.map(world => (
         <section key={world} className="world-section">
-          <h3>{world.charAt(0).toUpperCase() + world.slice(1)}</h3>
+          <h3>{worldNames[world] ?? world.charAt(0).toUpperCase() + world.slice(1)}</h3>
           <div className="collection-grid">
             {collection
               .filter(e => e.world === world)
