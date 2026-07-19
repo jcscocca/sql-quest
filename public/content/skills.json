@@ -257,6 +257,46 @@
           }
         }
       ]
+    },
+    {
+      "id": "boss",
+      "name": "Boss Arenas",
+      "world": "seattle311",
+      "skills": [
+        {
+          "id": "arena-yugioh",
+          "name": "Arena: Duelist Analytics",
+          "world": "yugioh",
+          "requires": ["recursive-cte", "window-frames", "window-offsets"],
+          "lesson": {
+            "intro": "This is an arena: no new syntax, just the full case. You are the analyst for a Yu-Gi-Oh! tournament committee weighing banlist changes, and every question here is a real report spanning the three tables you already know — cards, card_sets, and banlist. Expect to decompose each one: a CTE or two to build the clean working set (say, TCG banlist entries joined to their archetypes), conditional tallies with SUM(CASE WHEN ...), and a window like RANK() OVER (ORDER BY ...) to place each row against its peers. Nothing below needs a tool you haven't already mastered across Shaping, Combining, and Analyst Power — the whole challenge is composing them. Read the goal, name your steps, then build.",
+            "exampleSql": "WITH tcg_bans AS (SELECT c.archetype, b.status FROM cards c JOIN banlist b ON c.id = b.card_id WHERE b.format = 'tcg' AND c.archetype IS NOT NULL) SELECT archetype, COUNT(*) AS entries, RANK() OVER (ORDER BY COUNT(*) DESC) AS pressure_rank FROM tcg_bans GROUP BY archetype HAVING COUNT(*) >= 3 ORDER BY entries DESC, archetype",
+            "wrapUp": "Case closed. You turned three flat tables into a banlist-pressure briefing by composing joins, conditional aggregation, and windows — the exact workflow a working analyst runs. The syntax was never the hard part; choosing which intermediate results to build was. Carry that decomposition instinct into the next arena."
+          }
+        },
+        {
+          "id": "arena-movies",
+          "name": "Arena: Studio Greenlight",
+          "world": "movies",
+          "requires": ["recursive-cte", "window-frames", "window-offsets"],
+          "lesson": {
+            "intro": "Another arena, another real brief. You are the data analyst in a film studio's greenlight meeting, scoring catalog titles for remakes and sequels from the movies, ratings, and tags tables. Every question is a small case study: a stated goal, hard constraints — almost always a num_ratings floor so a single stray vote can't crown a 5.0 — and an exact output shape. You'll lean on CTEs to stage the eligible pool, window functions to rank films within their genre or compare a decade to the one before it, and CASE to turn scores into greenlight tiers. You have the whole toolkit; decompose the goal into named steps and go.",
+            "exampleSql": "WITH eligible AS (SELECT m.movie_id, m.genre1, m.title, r.avg_rating, r.num_ratings FROM movies m JOIN ratings r ON m.movie_id = r.movie_id WHERE r.num_ratings >= 50 AND m.genre1 IS NOT NULL) SELECT genre1, title, avg_rating, ROW_NUMBER() OVER (PARTITION BY genre1 ORDER BY avg_rating DESC, num_ratings DESC, title, movie_id) AS genre_rank FROM eligible ORDER BY genre1, genre_rank LIMIT 10",
+            "wrapUp": "Case closed. Rating floors kept the sample honest, CTEs staged the eligible slate, and windows plus CASE turned raw averages into a ranked, tiered greenlight board. That is analytics in production: the judgment lives in the constraints you set and the steps you name, not in any single clause. One arena remains."
+          }
+        },
+        {
+          "id": "arena-seattle",
+          "name": "Arena: City Dispatch",
+          "world": "seattle311",
+          "requires": ["recursive-cte", "window-frames", "window-offsets"],
+          "lesson": {
+            "intro": "The final arena, and a purely operational one. You are the analyst in Seattle's 311 dispatch center, and the requests table is your entire world — one row per service request, with a created_date but no closure date, so every question here is a time series. Bucket requests into days, weeks, or months with DATE_TRUNC; then reach across rows with LAG for period-over-period change, aggregate a sliding band with a ROWS BETWEEN frame for rolling averages, and rank or bucket departments and neighborhoods with windows and CASE. Remember the frame trap you learned: WHERE runs before a window, so compute rolling metrics over the full series in a CTE and filter to your display range afterward. No entities to collect here — the badge is the prize. Read the brief and build.",
+            "exampleSql": "WITH daily AS (SELECT created_date AS dt, COUNT(*) AS reqs FROM requests GROUP BY created_date) SELECT dt, reqs, ROUND(AVG(reqs) OVER (ORDER BY dt ROWS BETWEEN 6 PRECEDING AND CURRENT ROW), 2) AS rolling_7d FROM daily ORDER BY dt LIMIT 10",
+            "wrapUp": "Case closed, and with it the whole campaign. You smoothed noisy daily counts into rolling averages, measured momentum with LAG, and ranked departments and neighborhoods into severity tiers — the standard toolkit of an operations analyst, composed under real constraints. You began with SELECT and FROM; you now decompose open-ended business questions into staged, windowed, deterministic queries. That is the difference between knowing SQL and analyzing with it. Well dueled."
+          }
+        }
+      ]
     }
   ]
 }
