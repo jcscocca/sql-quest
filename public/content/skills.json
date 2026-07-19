@@ -199,28 +199,28 @@
     {
       "id": "analyst",
       "name": "Analyst Power",
-      "world": "movies",
+      "world": "digimon",
       "skills": [
         {
           "id": "cte",
           "name": "CTEs",
-          "world": "movies",
+          "world": "digimon",
           "requires": ["correlated-subqueries"],
           "lesson": {
-            "intro": "A CTE (Common Table Expression) is a named query you define with WITH before your main query, letting you build a result in readable, reusable steps instead of one dense nested statement. In the Movies world you might name a step genre_avg that joins movies to ratings and computes each genre1's mean avg_rating, then SELECT from it as if it were a table — even joining it back to movies to compare each film against its own genre. You can chain several CTEs separated by commas, and each may reference the ones before it, so a three-part question becomes three plainly named steps. Because ratings only exist for movies that received at least one rating, joining movies to ratings inside a CTE and applying a num_ratings floor is the honest way to keep a single stray vote from crowning a 5.0.",
-            "exampleSql": "WITH genre_avg AS (SELECT m.genre1, AVG(r.avg_rating) AS genre_mean FROM movies m JOIN ratings r ON m.movie_id = r.movie_id WHERE r.num_ratings >= 20 AND m.genre1 IS NOT NULL GROUP BY m.genre1) SELECT genre1, ROUND(genre_mean, 2) AS genre_mean FROM genre_avg ORDER BY genre_mean DESC",
-            "wrapUp": "A CTE names an intermediate result so a complex question reads as a sequence of clear steps — and unlike a subquery buried in a WHERE, it can be joined, reused, and stacked. This is the readable backbone of every analytical query to come. Next you'll add window functions, which compute across rows without collapsing them — starting by ranking films inside their genre."
+            "intro": "A CTE (Common Table Expression) is a named query you define with WITH before your main query, letting you build a result in readable, reusable steps instead of one dense nested statement. In the Digimon world you might name a step vaccine_mon that selects every Digimon whose attribute is 'Vaccine', then SELECT from it as if it were a table — even joining it to the evolutions table on id = from_id to trace what those Digimon evolve into. You can chain several CTEs separated by commas, and each may reference the ones before it, so a three-part question becomes three plainly named steps. Because a CTE can hold a grouped, aggregated result, you can count Digimon per attribute in one step and then keep only the crowded attributes in the next — filtering on a count that didn't exist until the group was formed.",
+            "exampleSql": "WITH by_attribute AS (SELECT attribute, COUNT(*) AS digimon_count FROM digimon WHERE attribute IS NOT NULL GROUP BY attribute) SELECT attribute, digimon_count FROM by_attribute WHERE digimon_count >= 100 ORDER BY digimon_count DESC, attribute",
+            "wrapUp": "A CTE names an intermediate result so a complex question reads as a sequence of clear steps — and unlike a subquery buried in a WHERE, it can be joined, reused, and stacked. This is the readable backbone of every analytical query to come. Next you'll add window functions, which compute across rows without collapsing them — starting by ranking Digimon within their own attribute or level."
           }
         },
         {
           "id": "window-ranking",
           "name": "Window Ranking",
-          "world": "movies",
+          "world": "digimon",
           "requires": ["cte"],
           "lesson": {
-            "intro": "A window function computes across a set of related rows while keeping every row — no collapsing the way GROUP BY does. RANK(), DENSE_RANK(), and ROW_NUMBER() each number rows within a partition defined by OVER (PARTITION BY ... ORDER BY ...): here, PARTITION BY genre1 ORDER BY avg_rating DESC ranks each film against others in its own genre. The three differ only in how they treat ties: ROW_NUMBER always gives distinct numbers (1, 2, 3, 4), RANK lets ties share a number then skips the next (1, 1, 3), and DENSE_RANK shares without skipping (1, 1, 2). Because a window function can't sit in a WHERE clause, you compute it in a CTE and filter on the result — that's how 'top 3 per genre' is done. And since rating ties are everywhere in this data, add tiebreakers like num_ratings DESC, title, movie_id inside the OVER clause when you need one definite winner.",
-            "exampleSql": "WITH ranked AS (SELECT m.genre1, m.title, r.avg_rating, ROW_NUMBER() OVER (PARTITION BY m.genre1 ORDER BY r.avg_rating DESC, r.num_ratings DESC, m.title, m.movie_id) AS rn FROM movies m JOIN ratings r ON m.movie_id = r.movie_id WHERE r.num_ratings >= 20 AND m.genre1 IS NOT NULL) SELECT genre1, title, avg_rating FROM ranked WHERE rn = 1 ORDER BY genre1",
-            "wrapUp": "Ranking windows number rows within a partition, and the choice between ROW_NUMBER, RANK, and DENSE_RANK is entirely about how ties are handled. Filter the ranked result in an outer query to get 'top N per group', and pin tiebreakers inside OVER so the winner is never left to chance. Next you'll shift from ranking to reaching across rows — comparing each period to the one before it with LAG and LEAD."
+            "intro": "A window function computes across a set of related rows while keeping every row — no collapsing the way GROUP BY does. RANK(), DENSE_RANK(), and ROW_NUMBER() each number rows within a partition defined by OVER (PARTITION BY ... ORDER BY ...): here, PARTITION BY attribute ORDER BY release_year DESC ranks each Digimon against others sharing its attribute, newest first. The three differ only in how they treat ties: ROW_NUMBER always gives distinct numbers (1, 2, 3, 4), RANK lets ties share a number then skips the next (1, 1, 3), and DENSE_RANK shares without skipping (1, 1, 2); NTILE(4) instead slices the ordered rows into four roughly equal buckets, the tool for quartiles. Because a window function can't sit in a WHERE clause, you compute it in a CTE and filter on the result — that's how 'the newest Digimon per attribute' or 'top 3 per level' is done. And since many Digimon share a release_year, add a tiebreaker like name inside the OVER clause when you need one definite ordering.",
+            "exampleSql": "WITH ranked AS (SELECT attribute, name, release_year, ROW_NUMBER() OVER (PARTITION BY attribute ORDER BY release_year DESC, name) AS recency_rank FROM digimon WHERE attribute IS NOT NULL) SELECT attribute, name, release_year FROM ranked WHERE recency_rank = 1 ORDER BY attribute",
+            "wrapUp": "Ranking windows number rows within a partition, and the choice between ROW_NUMBER, RANK, and DENSE_RANK is entirely about how ties are handled, while NTILE splits an ordering into buckets. Filter the ranked result in an outer query to get 'top N per group', and pin tiebreakers inside OVER so the ordering is never left to chance. Next you'll shift from ranking to reaching across rows — comparing each period to the one before it with LAG and LEAD over Seattle's 311 service requests."
           }
         },
         {
@@ -275,14 +275,14 @@
           }
         },
         {
-          "id": "arena-movies",
-          "name": "Arena: Studio Greenlight",
-          "world": "movies",
+          "id": "arena-digimon",
+          "name": "Digimon Arena",
+          "world": "digimon",
           "requires": ["recursive-cte", "window-frames", "window-offsets"],
           "lesson": {
-            "intro": "Another arena, another real brief. You are the data analyst in a film studio's greenlight meeting, scoring catalog titles for remakes and sequels from the movies, ratings, and tags tables. Every question is a small case study: a stated goal, hard constraints — almost always a num_ratings floor so a single stray vote can't crown a 5.0 — and an exact output shape. You'll lean on CTEs to stage the eligible pool, window functions to rank films within their genre or compare a decade to the one before it, and CASE to turn scores into greenlight tiers. You have the whole toolkit; decompose the goal into named steps and go.",
-            "exampleSql": "WITH eligible AS (SELECT m.movie_id, m.genre1, m.title, r.avg_rating, r.num_ratings FROM movies m JOIN ratings r ON m.movie_id = r.movie_id WHERE r.num_ratings >= 50 AND m.genre1 IS NOT NULL) SELECT genre1, title, avg_rating, ROW_NUMBER() OVER (PARTITION BY genre1 ORDER BY avg_rating DESC, num_ratings DESC, title, movie_id) AS genre_rank FROM eligible ORDER BY genre1, genre_rank LIMIT 10",
-            "wrapUp": "Case closed. Rating floors kept the sample honest, CTEs staged the eligible slate, and windows plus CASE turned raw averages into a ranked, tiered greenlight board. That is analytics in production: the judgment lives in the constraints you set and the steps you name, not in any single clause. One arena remains."
+            "intro": "Another arena, another real brief. You are the curator of the Digimon Analyzer, the field-guide database behind every Digivice, and each question here is a completion report spanning the two tables you know — digimon (one row per Digimon, with its level, type, attribute, x_antibody flag, and release_year) and evolutions (directed edges from one form to its possible next forms). Every question is a small case study: a stated goal, hard constraints, and an exact output shape. You'll lean on CTEs to stage the working set, conditional tallies with SUM(CASE WHEN ...), joins across the evolution graph, and window functions to rank Digimon within their attribute or to reach from one debut year to the next. One caution: the evolution graph contains cycles, so there is no recursive walk to attempt — the whole challenge is composing joins, aggregation, and windows. Decompose the goal into named steps and go.",
+            "exampleSql": "WITH stats AS (SELECT attribute, COUNT(*) AS total, SUM(CASE WHEN x_antibody THEN 1 ELSE 0 END) AS x_variants FROM digimon WHERE attribute IS NOT NULL GROUP BY attribute HAVING COUNT(*) >= 20) SELECT attribute, total, x_variants, RANK() OVER (ORDER BY total DESC) AS roster_rank FROM stats ORDER BY total DESC, attribute",
+            "wrapUp": "Case closed. You turned two flat tables into a field-guide completion briefing by composing joins across the evolution graph, conditional aggregation, and windows — the exact workflow a working analyst runs. The syntax was never the hard part; choosing which intermediate results to build was. One arena remains."
           }
         },
         {

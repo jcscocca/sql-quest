@@ -1,0 +1,66 @@
+{
+  "skillId": "arena-digimon",
+  "exercises": [
+    {
+      "id": "ad-1",
+      "prompt": "You are auditing the field guide's completion by attribute. For every attribute that is not NULL and covers at least 20 Digimon, report: attribute, total (its Digimon count), x_variants (how many are X-Antibody variants, i.e. x_antibody is TRUE), ultimate_count (how many sit at the 'Ultimate' level), newest_year (the most recent release_year among its Digimon), and roster_rank = the attribute's rank by total descending using RANK() so tied totals share a rank. Order by total descending, then attribute ascending.",
+      "referenceSql": "WITH stats AS (SELECT attribute, COUNT(*) AS total, SUM(CASE WHEN x_antibody THEN 1 ELSE 0 END) AS x_variants, SUM(CASE WHEN level = 'Ultimate' THEN 1 ELSE 0 END) AS ultimate_count, MAX(release_year) AS newest_year FROM digimon WHERE attribute IS NOT NULL GROUP BY attribute HAVING COUNT(*) >= 20) SELECT attribute, total, x_variants, ultimate_count, newest_year, RANK() OVER (ORDER BY total DESC) AS roster_rank FROM stats ORDER BY total DESC, attribute",
+      "orderMatters": true,
+      "hints": [
+        "Two steps. First a CTE (call it stats) that groups digimon by attribute, keeping attribute IS NOT NULL and HAVING COUNT(*) >= 20: use COUNT(*) for total, SUM(CASE WHEN x_antibody THEN 1 ELSE 0 END) for x_variants, SUM(CASE WHEN level = 'Ultimate' THEN 1 ELSE 0 END) for ultimate_count, and MAX(release_year) for newest_year. Then the outer query adds RANK() OVER (ORDER BY total DESC) and orders as asked.",
+        "WITH stats AS (SELECT attribute, COUNT(*) AS total, SUM(CASE WHEN x_antibody THEN 1 ELSE 0 END) AS x_variants, SUM(CASE WHEN level = 'Ultimate' THEN 1 ELSE 0 END) AS ultimate_count, MAX(release_year) AS newest_year FROM digimon WHERE attribute IS NOT NULL GROUP BY attribute HAVING COUNT(*) >= 20) SELECT attribute, total, x_variants, ultimate_count, newest_year, RANK() OVER (ORDER BY ...) AS roster_rank FROM stats ORDER BY total DESC, attribute.",
+        "```sql\nWITH stats AS (SELECT attribute, COUNT(*) AS total, SUM(CASE WHEN x_antibody THEN 1 ELSE 0 END) AS x_variants, SUM(CASE WHEN level = 'Ultimate' THEN 1 ELSE 0 END) AS ultimate_count, MAX(release_year) AS newest_year FROM digimon WHERE attribute IS NOT NULL GROUP BY attribute HAVING COUNT(*) >= 20) SELECT attribute, total, x_variants, ultimate_count, newest_year, RANK() OVER (ORDER BY total DESC) AS roster_rank FROM stats ORDER BY total DESC, attribute\n```"
+      ],
+      "xp": 20
+    },
+    {
+      "id": "ad-2",
+      "prompt": "For a 'signature evolver' report, find the single biggest evolution hub within each of the three main attributes. Consider only Digimon whose attribute is 'Vaccine', 'Virus', or 'Data'. For each such Digimon, count its distinct evolved forms by joining to evolutions on id = from_id and counting distinct to_id. Within each attribute, pick the one Digimon with the most distinct forms, breaking ties by name ascending. Return attribute, name, and the distinct-form count as form_count, ordered by attribute ascending.",
+      "referenceSql": "WITH forms AS (SELECT d.attribute, d.name, COUNT(DISTINCT e.to_id) AS form_count FROM digimon d JOIN evolutions e ON d.id = e.from_id WHERE d.attribute IN ('Vaccine', 'Virus', 'Data') GROUP BY d.attribute, d.name), ranked AS (SELECT attribute, name, form_count, ROW_NUMBER() OVER (PARTITION BY attribute ORDER BY form_count DESC, name) AS rn FROM forms) SELECT attribute, name, form_count FROM ranked WHERE rn = 1 ORDER BY attribute",
+      "orderMatters": true,
+      "hints": [
+        "First a CTE (forms) that joins digimon to evolutions on id = from_id, restricts to the three attributes, and GROUP BY attribute, name so COUNT(DISTINCT e.to_id) is each Digimon's distinct-form count. Then a CTE (ranked) that adds ROW_NUMBER() OVER (PARTITION BY attribute ORDER BY form_count DESC, name); keep rn = 1 to take each attribute's top hub.",
+        "WITH forms AS (SELECT d.attribute, d.name, COUNT(DISTINCT e.to_id) AS form_count FROM digimon d JOIN evolutions e ON d.id = e.from_id WHERE d.attribute IN (...) GROUP BY d.attribute, d.name), ranked AS (SELECT attribute, name, form_count, ROW_NUMBER() OVER (PARTITION BY attribute ORDER BY form_count DESC, name) AS rn FROM forms) SELECT attribute, name, form_count FROM ranked WHERE rn = 1 ORDER BY attribute.",
+        "```sql\nWITH forms AS (SELECT d.attribute, d.name, COUNT(DISTINCT e.to_id) AS form_count FROM digimon d JOIN evolutions e ON d.id = e.from_id WHERE d.attribute IN ('Vaccine', 'Virus', 'Data') GROUP BY d.attribute, d.name), ranked AS (SELECT attribute, name, form_count, ROW_NUMBER() OVER (PARTITION BY attribute ORDER BY form_count DESC, name) AS rn FROM forms) SELECT attribute, name, form_count FROM ranked WHERE rn = 1 ORDER BY attribute\n```"
+      ],
+      "xp": 20,
+      "collectibles": ["Greymon"]
+    },
+    {
+      "id": "ad-3",
+      "prompt": "Build a debut-momentum report for the modern era. For each release_year, count how many Digimon debuted, then use LAG() over the full year-by-year series (ordered by release_year) to bring in the previous listed year's count as prev_debuts. Report, for every year from 2010 through 2024, the release_year, debuts, prev_debuts, delta (debuts minus prev_debuts), and trend — a CASE label of 'Up' when debuts exceeds prev_debuts, 'Down' when it is less, and 'Flat' when they are equal. Compute the LAG across all years first, then restrict to 2010-2024. Order by release_year ascending.",
+      "referenceSql": "WITH yearly AS (SELECT release_year, COUNT(*) AS debuts FROM digimon GROUP BY release_year), delta AS (SELECT release_year, debuts, LAG(debuts) OVER (ORDER BY release_year) AS prev_debuts FROM yearly) SELECT release_year, debuts, prev_debuts, debuts - prev_debuts AS delta, CASE WHEN debuts > prev_debuts THEN 'Up' WHEN debuts < prev_debuts THEN 'Down' ELSE 'Flat' END AS trend FROM delta WHERE release_year BETWEEN 2010 AND 2024 ORDER BY release_year",
+      "orderMatters": true,
+      "hints": [
+        "Three layers. A CTE (yearly) counts debuts per release_year. A second CTE (delta) adds LAG(debuts) OVER (ORDER BY release_year) as prev_debuts — computed over every year so 2010 can see 2009. The outer query then filters to release_year BETWEEN 2010 AND 2024, subtracts for delta, and labels trend with a CASE. Filtering only at the end is what keeps the earliest shown year's LAG intact.",
+        "WITH yearly AS (SELECT release_year, COUNT(*) AS debuts FROM digimon GROUP BY release_year), delta AS (SELECT release_year, debuts, LAG(debuts) OVER (ORDER BY release_year) AS prev_debuts FROM yearly) SELECT release_year, debuts, prev_debuts, debuts - prev_debuts AS delta, CASE WHEN debuts > prev_debuts THEN 'Up' WHEN ... THEN 'Down' ELSE 'Flat' END AS trend FROM delta WHERE release_year BETWEEN 2010 AND 2024 ORDER BY release_year.",
+        "```sql\nWITH yearly AS (SELECT release_year, COUNT(*) AS debuts FROM digimon GROUP BY release_year), delta AS (SELECT release_year, debuts, LAG(debuts) OVER (ORDER BY release_year) AS prev_debuts FROM yearly) SELECT release_year, debuts, prev_debuts, debuts - prev_debuts AS delta, CASE WHEN debuts > prev_debuts THEN 'Up' WHEN debuts < prev_debuts THEN 'Down' ELSE 'Flat' END AS trend FROM delta WHERE release_year BETWEEN 2010 AND 2024 ORDER BY release_year\n```"
+      ],
+      "xp": 20
+    },
+    {
+      "id": "ad-4",
+      "prompt": "For a network-centrality briefing, find the Digimon that are hubs in both evolution directions. Using the evolutions table, compute each Digimon's out-degree (distinct to_id it evolves into) and in-degree (distinct from_id that evolve into it). Keep the Digimon whose out-degree is at least 40 AND whose in-degree is at least 40, and join back to digimon for identity. Return name, attribute (which may be NULL), out_forms (the out-degree), in_forms (the in-degree), total_links (out_forms + in_forms), and centrality_rank = RANK() OVER (ORDER BY total_links DESC) with ties sharing a rank. Order by total_links descending, then name ascending.",
+      "referenceSql": "WITH out_deg AS (SELECT from_id AS id, COUNT(DISTINCT to_id) AS out_forms FROM evolutions GROUP BY from_id), in_deg AS (SELECT to_id AS id, COUNT(DISTINCT from_id) AS in_forms FROM evolutions GROUP BY to_id) SELECT d.name, d.attribute, o.out_forms, i.in_forms, o.out_forms + i.in_forms AS total_links, RANK() OVER (ORDER BY o.out_forms + i.in_forms DESC) AS centrality_rank FROM digimon d JOIN out_deg o ON d.id = o.id JOIN in_deg i ON d.id = i.id WHERE o.out_forms >= 40 AND i.in_forms >= 40 ORDER BY total_links DESC, d.name",
+      "orderMatters": true,
+      "hints": [
+        "Two CTEs off the evolutions table: out_deg groups by from_id with COUNT(DISTINCT to_id) AS out_forms, and in_deg groups by to_id with COUNT(DISTINCT from_id) AS in_forms. Join both back to digimon on the id, filter to out_forms >= 40 AND in_forms >= 40, sum the two degrees for total_links, and rank with RANK() OVER (ORDER BY total_links DESC).",
+        "WITH out_deg AS (SELECT from_id AS id, COUNT(DISTINCT to_id) AS out_forms FROM evolutions GROUP BY from_id), in_deg AS (SELECT to_id AS id, COUNT(DISTINCT from_id) AS in_forms FROM evolutions GROUP BY to_id) SELECT d.name, d.attribute, o.out_forms, i.in_forms, o.out_forms + i.in_forms AS total_links, RANK() OVER (ORDER BY ...) AS centrality_rank FROM digimon d JOIN out_deg o ON d.id = o.id JOIN in_deg i ON d.id = i.id WHERE o.out_forms >= 40 AND i.in_forms >= 40 ORDER BY total_links DESC, d.name.",
+        "```sql\nWITH out_deg AS (SELECT from_id AS id, COUNT(DISTINCT to_id) AS out_forms FROM evolutions GROUP BY from_id), in_deg AS (SELECT to_id AS id, COUNT(DISTINCT from_id) AS in_forms FROM evolutions GROUP BY to_id) SELECT d.name, d.attribute, o.out_forms, i.in_forms, o.out_forms + i.in_forms AS total_links, RANK() OVER (ORDER BY o.out_forms + i.in_forms DESC) AS centrality_rank FROM digimon d JOIN out_deg o ON d.id = o.id JOIN in_deg i ON d.id = i.id WHERE o.out_forms >= 40 AND i.in_forms >= 40 ORDER BY total_links DESC, d.name\n```"
+      ],
+      "xp": 20
+    },
+    {
+      "id": "ad-5",
+      "prompt": "For a release-era breakdown, bucket each Digimon into an era by release_year — 'Classic' for 1997-2002, 'Expansion' for 2003-2010, and 'Modern' for 2011 onward — considering only Digimon whose attribute is 'Vaccine', 'Virus', 'Data', or 'Free'. For each era, count Digimon per attribute, and within each era keep the two attributes with the highest counts (break ties by attribute ascending). Return era, attribute, cnt (that attribute's count in the era), era_total (all four attributes' Digimon in the era), and pct_of_era = ROUND(100.0 * cnt / era_total, 1). Order by era ascending, then cnt descending, then attribute ascending.",
+      "referenceSql": "WITH classified AS (SELECT CASE WHEN release_year <= 2002 THEN 'Classic' WHEN release_year <= 2010 THEN 'Expansion' ELSE 'Modern' END AS era, attribute FROM digimon WHERE attribute IN ('Vaccine', 'Virus', 'Data', 'Free')), era_attr AS (SELECT era, attribute, COUNT(*) AS cnt FROM classified GROUP BY era, attribute), ranked AS (SELECT era, attribute, cnt, SUM(cnt) OVER (PARTITION BY era) AS era_total, ROW_NUMBER() OVER (PARTITION BY era ORDER BY cnt DESC, attribute) AS rk FROM era_attr) SELECT era, attribute, cnt, era_total, ROUND(100.0 * cnt / era_total, 1) AS pct_of_era FROM ranked WHERE rk <= 2 ORDER BY era, cnt DESC, attribute",
+      "orderMatters": true,
+      "hints": [
+        "Three CTEs. classified tags each of the four-attribute Digimon with an era via a CASE on release_year. era_attr counts Digimon per (era, attribute). ranked adds two windows partitioned by era: SUM(cnt) OVER (PARTITION BY era) for era_total (rides on every row) and ROW_NUMBER() OVER (PARTITION BY era ORDER BY cnt DESC, attribute) to pick the top attributes. The outer query keeps rk <= 2 and computes pct_of_era with ROUND(100.0 * cnt / era_total, 1).",
+        "WITH classified AS (SELECT CASE WHEN release_year <= 2002 THEN 'Classic' WHEN release_year <= 2010 THEN 'Expansion' ELSE 'Modern' END AS era, attribute FROM digimon WHERE attribute IN (...)), era_attr AS (SELECT era, attribute, COUNT(*) AS cnt FROM classified GROUP BY era, attribute), ranked AS (SELECT era, attribute, cnt, SUM(cnt) OVER (PARTITION BY era) AS era_total, ROW_NUMBER() OVER (PARTITION BY era ORDER BY cnt DESC, attribute) AS rk FROM era_attr) SELECT era, attribute, cnt, era_total, ROUND(100.0 * cnt / era_total, 1) AS pct_of_era FROM ranked WHERE rk <= 2 ORDER BY era, cnt DESC, attribute.",
+        "```sql\nWITH classified AS (SELECT CASE WHEN release_year <= 2002 THEN 'Classic' WHEN release_year <= 2010 THEN 'Expansion' ELSE 'Modern' END AS era, attribute FROM digimon WHERE attribute IN ('Vaccine', 'Virus', 'Data', 'Free')), era_attr AS (SELECT era, attribute, COUNT(*) AS cnt FROM classified GROUP BY era, attribute), ranked AS (SELECT era, attribute, cnt, SUM(cnt) OVER (PARTITION BY era) AS era_total, ROW_NUMBER() OVER (PARTITION BY era ORDER BY cnt DESC, attribute) AS rk FROM era_attr) SELECT era, attribute, cnt, era_total, ROUND(100.0 * cnt / era_total, 1) AS pct_of_era FROM ranked WHERE rk <= 2 ORDER BY era, cnt DESC, attribute\n```"
+      ],
+      "xp": 20
+    }
+  ]
+}

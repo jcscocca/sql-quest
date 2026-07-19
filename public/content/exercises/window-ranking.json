@@ -2,78 +2,76 @@
   "skillId": "window-ranking",
   "exercises": [
     {
-      "id": "wr-1",
-      "prompt": "Crown the top movie in each genre. Over movies with at least 20 ratings and a non-null genre1, use ROW_NUMBER() OVER (PARTITION BY genre1 ORDER BY avg_rating DESC, num_ratings DESC, title, movie_id) inside a CTE, then keep only the row numbered 1 in each genre. Return genre1, title, avg_rating, and num_ratings, ordered by genre1 ascending. (The extra ORDER BY keys inside the window break rating ties deterministically so exactly one champion is chosen per genre.)",
-      "referenceSql": "WITH ranked AS (SELECT m.movie_id, m.genre1, m.title, r.avg_rating, r.num_ratings, ROW_NUMBER() OVER (PARTITION BY m.genre1 ORDER BY r.avg_rating DESC, r.num_ratings DESC, m.title, m.movie_id) AS rn FROM movies m JOIN ratings r ON m.movie_id = r.movie_id WHERE r.num_ratings >= 20 AND m.genre1 IS NOT NULL) SELECT genre1, title, avg_rating, num_ratings FROM ranked WHERE rn = 1 ORDER BY genre1",
+      "id": "wrd-1",
+      "prompt": "Assign each Armor-level Digimon a debut rank, oldest first. Using ROW_NUMBER() over all Armor-level Digimon ordered by release_year ascending then name ascending, return name, release_year, and the number as debut_rank. Order the output by debut_rank ascending.",
+      "referenceSql": "SELECT name, release_year, ROW_NUMBER() OVER (ORDER BY release_year, name) AS debut_rank FROM digimon WHERE level = 'Armor' ORDER BY debut_rank",
       "orderMatters": true,
       "hints": [
-        "A window function cannot live in WHERE, so compute ROW_NUMBER() in a CTE and filter on it in the outer query. PARTITION BY genre1 restarts the numbering for each genre; the ORDER BY inside OVER decides who gets number 1.",
-        "WITH ranked AS (SELECT ..., ROW_NUMBER() OVER (PARTITION BY m.genre1 ORDER BY r.avg_rating DESC, r.num_ratings DESC, m.title, m.movie_id) AS rn FROM movies m JOIN ratings r ON m.movie_id = r.movie_id WHERE r.num_ratings >= 20 AND m.genre1 IS NOT NULL) SELECT genre1, title, avg_rating, num_ratings FROM ranked WHERE rn = 1 ORDER BY genre1.",
-        "```sql\nWITH ranked AS (SELECT m.movie_id, m.genre1, m.title, r.avg_rating, r.num_ratings, ROW_NUMBER() OVER (PARTITION BY m.genre1 ORDER BY r.avg_rating DESC, r.num_ratings DESC, m.title, m.movie_id) AS rn FROM movies m JOIN ratings r ON m.movie_id = r.movie_id WHERE r.num_ratings >= 20 AND m.genre1 IS NOT NULL) SELECT genre1, title, avg_rating, num_ratings FROM ranked WHERE rn = 1 ORDER BY genre1\n```"
+        "ROW_NUMBER() OVER (ORDER BY ...) numbers the rows 1, 2, 3, ... in the order you specify; put release_year then name in that OVER clause so the numbering is oldest-first with name breaking year ties.",
+        "SELECT name, release_year, ROW_NUMBER() OVER (ORDER BY release_year, name) AS debut_rank FROM digimon WHERE level = 'Armor' ORDER BY debut_rank.",
+        "```sql\nSELECT name, release_year, ROW_NUMBER() OVER (ORDER BY release_year, name) AS debut_rank FROM digimon WHERE level = 'Armor' ORDER BY debut_rank\n```"
       ],
       "xp": 17
     },
     {
-      "id": "wr-2",
-      "prompt": "List the top 3 movies in each of four genres. Over Action, Adventure, Crime, and Animation movies with at least 30 ratings, number them with ROW_NUMBER() OVER (PARTITION BY genre1 ORDER BY avg_rating DESC, num_ratings DESC, title, movie_id) inside a CTE, then keep rows numbered 3 or lower. Return genre1, rn, title, avg_rating, and num_ratings, ordered by genre1 ascending, then rn ascending.",
-      "referenceSql": "WITH ranked AS (SELECT m.movie_id, m.genre1, m.title, r.avg_rating, r.num_ratings, ROW_NUMBER() OVER (PARTITION BY m.genre1 ORDER BY r.avg_rating DESC, r.num_ratings DESC, m.title, m.movie_id) AS rn FROM movies m JOIN ratings r ON m.movie_id = r.movie_id WHERE r.num_ratings >= 30 AND m.genre1 IN ('Action','Adventure','Crime','Animation')) SELECT genre1, rn, title, avg_rating, num_ratings FROM ranked WHERE rn <= 3 ORDER BY genre1, rn",
+      "id": "wrd-2",
+      "prompt": "Rank the Fairy-type Digimon from newest to oldest. Using RANK() over the Fairy-type Digimon ordered by release_year descending — so Digimon that share a debut year share a rank and the following rank is skipped — return name, release_year, and the rank as year_rank. Order the output by year_rank ascending, then name ascending.",
+      "referenceSql": "SELECT name, release_year, RANK() OVER (ORDER BY release_year DESC) AS year_rank FROM digimon WHERE type = 'Fairy' ORDER BY year_rank, name",
       "orderMatters": true,
       "hints": [
-        "Same shape as crowning a single champion, but keep rn <= 3 instead of rn = 1. Because ROW_NUMBER assigns strictly distinct numbers, each genre yields exactly three rows even when ratings tie.",
-        "WITH ranked AS (SELECT ..., ROW_NUMBER() OVER (PARTITION BY m.genre1 ORDER BY r.avg_rating DESC, r.num_ratings DESC, m.title, m.movie_id) AS rn FROM movies m JOIN ratings r ON m.movie_id = r.movie_id WHERE r.num_ratings >= 30 AND m.genre1 IN ('Action','Adventure','Crime','Animation')) SELECT genre1, rn, title, avg_rating, num_ratings FROM ranked WHERE rn <= 3 ORDER BY genre1, rn.",
-        "```sql\nWITH ranked AS (SELECT m.movie_id, m.genre1, m.title, r.avg_rating, r.num_ratings, ROW_NUMBER() OVER (PARTITION BY m.genre1 ORDER BY r.avg_rating DESC, r.num_ratings DESC, m.title, m.movie_id) AS rn FROM movies m JOIN ratings r ON m.movie_id = r.movie_id WHERE r.num_ratings >= 30 AND m.genre1 IN ('Action','Adventure','Crime','Animation')) SELECT genre1, rn, title, avg_rating, num_ratings FROM ranked WHERE rn <= 3 ORDER BY genre1, rn\n```"
+        "RANK() OVER (ORDER BY release_year DESC) gives every Digimon of the same year the same rank and then jumps the count ahead — that shared-then-skipped behavior is exactly what RANK does.",
+        "SELECT name, release_year, RANK() OVER (ORDER BY release_year DESC) AS year_rank FROM digimon WHERE type = 'Fairy' ORDER BY year_rank, name.",
+        "```sql\nSELECT name, release_year, RANK() OVER (ORDER BY release_year DESC) AS year_rank FROM digimon WHERE type = 'Fairy' ORDER BY year_rank, name\n```"
       ],
-      "xp": 17,
-      "collectibles": ["Spirited Away (Sen to Chihiro no kamikakushi)"]
+      "xp": 17
     },
     {
-      "id": "wr-3",
-      "prompt": "See how RANK handles ties. Over Action, Crime, and Animation movies with at least 30 ratings, compute RANK() OVER (PARTITION BY genre1 ORDER BY avg_rating DESC) — note the window orders by avg_rating ONLY, so movies with equal ratings share a rank and the next rank is skipped. Keep rows with rank 3 or lower. Return genre1, rnk, title, avg_rating, and num_ratings, ordered by genre1 ascending, then rnk ascending, then num_ratings descending, then title ascending, then movie_id ascending.",
-      "referenceSql": "WITH ranked AS (SELECT m.movie_id, m.genre1, m.title, r.avg_rating, r.num_ratings, RANK() OVER (PARTITION BY m.genre1 ORDER BY r.avg_rating DESC) AS rnk FROM movies m JOIN ratings r ON m.movie_id = r.movie_id WHERE r.num_ratings >= 30 AND m.genre1 IN ('Action','Crime','Animation')) SELECT genre1, rnk, title, avg_rating, num_ratings FROM ranked WHERE rnk <= 3 ORDER BY genre1, rnk, num_ratings DESC, title, movie_id",
+      "id": "wrd-3",
+      "prompt": "Among the release years in which at least 48 Digimon debuted, rank the years by how many Digimon debuted, busiest first. Using DENSE_RANK() ordered by the debut count descending — so years with an equal count share a rank and no rank number is skipped — return release_year, the count as debut_count, and the rank as popularity_rank. Order by popularity_rank ascending, then release_year ascending.",
+      "referenceSql": "WITH yc AS (SELECT release_year, COUNT(*) AS debut_count FROM digimon GROUP BY release_year HAVING COUNT(*) >= 48) SELECT release_year, debut_count, DENSE_RANK() OVER (ORDER BY debut_count DESC) AS popularity_rank FROM yc ORDER BY popularity_rank, release_year",
       "orderMatters": true,
       "hints": [
-        "RANK gives tied rows the same number, so two movies with the same avg_rating both become rank 1 and the next distinct rating jumps to rank 3. That means a genre can return more than three rows here. The window ORDER BY stays avg_rating-only on purpose; the deterministic ordering is done in the outer ORDER BY.",
-        "WITH ranked AS (SELECT ..., RANK() OVER (PARTITION BY m.genre1 ORDER BY r.avg_rating DESC) AS rnk FROM movies m JOIN ratings r ON m.movie_id = r.movie_id WHERE r.num_ratings >= 30 AND m.genre1 IN ('Action','Crime','Animation')) SELECT genre1, rnk, title, avg_rating, num_ratings FROM ranked WHERE rnk <= 3 ORDER BY genre1, rnk, num_ratings DESC, title, movie_id.",
-        "```sql\nWITH ranked AS (SELECT m.movie_id, m.genre1, m.title, r.avg_rating, r.num_ratings, RANK() OVER (PARTITION BY m.genre1 ORDER BY r.avg_rating DESC) AS rnk FROM movies m JOIN ratings r ON m.movie_id = r.movie_id WHERE r.num_ratings >= 30 AND m.genre1 IN ('Action','Crime','Animation')) SELECT genre1, rnk, title, avg_rating, num_ratings FROM ranked WHERE rnk <= 3 ORDER BY genre1, rnk, num_ratings DESC, title, movie_id\n```"
-      ],
-      "xp": 18
-    },
-    {
-      "id": "wr-4",
-      "prompt": "Use DENSE_RANK to walk rating tiers, not row positions. Over Crime and Adventure movies with at least 50 ratings, compute DENSE_RANK() OVER (PARTITION BY genre1 ORDER BY avg_rating DESC) — tied ratings share a tier and, unlike RANK, the next distinct rating is the very next tier (no gaps). Keep tiers 3 or lower. Return genre1, drnk, title, avg_rating, and num_ratings, ordered by genre1 ascending, then drnk ascending, then num_ratings descending, then title ascending, then movie_id ascending.",
-      "referenceSql": "WITH ranked AS (SELECT m.movie_id, m.genre1, m.title, r.avg_rating, r.num_ratings, DENSE_RANK() OVER (PARTITION BY m.genre1 ORDER BY r.avg_rating DESC) AS drnk FROM movies m JOIN ratings r ON m.movie_id = r.movie_id WHERE r.num_ratings >= 50 AND m.genre1 IN ('Crime','Adventure')) SELECT genre1, drnk, title, avg_rating, num_ratings FROM ranked WHERE drnk <= 3 ORDER BY genre1, drnk, num_ratings DESC, title, movie_id",
-      "orderMatters": true,
-      "hints": [
-        "DENSE_RANK counts distinct rating values, so drnk <= 3 keeps every movie whose rating is one of the genre's top three distinct averages — which can be several movies per tier. Contrast with RANK, which would leave gaps after ties.",
-        "WITH ranked AS (SELECT ..., DENSE_RANK() OVER (PARTITION BY m.genre1 ORDER BY r.avg_rating DESC) AS drnk FROM movies m JOIN ratings r ON m.movie_id = r.movie_id WHERE r.num_ratings >= 50 AND m.genre1 IN ('Crime','Adventure')) SELECT genre1, drnk, title, avg_rating, num_ratings FROM ranked WHERE drnk <= 3 ORDER BY genre1, drnk, num_ratings DESC, title, movie_id.",
-        "```sql\nWITH ranked AS (SELECT m.movie_id, m.genre1, m.title, r.avg_rating, r.num_ratings, DENSE_RANK() OVER (PARTITION BY m.genre1 ORDER BY r.avg_rating DESC) AS drnk FROM movies m JOIN ratings r ON m.movie_id = r.movie_id WHERE r.num_ratings >= 50 AND m.genre1 IN ('Crime','Adventure')) SELECT genre1, drnk, title, avg_rating, num_ratings FROM ranked WHERE drnk <= 3 ORDER BY genre1, drnk, num_ratings DESC, title, movie_id\n```"
+        "First a CTE that counts debuts per year and keeps years with at least 48 (GROUP BY release_year HAVING COUNT(*) >= 48). Then apply DENSE_RANK() OVER (ORDER BY debut_count DESC) so tied counts share a rank with no gaps.",
+        "WITH yc AS (SELECT release_year, COUNT(*) AS debut_count FROM digimon GROUP BY release_year HAVING COUNT(*) >= 48) SELECT release_year, debut_count, DENSE_RANK() OVER (ORDER BY debut_count DESC) AS popularity_rank FROM yc ORDER BY popularity_rank, release_year.",
+        "```sql\nWITH yc AS (SELECT release_year, COUNT(*) AS debut_count FROM digimon GROUP BY release_year HAVING COUNT(*) >= 48) SELECT release_year, debut_count, DENSE_RANK() OVER (ORDER BY debut_count DESC) AS popularity_rank FROM yc ORDER BY popularity_rank, release_year\n```"
       ],
       "xp": 18
     },
     {
-      "id": "wr-5",
-      "prompt": "Find each genre's most-reviewed movie — popularity, not quality. Over every movie with a non-null genre1, number movies with ROW_NUMBER() OVER (PARTITION BY genre1 ORDER BY num_ratings DESC, avg_rating DESC, title, movie_id) inside a CTE and keep number 1. Return genre1, title, num_ratings, and avg_rating, ordered by genre1 ascending. (No minimum-ratings floor here — you are looking for the crowd favorite, whatever it scored.)",
-      "referenceSql": "WITH ranked AS (SELECT m.movie_id, m.genre1, m.title, r.avg_rating, r.num_ratings, ROW_NUMBER() OVER (PARTITION BY m.genre1 ORDER BY r.num_ratings DESC, r.avg_rating DESC, m.title, m.movie_id) AS rn FROM movies m JOIN ratings r ON m.movie_id = r.movie_id WHERE m.genre1 IS NOT NULL) SELECT genre1, title, num_ratings, avg_rating FROM ranked WHERE rn = 1 ORDER BY genre1",
+      "id": "wrd-4",
+      "prompt": "Split the God Man-type Digimon into four release-cohort buckets. Order them by release_year ascending, then name ascending, and use NTILE(4) over that ordering to divide them into four roughly equal groups. Return name, release_year, and the bucket number as quartile. Order the output by quartile ascending, then release_year ascending, then name ascending.",
+      "referenceSql": "SELECT name, release_year, NTILE(4) OVER (ORDER BY release_year, name) AS quartile FROM digimon WHERE type = 'God Man' ORDER BY quartile, release_year, name",
       "orderMatters": true,
       "hints": [
-        "Same crown-the-winner pattern, but the window's ORDER BY leads with num_ratings DESC instead of avg_rating — the ranking key is what changes the question from 'best' to 'most-rated'.",
-        "WITH ranked AS (SELECT ..., ROW_NUMBER() OVER (PARTITION BY m.genre1 ORDER BY r.num_ratings DESC, r.avg_rating DESC, m.title, m.movie_id) AS rn FROM movies m JOIN ratings r ON m.movie_id = r.movie_id WHERE m.genre1 IS NOT NULL) SELECT genre1, title, num_ratings, avg_rating FROM ranked WHERE rn = 1 ORDER BY genre1.",
-        "```sql\nWITH ranked AS (SELECT m.movie_id, m.genre1, m.title, r.avg_rating, r.num_ratings, ROW_NUMBER() OVER (PARTITION BY m.genre1 ORDER BY r.num_ratings DESC, r.avg_rating DESC, m.title, m.movie_id) AS rn FROM movies m JOIN ratings r ON m.movie_id = r.movie_id WHERE m.genre1 IS NOT NULL) SELECT genre1, title, num_ratings, avg_rating FROM ranked WHERE rn = 1 ORDER BY genre1\n```"
+        "NTILE(4) OVER (ORDER BY release_year, name) walks the rows in that order and stamps each with a bucket number 1 through 4, filling the buckets as evenly as it can.",
+        "SELECT name, release_year, NTILE(4) OVER (ORDER BY release_year, name) AS quartile FROM digimon WHERE type = 'God Man' ORDER BY quartile, release_year, name.",
+        "```sql\nSELECT name, release_year, NTILE(4) OVER (ORDER BY release_year, name) AS quartile FROM digimon WHERE type = 'God Man' ORDER BY quartile, release_year, name\n```"
+      ],
+      "xp": 18
+    },
+    {
+      "id": "wrd-5",
+      "prompt": "For each level, find the two most recently released Digimon (ignore rows where level is NULL). Within each level, use ROW_NUMBER() ordered by release_year descending, then name ascending, to number the Digimon, then keep those numbered 1 or 2. Return level, name, release_year, and the number as recency_rank. Order by level ascending, then recency_rank ascending.",
+      "referenceSql": "WITH ranked AS (SELECT level, name, release_year, ROW_NUMBER() OVER (PARTITION BY level ORDER BY release_year DESC, name) AS recency_rank FROM digimon WHERE level IS NOT NULL) SELECT level, name, release_year, recency_rank FROM ranked WHERE recency_rank <= 2 ORDER BY level, recency_rank",
+      "orderMatters": true,
+      "hints": [
+        "Because a window function can't go in WHERE, compute ROW_NUMBER() OVER (PARTITION BY level ORDER BY release_year DESC, name) inside a CTE, then filter recency_rank <= 2 in the outer query. PARTITION BY level restarts the numbering for each level.",
+        "WITH ranked AS (SELECT level, name, release_year, ROW_NUMBER() OVER (PARTITION BY level ORDER BY release_year DESC, name) AS recency_rank FROM digimon WHERE level IS NOT NULL) SELECT level, name, release_year, recency_rank FROM ranked WHERE recency_rank <= 2 ORDER BY level, recency_rank.",
+        "```sql\nWITH ranked AS (SELECT level, name, release_year, ROW_NUMBER() OVER (PARTITION BY level ORDER BY release_year DESC, name) AS recency_rank FROM digimon WHERE level IS NOT NULL) SELECT level, name, release_year, recency_rank FROM ranked WHERE recency_rank <= 2 ORDER BY level, recency_rank\n```"
       ],
       "xp": 19
     },
     {
-      "id": "wr-6",
-      "prompt": "Rank movies two ways at once. Over movies with at least 50 ratings and a non-null genre1, compute two windows in one CTE: overall_rank = RANK() OVER (ORDER BY avg_rating DESC, num_ratings DESC, title, movie_id) across the whole set, and genre_rank = RANK() OVER (PARTITION BY genre1 ORDER BY avg_rating DESC, num_ratings DESC, title, movie_id) within each genre. Keep the top 15 overall and return overall_rank, genre1, genre_rank, title, and avg_rating, ordered by overall_rank ascending.",
-      "referenceSql": "WITH ranked AS (SELECT m.movie_id, m.genre1, m.title, r.avg_rating, r.num_ratings, RANK() OVER (ORDER BY r.avg_rating DESC, r.num_ratings DESC, m.title, m.movie_id) AS overall_rank, RANK() OVER (PARTITION BY m.genre1 ORDER BY r.avg_rating DESC, r.num_ratings DESC, m.title, m.movie_id) AS genre_rank FROM movies m JOIN ratings r ON m.movie_id = r.movie_id WHERE r.num_ratings >= 50 AND m.genre1 IS NOT NULL) SELECT overall_rank, genre1, genre_rank, title, avg_rating FROM ranked WHERE overall_rank <= 15 ORDER BY overall_rank",
+      "id": "wrd-6",
+      "prompt": "For each of the four attributes 'Vaccine', 'Virus', 'Data', and 'Free', list its three earliest-debuting Digimon alongside how large that attribute's roster is. Restrict to Digimon carrying one of those four attributes. Within each attribute, use ROW_NUMBER() ordered by release_year ascending then name ascending to number the Digimon by debut order, and COUNT(*) OVER the attribute to compute attr_size (the total Digimon in that attribute). Keep the Digimon numbered 3 or lower and return attribute, name, release_year, the number as debut_rank, and attr_size. Order by attribute ascending, then debut_rank ascending.",
+      "referenceSql": "WITH ranked AS (SELECT attribute, name, release_year, ROW_NUMBER() OVER (PARTITION BY attribute ORDER BY release_year, name) AS debut_rank, COUNT(*) OVER (PARTITION BY attribute) AS attr_size FROM digimon WHERE attribute IN ('Vaccine', 'Virus', 'Data', 'Free')) SELECT attribute, name, release_year, debut_rank, attr_size FROM ranked WHERE debut_rank <= 3 ORDER BY attribute, debut_rank",
       "orderMatters": true,
       "hints": [
-        "You can compute several window functions in the same SELECT — one with no PARTITION (global rank) and one partitioned by genre1 (rank within genre). Both use the same full tiebreak so each rank is a distinct integer. Filter on the overall rank in the outer query.",
-        "WITH ranked AS (SELECT ..., RANK() OVER (ORDER BY r.avg_rating DESC, r.num_ratings DESC, m.title, m.movie_id) AS overall_rank, RANK() OVER (PARTITION BY m.genre1 ORDER BY r.avg_rating DESC, r.num_ratings DESC, m.title, m.movie_id) AS genre_rank FROM ... WHERE r.num_ratings >= 50 AND m.genre1 IS NOT NULL) SELECT overall_rank, genre1, genre_rank, title, avg_rating FROM ranked WHERE overall_rank <= 15 ORDER BY overall_rank.",
-        "```sql\nWITH ranked AS (SELECT m.movie_id, m.genre1, m.title, r.avg_rating, r.num_ratings, RANK() OVER (ORDER BY r.avg_rating DESC, r.num_ratings DESC, m.title, m.movie_id) AS overall_rank, RANK() OVER (PARTITION BY m.genre1 ORDER BY r.avg_rating DESC, r.num_ratings DESC, m.title, m.movie_id) AS genre_rank FROM movies m JOIN ratings r ON m.movie_id = r.movie_id WHERE r.num_ratings >= 50 AND m.genre1 IS NOT NULL) SELECT overall_rank, genre1, genre_rank, title, avg_rating FROM ranked WHERE overall_rank <= 15 ORDER BY overall_rank\n```"
+        "In a CTE over the four named attributes, compute two windows partitioned by attribute: ROW_NUMBER() OVER (PARTITION BY attribute ORDER BY release_year, name) for debut order and COUNT(*) OVER (PARTITION BY attribute) for the roster size that rides on every row. Then filter debut_rank <= 3.",
+        "WITH ranked AS (SELECT attribute, name, release_year, ROW_NUMBER() OVER (PARTITION BY attribute ORDER BY release_year, name) AS debut_rank, COUNT(*) OVER (PARTITION BY attribute) AS attr_size FROM digimon WHERE attribute IN ('Vaccine', 'Virus', 'Data', 'Free')) SELECT attribute, name, release_year, debut_rank, attr_size FROM ranked WHERE debut_rank <= 3 ORDER BY attribute, debut_rank.",
+        "```sql\nWITH ranked AS (SELECT attribute, name, release_year, ROW_NUMBER() OVER (PARTITION BY attribute ORDER BY release_year, name) AS debut_rank, COUNT(*) OVER (PARTITION BY attribute) AS attr_size FROM digimon WHERE attribute IN ('Vaccine', 'Virus', 'Data', 'Free')) SELECT attribute, name, release_year, debut_rank, attr_size FROM ranked WHERE debut_rank <= 3 ORDER BY attribute, debut_rank\n```"
       ],
-      "xp": 20,
-      "collectibles": ["Shawshank Redemption, The"]
+      "xp": 20
     }
   ]
 }
