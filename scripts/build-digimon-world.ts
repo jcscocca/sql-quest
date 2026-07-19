@@ -52,6 +52,7 @@ if (existsSync(idsPath)) {
     page.content.forEach(d => ids.push(d.id))
     await sleep(200)
   }
+  if (ids.length < 1400) throw new Error(`BLOCKED: only ${ids.length} ids fetched — expected ~1488; not caching a truncated list`)
   writeFileSync(idsPath, JSON.stringify(ids))
   console.log(`fetched ${ids.length} ids`)
 }
@@ -70,7 +71,14 @@ for (const id of ids) {
 console.log(`details: ${fetched} fetched now, ${ids.length - fetched} already cached`)
 
 // --- 3. transform ---
-const details = ids.map(id => JSON.parse(readFileSync(`${SRC}/detail/${id}.json`, 'utf8')) as Detail)
+const details = ids.map(id => {
+  const p = `${SRC}/detail/${id}.json`
+  try {
+    return JSON.parse(readFileSync(p, 'utf8')) as Detail
+  } catch (err) {
+    throw new Error(`corrupt cache file ${p} — delete it and re-run to re-fetch (${err})`)
+  }
+})
 
 const digimonOut = details.map(d => ({
   id: d.id,
@@ -79,6 +87,7 @@ const digimonOut = details.map(d => ({
   type: d.types?.[0]?.type ?? null,
   attribute: d.attributes?.[0]?.attribute ?? null,
   x_antibody: d.xAntibody,
+  // releaseDate is a bare year in DAPI; a dated string would NaN out to null
   release_year: d.releaseDate != null && Number(d.releaseDate) > 0 ? Number(d.releaseDate) : null,
 }))
 
