@@ -104,3 +104,89 @@ test('daily review updates mastery', async ({ page }) => {
   await page.getByRole('button', { name: 'Done' }).click()
   await expect(page.getByText(/Daily Review/)).not.toBeVisible()
 })
+
+test('seeded Foundations+Shaping unlocks Combining, world panel shows Yu-Gi-Oh active, and ij-1 catches', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    const req = indexedDB.open('keyval-store')
+    req.onupgradeneeded = () => req.result.createObjectStore('keyval')
+    req.onsuccess = () => {
+      const tx = req.result.transaction('keyval', 'readwrite')
+      const done = { solved: [], completed: true, mastery: 3, interval: 2, due: '2099-01-01' }
+      tx.objectStore('keyval').put(
+        {
+          version: 1,
+          xp: 200,
+          streak: { count: 1, lastDay: '2026-07-01' },
+          skills: {
+            'select-basics': done,
+            'where-filtering': done,
+            'order-limit': done,
+            distinct: done,
+            aggregates: done,
+            'group-by': done,
+            having: done,
+            'case-when': done,
+            'string-functions': done,
+            'null-handling': done,
+          },
+          collection: [],
+          badges: [],
+        },
+        'sql-quest-progress',
+      )
+    }
+  })
+  await page.goto('/')
+  await expect(page.getByRole('heading', { name: /SQL Quest/ })).toBeVisible()
+
+  const combiningRow = page.locator('.world-row', { hasText: 'Combining' })
+  await expect(combiningRow).toContainText('Yu-Gi-Oh!')
+  await expect(combiningRow).toContainText('▶')
+
+  const node = page.getByRole('button', { name: /INNER JOIN/ })
+  await expect(node).toBeEnabled()
+  await node.click()
+
+  await expect(page.getByText(/INNER JOIN stitches two tables together/)).toBeVisible()
+  await page.getByRole('button', { name: 'Start exercises' }).click()
+
+  for (let h = 0; h < 3; h++) await page.getByRole('button', { name: /💡 Hint/ }).click()
+  const hintText = await page.locator('.hint').last().textContent()
+  const sql = hintText!.match(/```sql([\s\S]*?)```/)![1].trim()
+  await page.locator('.cm-content').click()
+  await page.keyboard.type(sql)
+  await page.getByRole('button', { name: 'Submit' }).click()
+  await expect(page.getByText(/✓ Correct!/)).toBeVisible({ timeout: 30_000 })
+  await expect(page.getByText(/Caught: Red-Eyes Black Dragon!/)).toBeVisible()
+})
+
+test('seeded two-world collection groups by world section', async ({ page }) => {
+  await page.addInitScript(() => {
+    const req = indexedDB.open('keyval-store')
+    req.onupgradeneeded = () => req.result.createObjectStore('keyval')
+    req.onsuccess = () => {
+      const tx = req.result.transaction('keyval', 'readwrite')
+      tx.objectStore('keyval').put(
+        {
+          version: 1,
+          xp: 0,
+          streak: { count: 0, lastDay: '' },
+          skills: {},
+          collection: [
+            { world: 'pokemon', name: 'pikachu', label: 'electric' },
+            { world: 'yugioh', name: 'Dark Magician', label: 'Normal Monster' },
+          ],
+          badges: [],
+        },
+        'sql-quest-progress',
+      )
+    }
+  })
+  await page.goto('/')
+  await page.getByRole('button', { name: /📚/ }).click()
+  await expect(page.getByRole('heading', { name: 'Pokemon', level: 3 })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Yugioh', level: 3 })).toBeVisible()
+  await expect(page.locator('.tile')).toHaveCount(2)
+})
