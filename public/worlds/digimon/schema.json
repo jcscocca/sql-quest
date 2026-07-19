@@ -1,0 +1,83 @@
+{
+  "world": "digimon",
+  "name": "Digimon",
+  "entity": {
+    "table": "digimon",
+    "column": "name",
+    "labelColumn": "attribute"
+  },
+  "tables": [
+    {
+      "name": "digimon",
+      "description": "One row per Digimon (Wikimon-sourced via DAPI)",
+      "columns": [
+        {
+          "name": "id",
+          "type": "BIGINT",
+          "description": "DAPI id"
+        },
+        {
+          "name": "name",
+          "type": "VARCHAR",
+          "description": "Digimon name, e.g. Agumon"
+        },
+        {
+          "name": "level",
+          "type": "VARCHAR",
+          "description": "Primary evolution stage, e.g. 'Baby I', 'Child', 'Adult', 'Perfect', 'Ultimate' — NULL when unlisted"
+        },
+        {
+          "name": "type",
+          "type": "VARCHAR",
+          "description": "Primary type, e.g. 'Reptile', 'Machine' — NULL when unlisted"
+        },
+        {
+          "name": "attribute",
+          "type": "VARCHAR",
+          "description": "Primary attribute: 'Vaccine', 'Virus', 'Data', 'Free', or 'Variable' — NULL when unlisted"
+        },
+        {
+          "name": "x_antibody",
+          "type": "BOOLEAN",
+          "description": "TRUE for X-Antibody variants"
+        },
+        {
+          "name": "release_year",
+          "type": "BIGINT",
+          "description": "Year the Digimon debuted — NULL when unknown"
+        }
+      ]
+    },
+    {
+      "name": "evolutions",
+      "description": "Directed evolution edges (from one Digimon to a possible next form); a Digimon can have many rows in both directions",
+      "columns": [
+        {
+          "name": "from_id",
+          "type": "BIGINT",
+          "description": "References digimon.id (the earlier form)"
+        },
+        {
+          "name": "from_name",
+          "type": "VARCHAR",
+          "description": "Name of the earlier form (denormalized for readable joins)"
+        },
+        {
+          "name": "to_id",
+          "type": "BIGINT",
+          "description": "References digimon.id (the evolved form)"
+        },
+        {
+          "name": "to_name",
+          "type": "VARCHAR",
+          "description": "Name of the evolved form"
+        },
+        {
+          "name": "condition",
+          "type": "VARCHAR",
+          "description": "Evolution requirement text, e.g. 'with Starmons' — NULL when unconditional"
+        }
+      ]
+    }
+  ]
+}
