@@ -74,7 +74,11 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  test: { environment: 'node', setupFiles: ['./src/test-setup.ts'] },
+  test: {
+    environment: 'node',
+    setupFiles: ['./src/test-setup.ts'],
+    exclude: ['**/node_modules/**', '**/e2e/**'],
+  },
 })
 ```
 
@@ -149,7 +153,7 @@ playwright-report/
 
 ```bash
 npm install react react-dom zustand idb-keyval @duckdb/duckdb-wasm @uiw/react-codemirror @codemirror/lang-sql
-npm install -D typescript vite @vitejs/plugin-react @types/react @types/react-dom vitest fake-indexeddb tsx @duckdb/node-api @playwright/test
+npm install -D typescript vite @vitejs/plugin-react @types/react @types/react-dom vitest fake-indexeddb tsx @duckdb/node-api @playwright/test @types/node
 npx playwright install chromium
 ```
 Expected: installs succeed, `package-lock.json` created.
