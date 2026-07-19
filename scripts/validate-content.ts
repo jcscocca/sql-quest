@@ -37,6 +37,13 @@ for (const skill of skills) {
     continue
   }
   if (bank.skillId !== skill.id) failures.push(`${skill.id}: bank skillId is "${bank.skillId}"`)
+  if (!Array.isArray(bank.exercises)) {
+    failures.push(`${skill.id}: bank has no exercises array`)
+    continue
+  }
+  if (bank.exercises.length === 0) failures.push(`${skill.id}: exercise bank is empty`)
+  if (new Set(bank.exercises.map(e => e.id)).size !== bank.exercises.length)
+    failures.push(`${skill.id}: duplicate exercise ids in bank`)
   for (const ex of bank.exercises) {
     checked++
     const tag = `${skill.id}/${ex.id}`
