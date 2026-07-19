@@ -1,0 +1,29 @@
+{
+  "skillId": "order-limit",
+  "exercises": [
+    {
+      "id": "ol-1",
+      "prompt": "Show the top 10 Pokémon by total stats — name and total, highest first. Break ties alphabetically by name.",
+      "referenceSql": "SELECT name, total FROM pokemon ORDER BY total DESC, name LIMIT 10",
+      "orderMatters": true,
+      "hints": [
+        "ORDER BY total DESC puts the highest totals first; LIMIT 10 keeps ten rows.",
+        "To break ties alphabetically, add a second sort column: ORDER BY total DESC, name.",
+        "```sql\nSELECT name, total FROM pokemon ORDER BY total DESC, name LIMIT 10\n```"
+      ],
+      "xp": 15
+    },
+    {
+      "id": "ol-2",
+      "prompt": "Find the 5 heaviest Pokémon — name and weight_kg, heaviest first (ties alphabetical by name).",
+      "referenceSql": "SELECT name, weight_kg FROM pokemon ORDER BY weight_kg DESC, name LIMIT 5",
+      "orderMatters": true,
+      "hints": [
+        "Same shape as the last exercise, but sorting on weight_kg.",
+        "ORDER BY weight_kg DESC, name — then LIMIT 5.",
+        "```sql\nSELECT name, weight_kg FROM pokemon ORDER BY weight_kg DESC, name LIMIT 5\n```"
+      ],
+      "xp": 15
+    }
+  ]
+}

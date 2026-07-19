@@ -1,0 +1,30 @@
+{
+  "skillId": "where-filtering",
+  "exercises": [
+    {
+      "id": "wf-1",
+      "prompt": "List the names of all legendary Pokémon.",
+      "referenceSql": "SELECT name FROM pokemon WHERE is_legendary",
+      "orderMatters": false,
+      "hints": [
+        "Add a WHERE clause that tests the is_legendary column.",
+        "is_legendary is a BOOLEAN, so WHERE is_legendary (or WHERE is_legendary = true) works.",
+        "```sql\nSELECT name FROM pokemon WHERE is_legendary\n```"
+      ],
+      "xp": 10,
+      "collectibles": ["articuno", "zapdos", "moltres"]
+    },
+    {
+      "id": "wf-2",
+      "prompt": "Show the name and attack of water-type (type1) Pokémon whose attack is above 100.",
+      "referenceSql": "SELECT name, attack FROM pokemon WHERE type1 = 'water' AND attack > 100",
+      "orderMatters": false,
+      "hints": [
+        "You need two conditions joined with AND.",
+        "Text comparisons use quotes: type1 = 'water'. The other condition is attack > 100.",
+        "```sql\nSELECT name, attack FROM pokemon WHERE type1 = 'water' AND attack > 100\n```"
+      ],
+      "xp": 10
+    }
+  ]
+}

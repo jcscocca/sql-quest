@@ -1,0 +1,60 @@
+{
+  "regions": [
+    {
+      "id": "foundations",
+      "name": "Foundations",
+      "skills": [
+        {
+          "id": "select-basics",
+          "name": "SELECT Basics",
+          "world": "pokemon",
+          "requires": [],
+          "lesson": {
+            "intro": "Every query starts with SELECT (which columns you want) and FROM (which table they live in). SELECT * grabs every column, but naming columns explicitly — SELECT name, attack — is almost always better: you get exactly what you asked for, in the order you asked for it.",
+            "exampleSql": "SELECT name, type1, attack FROM pokemon"
+          }
+        },
+        {
+          "id": "where-filtering",
+          "name": "WHERE Filtering",
+          "world": "pokemon",
+          "requires": ["select-basics"],
+          "lesson": {
+            "intro": "WHERE keeps only the rows that pass a test. Combine tests with AND / OR, compare with = <> > < >= <=, match text with LIKE. One trap: NULL never equals anything — use IS NULL / IS NOT NULL for missing values (many Pokémon have no second type).",
+            "exampleSql": "SELECT name, attack FROM pokemon WHERE type1 = 'fire' AND attack >= 100"
+          }
+        },
+        {
+          "id": "order-limit",
+          "name": "ORDER BY & LIMIT",
+          "world": "pokemon",
+          "requires": ["where-filtering"],
+          "lesson": {
+            "intro": "ORDER BY sorts the output (ASC by default, DESC for highest-first) and LIMIT keeps the first N rows — together they answer every 'top 10' question. Sort by multiple columns to break ties deterministically: ORDER BY total DESC, name means 'by total, then alphabetically among equals'.",
+            "exampleSql": "SELECT name, speed FROM pokemon ORDER BY speed DESC, name LIMIT 5"
+          }
+        },
+        {
+          "id": "distinct",
+          "name": "DISTINCT",
+          "world": "pokemon",
+          "requires": ["where-filtering"],
+          "lesson": {
+            "intro": "DISTINCT collapses duplicate rows in the result. SELECT DISTINCT type1 lists each primary type once; COUNT(DISTINCT type1) counts how many different values exist. DISTINCT applies to the whole selected row, not just the column it sits next to.",
+            "exampleSql": "SELECT DISTINCT type1 FROM pokemon ORDER BY type1"
+          }
+        },
+        {
+          "id": "aggregates",
+          "name": "Aggregate Basics",
+          "world": "pokemon",
+          "requires": ["order-limit", "distinct"],
+          "lesson": {
+            "intro": "Aggregate functions squash many rows into one value: COUNT(*) counts rows, AVG/SUM/MIN/MAX do what they say. With no GROUP BY, the whole table becomes a single output row. COUNT(col) skips NULLs while COUNT(*) counts everything — that difference answers 'how many Pokémon have a second type?'",
+            "exampleSql": "SELECT COUNT(*) AS pokemon_count, AVG(attack) AS avg_attack FROM pokemon"
+          }
+        }
+      ]
+    }
+  ]
+}

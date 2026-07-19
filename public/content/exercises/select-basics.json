@@ -1,0 +1,29 @@
+{
+  "skillId": "select-basics",
+  "exercises": [
+    {
+      "id": "sb-1",
+      "prompt": "List the name of every Pokémon.",
+      "referenceSql": "SELECT name FROM pokemon",
+      "orderMatters": false,
+      "hints": [
+        "You need exactly two clauses: SELECT (which column?) and FROM (which table?).",
+        "The column is called name and the table is called pokemon.",
+        "```sql\nSELECT name FROM pokemon\n```"
+      ],
+      "xp": 10
+    },
+    {
+      "id": "sb-2",
+      "prompt": "Show each Pokémon's name, primary type (type1), and total stat score.",
+      "referenceSql": "SELECT name, type1, total FROM pokemon",
+      "orderMatters": false,
+      "hints": [
+        "List multiple columns after SELECT, separated by commas.",
+        "The three columns are name, type1, and total.",
+        "```sql\nSELECT name, type1, total FROM pokemon\n```"
+      ],
+      "xp": 10
+    }
+  ]
+}

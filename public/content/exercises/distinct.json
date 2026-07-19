@@ -1,0 +1,29 @@
+{
+  "skillId": "distinct",
+  "exercises": [
+    {
+      "id": "d-1",
+      "prompt": "List every distinct primary type (type1), alphabetically.",
+      "referenceSql": "SELECT DISTINCT type1 FROM pokemon ORDER BY type1",
+      "orderMatters": true,
+      "hints": [
+        "DISTINCT goes right after SELECT and removes duplicate rows.",
+        "Alphabetical means ORDER BY type1 (ascending is the default).",
+        "```sql\nSELECT DISTINCT type1 FROM pokemon ORDER BY type1\n```"
+      ],
+      "xp": 12
+    },
+    {
+      "id": "d-2",
+      "prompt": "How many distinct generations of Pokémon exist? Return a single number.",
+      "referenceSql": "SELECT COUNT(DISTINCT generation) AS generations FROM pokemon",
+      "orderMatters": false,
+      "hints": [
+        "You can put DISTINCT inside COUNT(...).",
+        "COUNT(DISTINCT generation) counts each generation value once.",
+        "```sql\nSELECT COUNT(DISTINCT generation) FROM pokemon\n```"
+      ],
+      "xp": 12
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "skillId": "aggregates",
+  "exercises": [
+    {
+      "id": "ag-1",
+      "prompt": "What is the average attack across all Pokémon? Return a single row.",
+      "referenceSql": "SELECT AVG(attack) AS avg_attack FROM pokemon",
+      "orderMatters": false,
+      "hints": [
+        "An aggregate with no GROUP BY collapses the whole table into one row.",
+        "The function you want is AVG(attack).",
+        "```sql\nSELECT AVG(attack) FROM pokemon\n```"
+      ],
+      "xp": 12
+    },
+    {
+      "id": "ag-2",
+      "prompt": "In one row: how many Pokémon are there, and what is the highest total stat score?",
+      "referenceSql": "SELECT COUNT(*) AS pokemon_count, MAX(total) AS best_total FROM pokemon",
+      "orderMatters": false,
+      "hints": [
+        "You can select two aggregates side by side in one SELECT.",
+        "COUNT(*) for the count, MAX(total) for the best total.",
+        "```sql\nSELECT COUNT(*), MAX(total) FROM pokemon\n```"
+      ],
+      "xp": 12
+    }
+  ]
+}
