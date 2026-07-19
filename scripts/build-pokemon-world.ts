@@ -2,7 +2,14 @@ import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
 import { DuckDBInstance } from '@duckdb/node-api'
 
 const CSV_BASE = 'https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv'
-const FILES = ['pokemon.csv', 'pokemon_species.csv', 'pokemon_stats.csv', 'pokemon_types.csv', 'types.csv']
+const FILES = [
+  'pokemon.csv',
+  'pokemon_species.csv',
+  'pokemon_stats.csv',
+  'pokemon_types.csv',
+  'types.csv',
+  'type_efficacy.csv',
+]
 const SRC = 'data-src/pokemon'
 const OUT = 'public/worlds/pokemon'
 
@@ -67,10 +74,26 @@ await conn.run(`COPY pokemon TO '${OUT}/pokemon.parquet' (FORMAT parquet)`)
 const reader = await conn.runAndReadAll('SELECT COUNT(*) AS n FROM pokemon')
 console.log(`wrote ${OUT}/pokemon.parquet with ${reader.getRows()[0][0]} rows`)
 
+await conn.run(`
+CREATE TABLE type_matchups AS
+SELECT
+  atk.identifier AS attacker_type,
+  def.identifier AS defender_type,
+  te.damage_factor / 100.0 AS multiplier
+FROM read_csv('${SRC}/type_efficacy.csv') te
+JOIN read_csv('${SRC}/types.csv') atk ON atk.id = te.damage_type_id
+JOIN read_csv('${SRC}/types.csv') def ON def.id = te.target_type_id
+ORDER BY atk.identifier, def.identifier
+`)
+
+await conn.run(`COPY type_matchups TO '${OUT}/type_matchups.parquet' (FORMAT parquet)`)
+const tmReader = await conn.runAndReadAll('SELECT COUNT(*) AS n FROM type_matchups')
+console.log(`wrote ${OUT}/type_matchups.parquet with ${tmReader.getRows()[0][0]} rows`)
+
 const schema = {
   world: 'pokemon',
   name: 'Pokémon',
-  entity: { table: 'pokemon', column: 'name' },
+  entity: { table: 'pokemon', column: 'name', labelColumn: 'type1' },
   tables: [
     {
       name: 'pokemon',
@@ -92,6 +115,19 @@ const schema = {
         { name: 'weight_kg', type: 'DOUBLE', description: 'Weight in kilograms' },
         { name: 'is_legendary', type: 'BOOLEAN', description: 'True for legendary Pokémon' },
         { name: 'evolves_from', type: 'VARCHAR', description: 'Name of the pre-evolution — NULL if none' },
+      ],
+    },
+    {
+      name: 'type_matchups',
+      description: 'Type-effectiveness chart: how much damage each attacking type deals to each defending type',
+      columns: [
+        { name: 'attacker_type', type: 'VARCHAR', description: 'Attacking move type, e.g. water' },
+        { name: 'defender_type', type: 'VARCHAR', description: 'Defending Pokémon type, e.g. fire' },
+        {
+          name: 'multiplier',
+          type: 'DOUBLE',
+          description: 'damage multiplier: 0, 0.5, 1, or 2',
+        },
       ],
     },
   ],

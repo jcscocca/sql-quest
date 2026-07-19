@@ -3,7 +3,8 @@
   "name": "Pokémon",
   "entity": {
     "table": "pokemon",
-    "column": "name"
+    "column": "name",
+    "labelColumn": "type1"
   },
   "tables": [
     {
@@ -89,6 +90,27 @@
           "name": "evolves_from",
           "type": "VARCHAR",
           "description": "Name of the pre-evolution — NULL if none"
+        }
+      ]
+    },
+    {
+      "name": "type_matchups",
+      "description": "Type-effectiveness chart: how much damage each attacking type deals to each defending type",
+      "columns": [
+        {
+          "name": "attacker_type",
+          "type": "VARCHAR",
+          "description": "Attacking move type, e.g. water"
+        },
+        {
+          "name": "defender_type",
+          "type": "VARCHAR",
+          "description": "Defending Pokémon type, e.g. fire"
+        },
+        {
+          "name": "multiplier",
+          "type": "DOUBLE",
+          "description": "damage multiplier: 0, 0.5, 1, or 2"
         }
       ]
     }
