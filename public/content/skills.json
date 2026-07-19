@@ -195,6 +195,68 @@
           }
         }
       ]
+    },
+    {
+      "id": "analyst",
+      "name": "Analyst Power",
+      "world": "movies",
+      "skills": [
+        {
+          "id": "cte",
+          "name": "CTEs",
+          "world": "movies",
+          "requires": ["correlated-subqueries"],
+          "lesson": {
+            "intro": "A CTE (Common Table Expression) is a named query you define with WITH before your main query, letting you build a result in readable, reusable steps instead of one dense nested statement. In the Movies world you might name a step genre_avg that joins movies to ratings and computes each genre1's mean avg_rating, then SELECT from it as if it were a table — even joining it back to movies to compare each film against its own genre. You can chain several CTEs separated by commas, and each may reference the ones before it, so a three-part question becomes three plainly named steps. Because ratings only exist for movies that received at least one rating, joining movies to ratings inside a CTE and applying a num_ratings floor is the honest way to keep a single stray vote from crowning a 5.0.",
+            "exampleSql": "WITH genre_avg AS (SELECT m.genre1, AVG(r.avg_rating) AS genre_mean FROM movies m JOIN ratings r ON m.movie_id = r.movie_id WHERE r.num_ratings >= 20 AND m.genre1 IS NOT NULL GROUP BY m.genre1) SELECT genre1, ROUND(genre_mean, 2) AS genre_mean FROM genre_avg ORDER BY genre_mean DESC",
+            "wrapUp": "A CTE names an intermediate result so a complex question reads as a sequence of clear steps — and unlike a subquery buried in a WHERE, it can be joined, reused, and stacked. This is the readable backbone of every analytical query to come. Next you'll add window functions, which compute across rows without collapsing them — starting by ranking films inside their genre."
+          }
+        },
+        {
+          "id": "window-ranking",
+          "name": "Window Ranking",
+          "world": "movies",
+          "requires": ["cte"],
+          "lesson": {
+            "intro": "A window function computes across a set of related rows while keeping every row — no collapsing the way GROUP BY does. RANK(), DENSE_RANK(), and ROW_NUMBER() each number rows within a partition defined by OVER (PARTITION BY ... ORDER BY ...): here, PARTITION BY genre1 ORDER BY avg_rating DESC ranks each film against others in its own genre. The three differ only in how they treat ties: ROW_NUMBER always gives distinct numbers (1, 2, 3, 4), RANK lets ties share a number then skips the next (1, 1, 3), and DENSE_RANK shares without skipping (1, 1, 2). Because a window function can't sit in a WHERE clause, you compute it in a CTE and filter on the result — that's how 'top 3 per genre' is done. And since rating ties are everywhere in this data, add tiebreakers like num_ratings DESC, title, movie_id inside the OVER clause when you need one definite winner.",
+            "exampleSql": "WITH ranked AS (SELECT m.genre1, m.title, r.avg_rating, ROW_NUMBER() OVER (PARTITION BY m.genre1 ORDER BY r.avg_rating DESC, r.num_ratings DESC, m.title, m.movie_id) AS rn FROM movies m JOIN ratings r ON m.movie_id = r.movie_id WHERE r.num_ratings >= 20 AND m.genre1 IS NOT NULL) SELECT genre1, title, avg_rating FROM ranked WHERE rn = 1 ORDER BY genre1",
+            "wrapUp": "Ranking windows number rows within a partition, and the choice between ROW_NUMBER, RANK, and DENSE_RANK is entirely about how ties are handled. Filter the ranked result in an outer query to get 'top N per group', and pin tiebreakers inside OVER so the winner is never left to chance. Next you'll shift from ranking to reaching across rows — comparing each period to the one before it with LAG and LEAD."
+          }
+        },
+        {
+          "id": "window-offsets",
+          "name": "Window Offsets",
+          "world": "seattle311",
+          "requires": ["window-ranking"],
+          "lesson": {
+            "intro": "LAG and LEAD reach across rows to pull a neighbor's value onto the current row — exactly what period-over-period comparisons need. This is your first query against Seattle's 311 data: the requests table, one row per service request with a created_date. There is no closed-date column here, so the analysis is a time series — bucket requests into days, weeks, or months with DATE_TRUNC, COUNT them, and then LAG(reqs) OVER (ORDER BY mon) hands you the previous period's count so you can compute a delta. LAG(reqs, 7) looks seven rows back, LEAD(reqs) looks one ahead, and PARTITION BY department keeps each department's series separate so one department's first month doesn't borrow another's last. One trap: WHERE runs before window functions, so when you need to compare against a period outside your display range, compute the offset in a CTE over the full series and filter afterward.",
+            "exampleSql": "WITH monthly AS (SELECT CAST(DATE_TRUNC('month', created_date) AS DATE) AS mon, COUNT(*) AS reqs FROM requests GROUP BY 1) SELECT mon, reqs, reqs - LAG(reqs) OVER (ORDER BY mon) AS delta FROM monthly ORDER BY mon",
+            "wrapUp": "LAG and LEAD turn a column of period counts into deltas, growth rates, and same-day-last-week comparisons by borrowing a neighboring row's value. Bucket with DATE_TRUNC, partition to keep series apart, and remember that filtering before a window can starve it of the rows it needs to look back on. Next, window frames aggregate a sliding band of neighbors instead of reaching for a single one."
+          }
+        },
+        {
+          "id": "window-frames",
+          "name": "Window Frames",
+          "world": "seattle311",
+          "requires": ["window-ranking"],
+          "lesson": {
+            "intro": "A window frame aggregates a moving band of rows around the current one, defined by a ROWS BETWEEN clause inside OVER. On the 311 daily counts, AVG(reqs) OVER (ORDER BY dt ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) is a rolling 7-day average — the current day plus the six before it — which smooths out the weekday-versus-weekend swing a single LAG can't. Change the frame to change the question: ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW is a running total, ROWS BETWEEN 2 PRECEDING AND CURRENT ROW is a 3-period moving average, and an empty OVER () spans every row — handy as the denominator for a cumulative percentage. AVG over a window returns a DOUBLE, so wrap rolling averages in ROUND(..., 2) rather than casting to DECIMAL. And as with offsets, WHERE filters before the window — compute the frame over the full series in a CTE, then filter to your display range so even the earliest shown rows have a complete window behind them.",
+            "exampleSql": "WITH daily AS (SELECT created_date AS dt, COUNT(*) AS reqs FROM requests GROUP BY 1) SELECT dt, reqs, ROUND(AVG(reqs) OVER (ORDER BY dt ROWS BETWEEN 6 PRECEDING AND CURRENT ROW), 2) AS rolling_avg_7d FROM daily ORDER BY dt LIMIT 10",
+            "wrapUp": "A frame clause turns a window into a sliding aggregate — rolling averages, running totals, and cumulative shares all come from choosing which neighboring rows ROWS BETWEEN includes. Pair frames with PARTITION BY to keep separate series apart, and ROUND fractional averages instead of casting them. One region skill remains: recursive CTEs, which let a query walk a chain of rows step by step."
+          }
+        },
+        {
+          "id": "recursive-cte",
+          "name": "Recursive CTEs",
+          "world": "pokemon",
+          "requires": ["cte"],
+          "lesson": {
+            "intro": "A recursive CTE queries a hierarchy by referencing itself, walking a chain one link at a time. It has two parts joined by UNION ALL: an anchor that picks the starting rows, and a recursive step that joins the CTE back to the base table to reach the next level, repeating until nothing new is found. In the Pokémon data each row's evolves_from names its pre-evolution, so anchoring on a base (evolves_from IS NULL) and stepping down to children (p.evolves_from = cte.name) walks an entire evolution family; carry a depth counter to number the stages and a base column to tag which family each member belongs to. Reverse the join (p.name = cte.evolves_from) to climb upward from a final form back to its base instead. One data quirk to respect: three form-suffixed rows name a pre-evolution that isn't itself in the table, so they never appear in any base-rooted walk — a reminder that recursion only ever reaches links that actually resolve.",
+            "exampleSql": "WITH RECURSIVE family AS (SELECT name, 1 AS depth FROM pokemon WHERE name = 'charmander' UNION ALL SELECT p.name, f.depth + 1 FROM pokemon p JOIN family f ON p.evolves_from = f.name) SELECT name, depth FROM family ORDER BY depth, name",
+            "wrapUp": "A recursive CTE walks a self-referencing hierarchy by repeatedly joining its own output back to the table — anchor to start, recursive step to advance, a depth counter to number the hops. Evolution chains, org charts, and threaded comments all yield to the same pattern. That completes the Analyst Power region: you can now name intermediate results, rank and offset and frame across rows, and traverse hierarchies — the full analytical toolkit."
+          }
+        }
+      ]
     }
   ]
 }

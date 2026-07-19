@@ -1,0 +1,77 @@
+{
+  "skillId": "window-offsets",
+  "exercises": [
+    {
+      "id": "wo-1",
+      "prompt": "Track Seattle's month-over-month request volume. In a CTE, count all requests created in each of the twelve full months from 2025-07-01 through 2026-06-30, bucketing with CAST(DATE_TRUNC('month', created_date) AS DATE) AS mon. Then return mon, reqs (the monthly count), and delta = reqs minus the previous month's reqs using LAG(reqs) OVER (ORDER BY mon). Order by mon ascending. The earliest month has no prior month, so its delta is NULL.",
+      "referenceSql": "WITH monthly AS (SELECT CAST(DATE_TRUNC('month', created_date) AS DATE) AS mon, COUNT(*) AS reqs FROM requests WHERE created_date BETWEEN DATE '2025-07-01' AND DATE '2026-06-30' GROUP BY 1) SELECT mon, reqs, reqs - LAG(reqs) OVER (ORDER BY mon) AS delta FROM monthly ORDER BY mon",
+      "orderMatters": true,
+      "hints": [
+        "First collapse the raw requests into one row per month (a CTE with DATE_TRUNC to the month and COUNT(*)). LAG(reqs) OVER (ORDER BY mon) then reaches back one row — the previous month — so you can subtract it from the current month.",
+        "WITH monthly AS (SELECT CAST(DATE_TRUNC('month', created_date) AS DATE) AS mon, COUNT(*) AS reqs FROM requests WHERE created_date BETWEEN DATE '2025-07-01' AND DATE '2026-06-30' GROUP BY 1) SELECT mon, reqs, reqs - LAG(reqs) OVER (ORDER BY mon) AS delta FROM monthly ORDER BY mon.",
+        "```sql\nWITH monthly AS (SELECT CAST(DATE_TRUNC('month', created_date) AS DATE) AS mon, COUNT(*) AS reqs FROM requests WHERE created_date BETWEEN DATE '2025-07-01' AND DATE '2026-06-30' GROUP BY 1) SELECT mon, reqs, reqs - LAG(reqs) OVER (ORDER BY mon) AS delta FROM monthly ORDER BY mon\n```"
+      ],
+      "xp": 17
+    },
+    {
+      "id": "wo-2",
+      "prompt": "Compare month-over-month volume within each department, not across the whole city. In a CTE, count requests per department and per month (CAST(DATE_TRUNC('month', created_date) AS DATE) AS mon) for the twelve full months 2025-07-01 through 2026-06-30, limited to these three departments: 'SDOT-Seattle Department of Transportation', 'SPU-Seattle Public Utilities', and 'SPR-Seattle Parks and Recreation'. Return department, mon, reqs, and delta from the previous month WITHIN that department using LAG(reqs) OVER (PARTITION BY department ORDER BY mon). Order by department ascending, then mon ascending.",
+      "referenceSql": "WITH monthly AS (SELECT department, CAST(DATE_TRUNC('month', created_date) AS DATE) AS mon, COUNT(*) AS reqs FROM requests WHERE created_date BETWEEN DATE '2025-07-01' AND DATE '2026-06-30' AND department IN ('SDOT-Seattle Department of Transportation','SPU-Seattle Public Utilities','SPR-Seattle Parks and Recreation') GROUP BY 1, 2) SELECT department, mon, reqs, reqs - LAG(reqs) OVER (PARTITION BY department ORDER BY mon) AS delta FROM monthly ORDER BY department, mon",
+      "orderMatters": true,
+      "hints": [
+        "PARTITION BY department makes LAG restart at each department, so the first month of every department has a NULL delta instead of borrowing the previous department's last month. Group the CTE by both department and month.",
+        "WITH monthly AS (SELECT department, CAST(DATE_TRUNC('month', created_date) AS DATE) AS mon, COUNT(*) AS reqs FROM requests WHERE created_date BETWEEN DATE '2025-07-01' AND DATE '2026-06-30' AND department IN (...) GROUP BY 1, 2) SELECT department, mon, reqs, reqs - LAG(reqs) OVER (PARTITION BY department ORDER BY mon) AS delta FROM monthly ORDER BY department, mon.",
+        "```sql\nWITH monthly AS (SELECT department, CAST(DATE_TRUNC('month', created_date) AS DATE) AS mon, COUNT(*) AS reqs FROM requests WHERE created_date BETWEEN DATE '2025-07-01' AND DATE '2026-06-30' AND department IN ('SDOT-Seattle Department of Transportation','SPU-Seattle Public Utilities','SPR-Seattle Parks and Recreation') GROUP BY 1, 2) SELECT department, mon, reqs, reqs - LAG(reqs) OVER (PARTITION BY department ORDER BY mon) AS delta FROM monthly ORDER BY department, mon\n```"
+      ],
+      "xp": 17
+    },
+    {
+      "id": "wo-3",
+      "prompt": "Look forward instead of back: pair each month with the one that follows it. Using the same twelve-full-month volume CTE (2025-07-01 through 2026-06-30, CAST(DATE_TRUNC('month', created_date) AS DATE) AS mon, COUNT(*) AS reqs), return mon, reqs, next_month = LEAD(reqs) OVER (ORDER BY mon), and change_next = next_month minus reqs. Order by mon ascending. The final month has no following month, so next_month and change_next are NULL there.",
+      "referenceSql": "WITH monthly AS (SELECT CAST(DATE_TRUNC('month', created_date) AS DATE) AS mon, COUNT(*) AS reqs FROM requests WHERE created_date BETWEEN DATE '2025-07-01' AND DATE '2026-06-30' GROUP BY 1) SELECT mon, reqs, LEAD(reqs) OVER (ORDER BY mon) AS next_month, LEAD(reqs) OVER (ORDER BY mon) - reqs AS change_next FROM monthly ORDER BY mon",
+      "orderMatters": true,
+      "hints": [
+        "LEAD is LAG's mirror image: LEAD(reqs) OVER (ORDER BY mon) pulls the NEXT row's value forward onto the current row. Subtract the current reqs from it to see how the following month changes.",
+        "WITH monthly AS (SELECT CAST(DATE_TRUNC('month', created_date) AS DATE) AS mon, COUNT(*) AS reqs FROM requests WHERE created_date BETWEEN DATE '2025-07-01' AND DATE '2026-06-30' GROUP BY 1) SELECT mon, reqs, LEAD(reqs) OVER (ORDER BY mon) AS next_month, LEAD(reqs) OVER (ORDER BY mon) - reqs AS change_next FROM monthly ORDER BY mon.",
+        "```sql\nWITH monthly AS (SELECT CAST(DATE_TRUNC('month', created_date) AS DATE) AS mon, COUNT(*) AS reqs FROM requests WHERE created_date BETWEEN DATE '2025-07-01' AND DATE '2026-06-30' GROUP BY 1) SELECT mon, reqs, LEAD(reqs) OVER (ORDER BY mon) AS next_month, LEAD(reqs) OVER (ORDER BY mon) - reqs AS change_next FROM monthly ORDER BY mon\n```"
+      ],
+      "xp": 18
+    },
+    {
+      "id": "wo-4",
+      "prompt": "Turn the raw month-over-month change into a percentage. Using the twelve-full-month volume CTE (2025-07-01 through 2026-06-30, CAST(DATE_TRUNC('month', created_date) AS DATE) AS mon, COUNT(*) AS reqs), return mon, reqs, and pct_change = ROUND(100.0 * (reqs - LAG(reqs) OVER (ORDER BY mon)) / LAG(reqs) OVER (ORDER BY mon), 2). Order by mon ascending. The first month's pct_change is NULL because it divides by an absent prior month.",
+      "referenceSql": "WITH monthly AS (SELECT CAST(DATE_TRUNC('month', created_date) AS DATE) AS mon, COUNT(*) AS reqs FROM requests WHERE created_date BETWEEN DATE '2025-07-01' AND DATE '2026-06-30' GROUP BY 1) SELECT mon, reqs, ROUND(100.0 * (reqs - LAG(reqs) OVER (ORDER BY mon)) / LAG(reqs) OVER (ORDER BY mon), 2) AS pct_change FROM monthly ORDER BY mon",
+      "orderMatters": true,
+      "hints": [
+        "Percent change is (current - previous) / previous * 100. Multiply by 100.0 (not 100) so the division stays a decimal, and wrap the whole thing in ROUND(..., 2). LAG(reqs) supplies the previous month in both the numerator and the denominator.",
+        "WITH monthly AS (SELECT CAST(DATE_TRUNC('month', created_date) AS DATE) AS mon, COUNT(*) AS reqs FROM requests WHERE created_date BETWEEN DATE '2025-07-01' AND DATE '2026-06-30' GROUP BY 1) SELECT mon, reqs, ROUND(100.0 * (reqs - LAG(reqs) OVER (ORDER BY mon)) / LAG(reqs) OVER (ORDER BY mon), 2) AS pct_change FROM monthly ORDER BY mon.",
+        "```sql\nWITH monthly AS (SELECT CAST(DATE_TRUNC('month', created_date) AS DATE) AS mon, COUNT(*) AS reqs FROM requests WHERE created_date BETWEEN DATE '2025-07-01' AND DATE '2026-06-30' GROUP BY 1) SELECT mon, reqs, ROUND(100.0 * (reqs - LAG(reqs) OVER (ORDER BY mon)) / LAG(reqs) OVER (ORDER BY mon), 2) AS pct_change FROM monthly ORDER BY mon\n```"
+      ],
+      "xp": 18
+    },
+    {
+      "id": "wo-5",
+      "prompt": "Trace a single service type week by week through one quarter. In a CTE, count requests of service_request_type 'Unauthorized Encampment' created between 2025-10-01 and 2025-12-31, bucketed by CAST(DATE_TRUNC('week', created_date) AS DATE) AS wk. Return wk, reqs, and delta = reqs minus the prior week's reqs via LAG(reqs) OVER (ORDER BY wk). Order by wk ascending.",
+      "referenceSql": "WITH weekly AS (SELECT CAST(DATE_TRUNC('week', created_date) AS DATE) AS wk, COUNT(*) AS reqs FROM requests WHERE service_request_type = 'Unauthorized Encampment' AND created_date BETWEEN DATE '2025-10-01' AND DATE '2025-12-31' GROUP BY 1) SELECT wk, reqs, reqs - LAG(reqs) OVER (ORDER BY wk) AS delta FROM weekly ORDER BY wk",
+      "orderMatters": true,
+      "hints": [
+        "DATE_TRUNC('week', created_date) snaps every date back to its Monday, so counting grouped by that gives one row per week. Then LAG over the weekly series is the same one-row-back trick you used on months.",
+        "WITH weekly AS (SELECT CAST(DATE_TRUNC('week', created_date) AS DATE) AS wk, COUNT(*) AS reqs FROM requests WHERE service_request_type = 'Unauthorized Encampment' AND created_date BETWEEN DATE '2025-10-01' AND DATE '2025-12-31' GROUP BY 1) SELECT wk, reqs, reqs - LAG(reqs) OVER (ORDER BY wk) AS delta FROM weekly ORDER BY wk.",
+        "```sql\nWITH weekly AS (SELECT CAST(DATE_TRUNC('week', created_date) AS DATE) AS wk, COUNT(*) AS reqs FROM requests WHERE service_request_type = 'Unauthorized Encampment' AND created_date BETWEEN DATE '2025-10-01' AND DATE '2025-12-31' GROUP BY 1) SELECT wk, reqs, reqs - LAG(reqs) OVER (ORDER BY wk) AS delta FROM weekly ORDER BY wk\n```"
+      ],
+      "xp": 19
+    },
+    {
+      "id": "wo-6",
+      "prompt": "Compare each day's total volume to the same day one week earlier. Build a daily CTE counting all requests per created_date across the whole dataset, then a second CTE that computes week_ago = LAG(reqs, 7) OVER (ORDER BY dt) — the count from exactly seven rows (days) back. Finally return dt, reqs, week_ago, and vs_last_week = reqs - week_ago for dates from 2026-06-08 through 2026-06-21, ordered by dt ascending. Compute the LAG over the full daily series in the CTE, THEN filter to the display window, so week_ago reaches back into early June rather than being NULL.",
+      "referenceSql": "WITH daily AS (SELECT created_date AS dt, COUNT(*) AS reqs FROM requests GROUP BY 1), compared AS (SELECT dt, reqs, LAG(reqs, 7) OVER (ORDER BY dt) AS week_ago FROM daily) SELECT dt, reqs, week_ago, reqs - week_ago AS vs_last_week FROM compared WHERE dt BETWEEN DATE '2026-06-08' AND DATE '2026-06-21' ORDER BY dt",
+      "orderMatters": true,
+      "hints": [
+        "LAG takes an optional offset: LAG(reqs, 7) looks seven rows back instead of one. The catch is that WHERE runs before window functions, so if you filter to mid-June first, there are no earlier rows to reach. Do the LAG in a CTE over every day, and only then filter the outer query to the display range.",
+        "WITH daily AS (SELECT created_date AS dt, COUNT(*) AS reqs FROM requests GROUP BY 1), compared AS (SELECT dt, reqs, LAG(reqs, 7) OVER (ORDER BY dt) AS week_ago FROM daily) SELECT dt, reqs, week_ago, reqs - week_ago AS vs_last_week FROM compared WHERE dt BETWEEN DATE '2026-06-08' AND DATE '2026-06-21' ORDER BY dt.",
+        "```sql\nWITH daily AS (SELECT created_date AS dt, COUNT(*) AS reqs FROM requests GROUP BY 1), compared AS (SELECT dt, reqs, LAG(reqs, 7) OVER (ORDER BY dt) AS week_ago FROM daily) SELECT dt, reqs, week_ago, reqs - week_ago AS vs_last_week FROM compared WHERE dt BETWEEN DATE '2026-06-08' AND DATE '2026-06-21' ORDER BY dt\n```"
+      ],
+      "xp": 20
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "skillId": "recursive-cte",
+  "exercises": [
+    {
+      "id": "rc-1",
+      "prompt": "Walk the entire Eevee family tree downward. Write a recursive CTE named family: the anchor selects the row where name = 'eevee' with depth 1; the recursive step joins pokemon to family on p.evolves_from = family.name, adding 1 to depth each level. Return name and depth for every member, ordered by depth ascending, then name ascending. (Eevee branches into many evolutions, so several rows share depth 2.)",
+      "referenceSql": "WITH RECURSIVE family AS (SELECT name, 1 AS depth FROM pokemon WHERE name = 'eevee' UNION ALL SELECT p.name, f.depth + 1 FROM pokemon p JOIN family f ON p.evolves_from = f.name) SELECT name, depth FROM family ORDER BY depth, name",
+      "orderMatters": true,
+      "hints": [
+        "A recursive CTE has two halves joined by UNION ALL: an anchor row to start from (eevee, depth 1) and a recursive step that finds the children of whatever is already in the CTE — the pokemon whose evolves_from equals a name already collected. Each hop adds 1 to depth.",
+        "WITH RECURSIVE family AS (SELECT name, 1 AS depth FROM pokemon WHERE name = 'eevee' UNION ALL SELECT p.name, f.depth + 1 FROM pokemon p JOIN family f ON p.evolves_from = f.name) SELECT name, depth FROM family ORDER BY depth, name.",
+        "```sql\nWITH RECURSIVE family AS (SELECT name, 1 AS depth FROM pokemon WHERE name = 'eevee' UNION ALL SELECT p.name, f.depth + 1 FROM pokemon p JOIN family f ON p.evolves_from = f.name) SELECT name, depth FROM family ORDER BY depth, name\n```"
+      ],
+      "xp": 17
+    },
+    {
+      "id": "rc-2",
+      "prompt": "Trace a lineage upward from a final evolution to its base. Write a recursive CTE named ancestry: the anchor is the row where name = 'venusaur' with step 1, carrying evolves_from; the recursive step climbs to the pre-evolution by joining pokemon to ancestry on p.name = ancestry.evolves_from, adding 1 to step. Return step and name, ordered by step ascending.",
+      "referenceSql": "WITH RECURSIVE ancestry AS (SELECT name, evolves_from, 1 AS step FROM pokemon WHERE name = 'venusaur' UNION ALL SELECT p.name, p.evolves_from, a.step + 1 FROM pokemon p JOIN ancestry a ON p.name = a.evolves_from) SELECT step, name FROM ancestry ORDER BY step",
+      "orderMatters": true,
+      "hints": [
+        "This time you follow evolves_from upward: the recursive step looks for the pokemon whose name matches the current row's evolves_from (its parent). When a row's evolves_from is NULL, no parent matches and the recursion stops — that row is the base.",
+        "WITH RECURSIVE ancestry AS (SELECT name, evolves_from, 1 AS step FROM pokemon WHERE name = 'venusaur' UNION ALL SELECT p.name, p.evolves_from, a.step + 1 FROM pokemon p JOIN ancestry a ON p.name = a.evolves_from) SELECT step, name FROM ancestry ORDER BY step.",
+        "```sql\nWITH RECURSIVE ancestry AS (SELECT name, evolves_from, 1 AS step FROM pokemon WHERE name = 'venusaur' UNION ALL SELECT p.name, p.evolves_from, a.step + 1 FROM pokemon p JOIN ancestry a ON p.name = a.evolves_from) SELECT step, name FROM ancestry ORDER BY step\n```"
+      ],
+      "xp": 17
+    },
+    {
+      "id": "rc-3",
+      "prompt": "Measure the size and depth of the biggest evolution families. Write a recursive CTE named chain that starts from every base (evolves_from IS NULL), carrying the base name along, its own name, and depth 1; the recursive step walks down to children (p.evolves_from = chain.name), adding 1 to depth. Then, grouping by base, return base, stages = MAX(depth), and members = COUNT(*) for families with at least 4 members, ordered by members descending, then base ascending.",
+      "referenceSql": "WITH RECURSIVE chain AS (SELECT name AS base, name, 1 AS depth FROM pokemon WHERE evolves_from IS NULL UNION ALL SELECT c.base, p.name, c.depth + 1 FROM pokemon p JOIN chain c ON p.evolves_from = c.name) SELECT base, MAX(depth) AS stages, COUNT(*) AS members FROM chain GROUP BY base HAVING COUNT(*) >= 4 ORDER BY members DESC, base",
+      "orderMatters": true,
+      "hints": [
+        "Carry the original base name through every recursive step (SELECT c.base, ...) so the whole family stays tagged with its root. Then a normal GROUP BY base over the recursive result gives MAX(depth) as the number of stages and COUNT(*) as the family size.",
+        "WITH RECURSIVE chain AS (SELECT name AS base, name, 1 AS depth FROM pokemon WHERE evolves_from IS NULL UNION ALL SELECT c.base, p.name, c.depth + 1 FROM pokemon p JOIN chain c ON p.evolves_from = c.name) SELECT base, MAX(depth) AS stages, COUNT(*) AS members FROM chain GROUP BY base HAVING COUNT(*) >= 4 ORDER BY members DESC, base.",
+        "```sql\nWITH RECURSIVE chain AS (SELECT name AS base, name, 1 AS depth FROM pokemon WHERE evolves_from IS NULL UNION ALL SELECT c.base, p.name, c.depth + 1 FROM pokemon p JOIN chain c ON p.evolves_from = c.name) SELECT base, MAX(depth) AS stages, COUNT(*) AS members FROM chain GROUP BY base HAVING COUNT(*) >= 4 ORDER BY members DESC, base\n```"
+      ],
+      "xp": 18
+    },
+    {
+      "id": "rc-4",
+      "prompt": "Expose the orphaned evolutions. A few form-suffixed rows name a pre-evolution that isn't itself a row in the table, so they can never be reached by walking down from any base. Build a recursive CTE named reachable that collects every name reachable from a base (anchor: evolves_from IS NULL; recursive step: p.evolves_from = reachable.name). Then return name and evolves_from for the pokemon whose evolves_from IS NOT NULL but whose name is NOT IN (SELECT name FROM reachable), ordered by name ascending. You should find exactly three.",
+      "referenceSql": "WITH RECURSIVE reachable AS (SELECT name FROM pokemon WHERE evolves_from IS NULL UNION ALL SELECT p.name FROM pokemon p JOIN reachable r ON p.evolves_from = r.name) SELECT p.name, p.evolves_from FROM pokemon p WHERE p.evolves_from IS NOT NULL AND p.name NOT IN (SELECT name FROM reachable) ORDER BY p.name",
+      "orderMatters": true,
+      "hints": [
+        "First build the set of everything a base-rooted walk can reach. Any pokemon that has a pre-evolution yet never shows up in that reachable set is an orphan — its named pre-evolution has no matching row, so the downward walk never arrives. Compare with NOT IN against the recursive result.",
+        "WITH RECURSIVE reachable AS (SELECT name FROM pokemon WHERE evolves_from IS NULL UNION ALL SELECT p.name FROM pokemon p JOIN reachable r ON p.evolves_from = r.name) SELECT p.name, p.evolves_from FROM pokemon p WHERE p.evolves_from IS NOT NULL AND p.name NOT IN (SELECT name FROM reachable) ORDER BY p.name.",
+        "```sql\nWITH RECURSIVE reachable AS (SELECT name FROM pokemon WHERE evolves_from IS NULL UNION ALL SELECT p.name FROM pokemon p JOIN reachable r ON p.evolves_from = r.name) SELECT p.name, p.evolves_from FROM pokemon p WHERE p.evolves_from IS NOT NULL AND p.name NOT IN (SELECT name FROM reachable) ORDER BY p.name\n```"
+      ],
+      "xp": 18
+    },
+    {
+      "id": "rc-5",
+      "prompt": "Build the readable evolution path for the Poliwag family. Write a recursive CTE named paths starting at name = 'poliwag' with path set to its own name and depth 1; the recursive step appends each child with the || operator: pa.path || ' > ' || p.name. Return name, path, and depth for every family member, ordered by depth ascending, then name ascending. The paths should read like 'poliwag > poliwhirl > poliwrath'.",
+      "referenceSql": "WITH RECURSIVE paths AS (SELECT name, name AS path, 1 AS depth FROM pokemon WHERE name = 'poliwag' UNION ALL SELECT p.name, pa.path || ' > ' || p.name, pa.depth + 1 FROM pokemon p JOIN paths pa ON p.evolves_from = pa.name) SELECT name, path, depth FROM paths ORDER BY depth, name",
+      "orderMatters": true,
+      "hints": [
+        "Accumulate a string as you recurse: the anchor's path is just its name, and each recursive step concatenates the parent's path, a ' > ' separator, and the child's name. The || operator joins the pieces.",
+        "WITH RECURSIVE paths AS (SELECT name, name AS path, 1 AS depth FROM pokemon WHERE name = 'poliwag' UNION ALL SELECT p.name, pa.path || ' > ' || p.name, pa.depth + 1 FROM pokemon p JOIN paths pa ON p.evolves_from = pa.name) SELECT name, path, depth FROM paths ORDER BY depth, name.",
+        "```sql\nWITH RECURSIVE paths AS (SELECT name, name AS path, 1 AS depth FROM pokemon WHERE name = 'poliwag' UNION ALL SELECT p.name, pa.path || ' > ' || p.name, pa.depth + 1 FROM pokemon p JOIN paths pa ON p.evolves_from = pa.name) SELECT name, path, depth FROM paths ORDER BY depth, name\n```"
+      ],
+      "xp": 19
+    },
+    {
+      "id": "rc-6",
+      "prompt": "Find the strongest third-stage final forms. Write a recursive CTE named chain from every base (carry base, name, depth; recursive step p.evolves_from = chain.name, depth + 1). In a second CTE named finals, keep the chain rows at depth = 3 that have no further evolution — NOT EXISTS (SELECT 1 FROM pokemon p WHERE p.evolves_from = chain.name). Join finals back to pokemon to read each final form's total stat, and return base, final_form (the final's name), and total for the top 15, ordered by total descending, then final_form ascending.",
+      "referenceSql": "WITH RECURSIVE chain AS (SELECT name AS base, name, 1 AS depth FROM pokemon WHERE evolves_from IS NULL UNION ALL SELECT c.base, p.name, c.depth + 1 FROM pokemon p JOIN chain c ON p.evolves_from = c.name), finals AS (SELECT c.base, c.name, c.depth FROM chain c WHERE c.depth = 3 AND NOT EXISTS (SELECT 1 FROM pokemon p WHERE p.evolves_from = c.name)) SELECT f.base, f.name AS final_form, p.total FROM finals f JOIN pokemon p ON p.name = f.name ORDER BY p.total DESC, f.name LIMIT 15",
+      "orderMatters": true,
+      "hints": [
+        "The recursive chain tags every pokemon with its depth from the base. A depth-3 row that no other pokemon evolves from (NOT EXISTS a child) is a true third-stage final form. Join those back to pokemon for the total stat, sort by total descending, and LIMIT 15 — the name tiebreak keeps the cut deterministic.",
+        "WITH RECURSIVE chain AS (... depth walk ...), finals AS (SELECT c.base, c.name, c.depth FROM chain c WHERE c.depth = 3 AND NOT EXISTS (SELECT 1 FROM pokemon p WHERE p.evolves_from = c.name)) SELECT f.base, f.name AS final_form, p.total FROM finals f JOIN pokemon p ON p.name = f.name ORDER BY p.total DESC, f.name LIMIT 15.",
+        "```sql\nWITH RECURSIVE chain AS (SELECT name AS base, name, 1 AS depth FROM pokemon WHERE evolves_from IS NULL UNION ALL SELECT c.base, p.name, c.depth + 1 FROM pokemon p JOIN chain c ON p.evolves_from = c.name), finals AS (SELECT c.base, c.name, c.depth FROM chain c WHERE c.depth = 3 AND NOT EXISTS (SELECT 1 FROM pokemon p WHERE p.evolves_from = c.name)) SELECT f.base, f.name AS final_form, p.total FROM finals f JOIN pokemon p ON p.name = f.name ORDER BY p.total DESC, f.name LIMIT 15\n```"
+      ],
+      "xp": 20
+    }
+  ]
+}

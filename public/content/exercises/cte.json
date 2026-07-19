@@ -1,0 +1,77 @@
+{
+  "skillId": "cte",
+  "exercises": [
+    {
+      "id": "cte-1",
+      "prompt": "Which films beat their own genre's typical rating? First build a CTE named genre_avg that, over movies with at least 20 ratings, computes each genre1's mean of avg_rating. Then join it back to movies and ratings to find every Crime or Animation movie (again requiring num_ratings >= 20) whose avg_rating exceeds its genre's mean. Return title, genre1, avg_rating, and the genre mean rounded to 2 decimals as genre_mean — ordered by genre1 ascending, then avg_rating descending, then title ascending, then movie_id ascending.",
+      "referenceSql": "WITH genre_avg AS (SELECT m.genre1, AVG(r.avg_rating) AS genre_mean FROM movies m JOIN ratings r ON m.movie_id = r.movie_id WHERE r.num_ratings >= 20 AND m.genre1 IS NOT NULL GROUP BY m.genre1) SELECT m.title, m.genre1, r.avg_rating, ROUND(ga.genre_mean, 2) AS genre_mean FROM movies m JOIN ratings r ON m.movie_id = r.movie_id JOIN genre_avg ga ON m.genre1 = ga.genre1 WHERE r.num_ratings >= 20 AND m.genre1 IN ('Crime','Animation') AND r.avg_rating > ga.genre_mean ORDER BY m.genre1, r.avg_rating DESC, m.title, m.movie_id",
+      "orderMatters": true,
+      "hints": [
+        "You cannot compare a movie's rating to its genre's average in one flat pass — the average has to exist first. Compute the per-genre average in a WITH clause, then JOIN that result back to the movies so each row carries its genre's mean to compare against.",
+        "WITH genre_avg AS (SELECT m.genre1, AVG(r.avg_rating) AS genre_mean FROM movies m JOIN ratings r ON m.movie_id = r.movie_id WHERE r.num_ratings >= 20 AND m.genre1 IS NOT NULL GROUP BY m.genre1) SELECT ... FROM movies m JOIN ratings r ON ... JOIN genre_avg ga ON m.genre1 = ga.genre1 WHERE r.num_ratings >= 20 AND m.genre1 IN ('Crime','Animation') AND r.avg_rating > ga.genre_mean ORDER BY m.genre1, r.avg_rating DESC, m.title, m.movie_id.",
+        "```sql\nWITH genre_avg AS (SELECT m.genre1, AVG(r.avg_rating) AS genre_mean FROM movies m JOIN ratings r ON m.movie_id = r.movie_id WHERE r.num_ratings >= 20 AND m.genre1 IS NOT NULL GROUP BY m.genre1) SELECT m.title, m.genre1, r.avg_rating, ROUND(ga.genre_mean, 2) AS genre_mean FROM movies m JOIN ratings r ON m.movie_id = r.movie_id JOIN genre_avg ga ON m.genre1 = ga.genre1 WHERE r.num_ratings >= 20 AND m.genre1 IN ('Crime','Animation') AND r.avg_rating > ga.genre_mean ORDER BY m.genre1, r.avg_rating DESC, m.title, m.movie_id\n```"
+      ],
+      "xp": 17
+    },
+    {
+      "id": "cte-2",
+      "prompt": "Bucket rated movies into release decades with a CTE, then summarize each decade. In a CTE named by_decade, take every movie that has a year and at least 20 ratings and derive its decade as year - (year % 10), carrying avg_rating alongside. Then return decade, the movie_count, and the mean of avg_rating rounded to 2 decimals as mean_rating — one row per decade, ordered by decade ascending.",
+      "referenceSql": "WITH by_decade AS (SELECT m.year - (m.year % 10) AS decade, r.avg_rating FROM movies m JOIN ratings r ON m.movie_id = r.movie_id WHERE m.year IS NOT NULL AND r.num_ratings >= 20) SELECT decade, COUNT(*) AS movie_count, ROUND(AVG(avg_rating), 2) AS mean_rating FROM by_decade GROUP BY decade ORDER BY decade",
+      "orderMatters": true,
+      "hints": [
+        "The decade of a year is that year with its last digit knocked off: year - (year % 10) turns 1994 into 1990. Compute that derived column once inside a CTE so the outer query can simply GROUP BY decade.",
+        "WITH by_decade AS (SELECT m.year - (m.year % 10) AS decade, r.avg_rating FROM movies m JOIN ratings r ON m.movie_id = r.movie_id WHERE m.year IS NOT NULL AND r.num_ratings >= 20) SELECT decade, COUNT(*) AS movie_count, ROUND(AVG(avg_rating), 2) AS mean_rating FROM by_decade GROUP BY decade ORDER BY decade.",
+        "```sql\nWITH by_decade AS (SELECT m.year - (m.year % 10) AS decade, r.avg_rating FROM movies m JOIN ratings r ON m.movie_id = r.movie_id WHERE m.year IS NOT NULL AND r.num_ratings >= 20) SELECT decade, COUNT(*) AS movie_count, ROUND(AVG(avg_rating), 2) AS mean_rating FROM by_decade GROUP BY decade ORDER BY decade\n```"
+      ],
+      "xp": 17
+    },
+    {
+      "id": "cte-3",
+      "prompt": "Build a genre leaderboard in two named steps. First a CTE named rated pairs each movie having at least 20 ratings with its genre1 and avg_rating (skip movies whose genre1 is NULL). Then a CTE named genre_stats counts the movies as n and averages avg_rating per genre1, rounded to 2 decimals as mean_rating. Return genre1, n, and mean_rating for genres with at least 30 rated movies, ordered by mean_rating descending, then genre1 ascending.",
+      "referenceSql": "WITH rated AS (SELECT m.genre1, r.avg_rating FROM movies m JOIN ratings r ON m.movie_id = r.movie_id WHERE r.num_ratings >= 20 AND m.genre1 IS NOT NULL), genre_stats AS (SELECT genre1, COUNT(*) AS n, ROUND(AVG(avg_rating), 2) AS mean_rating FROM rated GROUP BY genre1) SELECT genre1, n, mean_rating FROM genre_stats WHERE n >= 30 ORDER BY mean_rating DESC, genre1",
+      "orderMatters": true,
+      "hints": [
+        "Chain two CTEs with a comma: the first (rated) does the join-and-filter so the second can think purely in terms of genres and ratings. The second (genre_stats) groups rated by genre1. The final SELECT then just filters genre_stats by n >= 30.",
+        "WITH rated AS (SELECT m.genre1, r.avg_rating FROM movies m JOIN ratings r ON m.movie_id = r.movie_id WHERE r.num_ratings >= 20 AND m.genre1 IS NOT NULL), genre_stats AS (SELECT genre1, COUNT(*) AS n, ROUND(AVG(avg_rating), 2) AS mean_rating FROM rated GROUP BY genre1) SELECT genre1, n, mean_rating FROM genre_stats WHERE n >= 30 ORDER BY mean_rating DESC, genre1.",
+        "```sql\nWITH rated AS (SELECT m.genre1, r.avg_rating FROM movies m JOIN ratings r ON m.movie_id = r.movie_id WHERE r.num_ratings >= 20 AND m.genre1 IS NOT NULL), genre_stats AS (SELECT genre1, COUNT(*) AS n, ROUND(AVG(avg_rating), 2) AS mean_rating FROM rated GROUP BY genre1) SELECT genre1, n, mean_rating FROM genre_stats WHERE n >= 30 ORDER BY mean_rating DESC, genre1\n```"
+      ],
+      "xp": 18
+    },
+    {
+      "id": "cte-4",
+      "prompt": "Which genres out-rate the catalog as a whole? Build a CTE named rated (movies with at least 20 ratings and a non-null genre1, carrying genre1 and avg_rating), a CTE named overall computing the single mean of avg_rating across all rated movies as all_mean, and a CTE named genre_stats computing each genre1's mean avg_rating as mean_rating. Return genre1 and its mean_rating rounded to 2 decimals for the genres whose mean exceeds all_mean, ordered by mean_rating descending, then genre1 ascending.",
+      "referenceSql": "WITH rated AS (SELECT m.genre1, r.avg_rating FROM movies m JOIN ratings r ON m.movie_id = r.movie_id WHERE r.num_ratings >= 20 AND m.genre1 IS NOT NULL), overall AS (SELECT AVG(avg_rating) AS all_mean FROM rated), genre_stats AS (SELECT genre1, AVG(avg_rating) AS mean_rating FROM rated GROUP BY genre1) SELECT gs.genre1, ROUND(gs.mean_rating, 2) AS mean_rating FROM genre_stats gs, overall o WHERE gs.mean_rating > o.all_mean ORDER BY gs.mean_rating DESC, gs.genre1",
+      "orderMatters": true,
+      "hints": [
+        "The catalog-wide average is a single number, so put it in its own one-row CTE (overall). Because it is one row, you can cross join it to genre_stats (FROM genre_stats gs, overall o) and every genre row can then compare its mean against o.all_mean.",
+        "WITH rated AS (...), overall AS (SELECT AVG(avg_rating) AS all_mean FROM rated), genre_stats AS (SELECT genre1, AVG(avg_rating) AS mean_rating FROM rated GROUP BY genre1) SELECT gs.genre1, ROUND(gs.mean_rating, 2) AS mean_rating FROM genre_stats gs, overall o WHERE gs.mean_rating > o.all_mean ORDER BY gs.mean_rating DESC, gs.genre1.",
+        "```sql\nWITH rated AS (SELECT m.genre1, r.avg_rating FROM movies m JOIN ratings r ON m.movie_id = r.movie_id WHERE r.num_ratings >= 20 AND m.genre1 IS NOT NULL), overall AS (SELECT AVG(avg_rating) AS all_mean FROM rated), genre_stats AS (SELECT genre1, AVG(avg_rating) AS mean_rating FROM rated GROUP BY genre1) SELECT gs.genre1, ROUND(gs.mean_rating, 2) AS mean_rating FROM genre_stats gs, overall o WHERE gs.mean_rating > o.all_mean ORDER BY gs.mean_rating DESC, gs.genre1\n```"
+      ],
+      "xp": 18
+    },
+    {
+      "id": "cte-5",
+      "prompt": "Measure how far the best films sit above their genre's norm. In a CTE named genre_avg, compute each genre1's mean avg_rating (as genre_mean) over movies with at least 30 ratings. Then, for Action, Comedy, Drama, and Crime movies with at least 30 ratings and an avg_rating of 4.2 or higher, return title, genre1, avg_rating, and above_genre = ROUND(avg_rating - genre_mean, 2) — ordered by above_genre descending, then title ascending, then movie_id ascending.",
+      "referenceSql": "WITH genre_avg AS (SELECT m.genre1, AVG(r.avg_rating) AS genre_mean FROM movies m JOIN ratings r ON m.movie_id = r.movie_id WHERE r.num_ratings >= 30 AND m.genre1 IS NOT NULL GROUP BY m.genre1) SELECT m.title, m.genre1, r.avg_rating, ROUND(r.avg_rating - ga.genre_mean, 2) AS above_genre FROM movies m JOIN ratings r ON m.movie_id = r.movie_id JOIN genre_avg ga ON m.genre1 = ga.genre1 WHERE r.num_ratings >= 30 AND r.avg_rating >= 4.2 AND m.genre1 IN ('Action','Comedy','Drama','Crime') ORDER BY above_genre DESC, m.title, m.movie_id",
+      "orderMatters": true,
+      "hints": [
+        "The gap you want, avg_rating - genre_mean, needs both numbers on the same row — so the genre mean must ride along via a JOIN to the genre_avg CTE. Keep the same num_ratings >= 30 floor in both the CTE and the outer filter so you compare like with like.",
+        "WITH genre_avg AS (SELECT m.genre1, AVG(r.avg_rating) AS genre_mean FROM ... WHERE r.num_ratings >= 30 ... GROUP BY m.genre1) SELECT m.title, m.genre1, r.avg_rating, ROUND(r.avg_rating - ga.genre_mean, 2) AS above_genre FROM movies m JOIN ratings r ON ... JOIN genre_avg ga ON m.genre1 = ga.genre1 WHERE r.num_ratings >= 30 AND r.avg_rating >= 4.2 AND m.genre1 IN ('Action','Comedy','Drama','Crime') ORDER BY above_genre DESC, m.title, m.movie_id.",
+        "```sql\nWITH genre_avg AS (SELECT m.genre1, AVG(r.avg_rating) AS genre_mean FROM movies m JOIN ratings r ON m.movie_id = r.movie_id WHERE r.num_ratings >= 30 AND m.genre1 IS NOT NULL GROUP BY m.genre1) SELECT m.title, m.genre1, r.avg_rating, ROUND(r.avg_rating - ga.genre_mean, 2) AS above_genre FROM movies m JOIN ratings r ON m.movie_id = r.movie_id JOIN genre_avg ga ON m.genre1 = ga.genre1 WHERE r.num_ratings >= 30 AND r.avg_rating >= 4.2 AND m.genre1 IN ('Action','Comedy','Drama','Crime') ORDER BY above_genre DESC, m.title, m.movie_id\n```"
+      ],
+      "xp": 19
+    },
+    {
+      "id": "cte-6",
+      "prompt": "A three-CTE standout finder. Build rated (movies with at least 30 ratings and a non-null genre1, carrying movie_id, title, genre1, avg_rating), big_genres (the genre1 values having at least 100 movies in rated), and genre_avg (each genre1's mean avg_rating from rated, as genre_mean). Return title, genre1, avg_rating, and genre_mean rounded to 2 decimals for movies that belong to a big genre and beat their genre mean by at least 0.6 — ordered by genre1 ascending, then avg_rating descending, then title ascending, then movie_id ascending.",
+      "referenceSql": "WITH rated AS (SELECT m.movie_id, m.title, m.genre1, r.avg_rating FROM movies m JOIN ratings r ON m.movie_id = r.movie_id WHERE r.num_ratings >= 30 AND m.genre1 IS NOT NULL), big_genres AS (SELECT genre1 FROM rated GROUP BY genre1 HAVING COUNT(*) >= 100), genre_avg AS (SELECT genre1, AVG(avg_rating) AS genre_mean FROM rated GROUP BY genre1) SELECT ra.title, ra.genre1, ra.avg_rating, ROUND(ga.genre_mean, 2) AS genre_mean FROM rated ra JOIN big_genres bg ON ra.genre1 = bg.genre1 JOIN genre_avg ga ON ra.genre1 = ga.genre1 WHERE ra.avg_rating - ga.genre_mean >= 0.6 ORDER BY ra.genre1, ra.avg_rating DESC, ra.title, ra.movie_id",
+      "orderMatters": true,
+      "hints": [
+        "Each CTE answers one sub-question: rated is the clean working set, big_genres is the set of large genres (a HAVING COUNT(*) >= 100 filter), and genre_avg is the per-genre mean. The final query joins rated to both — big_genres to keep only large genres, genre_avg to supply the mean it must beat by 0.6.",
+        "WITH rated AS (SELECT m.movie_id, m.title, m.genre1, r.avg_rating FROM ... WHERE r.num_ratings >= 30 AND m.genre1 IS NOT NULL), big_genres AS (SELECT genre1 FROM rated GROUP BY genre1 HAVING COUNT(*) >= 100), genre_avg AS (SELECT genre1, AVG(avg_rating) AS genre_mean FROM rated GROUP BY genre1) SELECT ra.title, ra.genre1, ra.avg_rating, ROUND(ga.genre_mean, 2) AS genre_mean FROM rated ra JOIN big_genres bg ON ra.genre1 = bg.genre1 JOIN genre_avg ga ON ra.genre1 = ga.genre1 WHERE ra.avg_rating - ga.genre_mean >= 0.6 ORDER BY ra.genre1, ra.avg_rating DESC, ra.title, ra.movie_id.",
+        "```sql\nWITH rated AS (SELECT m.movie_id, m.title, m.genre1, r.avg_rating FROM movies m JOIN ratings r ON m.movie_id = r.movie_id WHERE r.num_ratings >= 30 AND m.genre1 IS NOT NULL), big_genres AS (SELECT genre1 FROM rated GROUP BY genre1 HAVING COUNT(*) >= 100), genre_avg AS (SELECT genre1, AVG(avg_rating) AS genre_mean FROM rated GROUP BY genre1) SELECT ra.title, ra.genre1, ra.avg_rating, ROUND(ga.genre_mean, 2) AS genre_mean FROM rated ra JOIN big_genres bg ON ra.genre1 = bg.genre1 JOIN genre_avg ga ON ra.genre1 = ga.genre1 WHERE ra.avg_rating - ga.genre_mean >= 0.6 ORDER BY ra.genre1, ra.avg_rating DESC, ra.title, ra.movie_id\n```"
+      ],
+      "xp": 20
+    }
+  ]
+}

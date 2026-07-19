@@ -1,0 +1,77 @@
+{
+  "skillId": "window-frames",
+  "exercises": [
+    {
+      "id": "wf-1",
+      "prompt": "Smooth out daily noise with a rolling 7-day request count. Build a daily CTE counting all requests per created_date across the whole dataset, then a second CTE computing rolling_7d = SUM(reqs) OVER (ORDER BY dt ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) — the current day plus the six before it. Return dt, reqs, and rolling_7d for dates from 2026-06-08 through 2026-06-21, ordered by dt ascending. Do the windowed sum over the full daily series first, THEN filter to the display range, so every shown day has a complete 7-day window.",
+      "referenceSql": "WITH daily AS (SELECT created_date AS dt, COUNT(*) AS reqs FROM requests GROUP BY 1), rolled AS (SELECT dt, reqs, SUM(reqs) OVER (ORDER BY dt ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS rolling_7d FROM daily) SELECT dt, reqs, rolling_7d FROM rolled WHERE dt BETWEEN DATE '2026-06-08' AND DATE '2026-06-21' ORDER BY dt",
+      "orderMatters": true,
+      "hints": [
+        "A frame clause, ROWS BETWEEN 6 PRECEDING AND CURRENT ROW, tells the window which rows to aggregate: this one and the six before it — seven days in all. Because WHERE runs before the window, compute the rolling sum in a CTE over every day, then filter the outer query to mid-June.",
+        "WITH daily AS (SELECT created_date AS dt, COUNT(*) AS reqs FROM requests GROUP BY 1), rolled AS (SELECT dt, reqs, SUM(reqs) OVER (ORDER BY dt ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS rolling_7d FROM daily) SELECT dt, reqs, rolling_7d FROM rolled WHERE dt BETWEEN DATE '2026-06-08' AND DATE '2026-06-21' ORDER BY dt.",
+        "```sql\nWITH daily AS (SELECT created_date AS dt, COUNT(*) AS reqs FROM requests GROUP BY 1), rolled AS (SELECT dt, reqs, SUM(reqs) OVER (ORDER BY dt ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS rolling_7d FROM daily) SELECT dt, reqs, rolling_7d FROM rolled WHERE dt BETWEEN DATE '2026-06-08' AND DATE '2026-06-21' ORDER BY dt\n```"
+      ],
+      "xp": 17
+    },
+    {
+      "id": "wf-2",
+      "prompt": "Report the rolling 7-day average daily volume, rounded. Using the same daily-count CTE over the whole dataset, compute rolling_avg_7d = ROUND(AVG(reqs) OVER (ORDER BY dt ROWS BETWEEN 6 PRECEDING AND CURRENT ROW), 2). Return dt, reqs, and rolling_avg_7d for dates from 2026-06-08 through 2026-06-21, ordered by dt ascending. Window over the full daily series, then filter.",
+      "referenceSql": "WITH daily AS (SELECT created_date AS dt, COUNT(*) AS reqs FROM requests GROUP BY 1), rolled AS (SELECT dt, reqs, ROUND(AVG(reqs) OVER (ORDER BY dt ROWS BETWEEN 6 PRECEDING AND CURRENT ROW), 2) AS rolling_avg_7d FROM daily) SELECT dt, reqs, rolling_avg_7d FROM rolled WHERE dt BETWEEN DATE '2026-06-08' AND DATE '2026-06-21' ORDER BY dt",
+      "orderMatters": true,
+      "hints": [
+        "Swap SUM for AVG over the same ROWS BETWEEN 6 PRECEDING AND CURRENT ROW frame. AVG over a window returns a fractional (DOUBLE) value, so wrap it in ROUND(..., 2) — do not CAST to DECIMAL.",
+        "WITH daily AS (SELECT created_date AS dt, COUNT(*) AS reqs FROM requests GROUP BY 1), rolled AS (SELECT dt, reqs, ROUND(AVG(reqs) OVER (ORDER BY dt ROWS BETWEEN 6 PRECEDING AND CURRENT ROW), 2) AS rolling_avg_7d FROM daily) SELECT dt, reqs, rolling_avg_7d FROM rolled WHERE dt BETWEEN DATE '2026-06-08' AND DATE '2026-06-21' ORDER BY dt.",
+        "```sql\nWITH daily AS (SELECT created_date AS dt, COUNT(*) AS reqs FROM requests GROUP BY 1), rolled AS (SELECT dt, reqs, ROUND(AVG(reqs) OVER (ORDER BY dt ROWS BETWEEN 6 PRECEDING AND CURRENT ROW), 2) AS rolling_avg_7d FROM daily) SELECT dt, reqs, rolling_avg_7d FROM rolled WHERE dt BETWEEN DATE '2026-06-08' AND DATE '2026-06-21' ORDER BY dt\n```"
+      ],
+      "xp": 17
+    },
+    {
+      "id": "wf-3",
+      "prompt": "Accumulate a running total of pothole reports through the first two weeks of June 2026. In a CTE, count requests of service_request_type 'Pothole' per created_date between 2026-06-01 and 2026-06-14. Then return dt, reqs, and running_total = SUM(reqs) OVER (ORDER BY dt ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), ordered by dt ascending. Here the cumulative total should start fresh at the beginning of this period.",
+      "referenceSql": "WITH daily AS (SELECT created_date AS dt, COUNT(*) AS reqs FROM requests WHERE service_request_type = 'Pothole' AND created_date BETWEEN DATE '2026-06-01' AND DATE '2026-06-14' GROUP BY 1) SELECT dt, reqs, SUM(reqs) OVER (ORDER BY dt ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_total FROM daily ORDER BY dt",
+      "orderMatters": true,
+      "hints": [
+        "A running total is a frame that grows: ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW sums everything from the first row up to this one. Because you want the total to begin at June 1, filtering inside the CTE (before the window) is exactly right this time.",
+        "WITH daily AS (SELECT created_date AS dt, COUNT(*) AS reqs FROM requests WHERE service_request_type = 'Pothole' AND created_date BETWEEN DATE '2026-06-01' AND DATE '2026-06-14' GROUP BY 1) SELECT dt, reqs, SUM(reqs) OVER (ORDER BY dt ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_total FROM daily ORDER BY dt.",
+        "```sql\nWITH daily AS (SELECT created_date AS dt, COUNT(*) AS reqs FROM requests WHERE service_request_type = 'Pothole' AND created_date BETWEEN DATE '2026-06-01' AND DATE '2026-06-14' GROUP BY 1) SELECT dt, reqs, SUM(reqs) OVER (ORDER BY dt ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_total FROM daily ORDER BY dt\n```"
+      ],
+      "xp": 18
+    },
+    {
+      "id": "wf-4",
+      "prompt": "Compute a 3-month moving average of volume for two departments. In a CTE, count requests per department and month (CAST(DATE_TRUNC('month', created_date) AS DATE) AS mon) over the twelve full months 2025-07-01 through 2026-06-30, for 'SDOT-Seattle Department of Transportation' and 'SPU-Seattle Public Utilities'. Return department, mon, reqs, and rolling_3mo = ROUND(AVG(reqs) OVER (PARTITION BY department ORDER BY mon ROWS BETWEEN 2 PRECEDING AND CURRENT ROW), 2). Order by department ascending, then mon ascending.",
+      "referenceSql": "WITH monthly AS (SELECT department, CAST(DATE_TRUNC('month', created_date) AS DATE) AS mon, COUNT(*) AS reqs FROM requests WHERE created_date BETWEEN DATE '2025-07-01' AND DATE '2026-06-30' AND department IN ('SDOT-Seattle Department of Transportation','SPU-Seattle Public Utilities') GROUP BY 1, 2) SELECT department, mon, reqs, ROUND(AVG(reqs) OVER (PARTITION BY department ORDER BY mon ROWS BETWEEN 2 PRECEDING AND CURRENT ROW), 2) AS rolling_3mo FROM monthly ORDER BY department, mon",
+      "orderMatters": true,
+      "hints": [
+        "Combine partitioning with a frame: PARTITION BY department keeps each department's moving average separate, and ROWS BETWEEN 2 PRECEDING AND CURRENT ROW averages this month with the two before it. The first two months of each department average over a partial window.",
+        "WITH monthly AS (SELECT department, CAST(DATE_TRUNC('month', created_date) AS DATE) AS mon, COUNT(*) AS reqs FROM requests WHERE created_date BETWEEN DATE '2025-07-01' AND DATE '2026-06-30' AND department IN (...) GROUP BY 1, 2) SELECT department, mon, reqs, ROUND(AVG(reqs) OVER (PARTITION BY department ORDER BY mon ROWS BETWEEN 2 PRECEDING AND CURRENT ROW), 2) AS rolling_3mo FROM monthly ORDER BY department, mon.",
+        "```sql\nWITH monthly AS (SELECT department, CAST(DATE_TRUNC('month', created_date) AS DATE) AS mon, COUNT(*) AS reqs FROM requests WHERE created_date BETWEEN DATE '2025-07-01' AND DATE '2026-06-30' AND department IN ('SDOT-Seattle Department of Transportation','SPU-Seattle Public Utilities') GROUP BY 1, 2) SELECT department, mon, reqs, ROUND(AVG(reqs) OVER (PARTITION BY department ORDER BY mon ROWS BETWEEN 2 PRECEDING AND CURRENT ROW), 2) AS rolling_3mo FROM monthly ORDER BY department, mon\n```"
+      ],
+      "xp": 18
+    },
+    {
+      "id": "wf-5",
+      "prompt": "Show how the year's requests accumulate toward 100%. In a CTE, count all requests per month (CAST(DATE_TRUNC('month', created_date) AS DATE) AS mon) over the twelve full months 2025-07-01 through 2026-06-30. Return mon, reqs, running_total = SUM(reqs) OVER (ORDER BY mon ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), and cum_pct = ROUND(100.0 * running_total / grand_total, 2), where grand_total is SUM(reqs) OVER () across all twelve months. Order by mon ascending; cum_pct reaches 100 in the final month.",
+      "referenceSql": "WITH monthly AS (SELECT CAST(DATE_TRUNC('month', created_date) AS DATE) AS mon, COUNT(*) AS reqs FROM requests WHERE created_date BETWEEN DATE '2025-07-01' AND DATE '2026-06-30' GROUP BY 1) SELECT mon, reqs, SUM(reqs) OVER (ORDER BY mon ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_total, ROUND(100.0 * SUM(reqs) OVER (ORDER BY mon ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) / SUM(reqs) OVER (), 2) AS cum_pct FROM monthly ORDER BY mon",
+      "orderMatters": true,
+      "hints": [
+        "Two frames in one query: the running total uses ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW, while the grand total uses an empty OVER () (every row). Divide one by the other, times 100.0, and ROUND to 2 — the empty-window total is the same on every row.",
+        "SELECT mon, reqs, SUM(reqs) OVER (ORDER BY mon ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_total, ROUND(100.0 * SUM(reqs) OVER (ORDER BY mon ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) / SUM(reqs) OVER (), 2) AS cum_pct FROM monthly ORDER BY mon.",
+        "```sql\nWITH monthly AS (SELECT CAST(DATE_TRUNC('month', created_date) AS DATE) AS mon, COUNT(*) AS reqs FROM requests WHERE created_date BETWEEN DATE '2025-07-01' AND DATE '2026-06-30' GROUP BY 1) SELECT mon, reqs, SUM(reqs) OVER (ORDER BY mon ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_total, ROUND(100.0 * SUM(reqs) OVER (ORDER BY mon ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) / SUM(reqs) OVER (), 2) AS cum_pct FROM monthly ORDER BY mon\n```"
+      ],
+      "xp": 19
+    },
+    {
+      "id": "wf-6",
+      "prompt": "Flag how far each day sits from its own 7-day trend. Build a daily CTE counting all requests per created_date across the whole dataset, then a second CTE computing avg7 = AVG(reqs) OVER (ORDER BY dt ROWS BETWEEN 6 PRECEDING AND CURRENT ROW). Return dt, reqs, rolling_avg_7d = ROUND(avg7, 2), and deviation = ROUND(reqs - avg7, 2) for dates from 2026-06-08 through 2026-06-21, ordered by dt ascending. Window over the full series first, then filter.",
+      "referenceSql": "WITH daily AS (SELECT created_date AS dt, COUNT(*) AS reqs FROM requests GROUP BY 1), rolled AS (SELECT dt, reqs, AVG(reqs) OVER (ORDER BY dt ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS avg7 FROM daily) SELECT dt, reqs, ROUND(avg7, 2) AS rolling_avg_7d, ROUND(reqs - avg7, 2) AS deviation FROM rolled WHERE dt BETWEEN DATE '2026-06-08' AND DATE '2026-06-21' ORDER BY dt",
+      "orderMatters": true,
+      "hints": [
+        "Compute the rolling average once (keep it as avg7 in a CTE), then in the outer query use it twice — once rounded on its own, and once as reqs - avg7 to measure the day's deviation from its trend. Keeping avg7 unrounded until the final subtraction avoids compounding rounding.",
+        "WITH daily AS (SELECT created_date AS dt, COUNT(*) AS reqs FROM requests GROUP BY 1), rolled AS (SELECT dt, reqs, AVG(reqs) OVER (ORDER BY dt ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS avg7 FROM daily) SELECT dt, reqs, ROUND(avg7, 2) AS rolling_avg_7d, ROUND(reqs - avg7, 2) AS deviation FROM rolled WHERE dt BETWEEN DATE '2026-06-08' AND DATE '2026-06-21' ORDER BY dt.",
+        "```sql\nWITH daily AS (SELECT created_date AS dt, COUNT(*) AS reqs FROM requests GROUP BY 1), rolled AS (SELECT dt, reqs, AVG(reqs) OVER (ORDER BY dt ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS avg7 FROM daily) SELECT dt, reqs, ROUND(avg7, 2) AS rolling_avg_7d, ROUND(reqs - avg7, 2) AS deviation FROM rolled WHERE dt BETWEEN DATE '2026-06-08' AND DATE '2026-06-21' ORDER BY dt\n```"
+      ],
+      "xp": 20
+    }
+  ]
+}
