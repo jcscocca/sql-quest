@@ -482,6 +482,20 @@ test('stage 1 saves without collection/badges hydrate with defaults', async () =
   expect(useProgress.getState().collection).toEqual([])
   expect(useProgress.getState().badges).toEqual([])
 })
+
+test('stage 1 completed skills get a review schedule backfilled on hydrate', async () => {
+  const { set: idbSet } = await import('idb-keyval')
+  await idbSet('sql-quest-progress', {
+    version: 1,
+    xp: 10,
+    streak: { count: 1, lastDay: '2026-07-18' },
+    skills: { 'select-basics': { solved: ['sb-1', 'sb-2'], completed: true, mastery: 3 } },
+  })
+  await useProgress.getState().hydrate()
+  const sk = useProgress.getState().skills['select-basics']
+  expect(sk.interval).toBe(2)
+  expect(sk.due).toBe(todayString())
+})
 ```
 
 - [ ] **Step 2: Run to verify fail.**
@@ -492,7 +506,7 @@ test('stage 1 saves without collection/badges hydrate with defaults', async () =
 import { create } from 'zustand'
 import { get as idbGet, set as idbSet } from 'idb-keyval'
 import { computeXp, todayString, updateStreak, type Streak } from './xp'
-import { REVIEW_BASE_XP, reviewOutcome, scheduleOnComplete } from './review'
+import { FIRST_INTERVAL, REVIEW_BASE_XP, reviewOutcome, scheduleOnComplete } from './review'
 
 export interface SkillProgress {
   solved: string[]
@@ -551,8 +565,17 @@ function isProgressState(x: unknown): x is ProgressState {
 }
 
 function normalize(s: ProgressState): ProgressState {
+  const today = todayString()
+  const skills: Record<string, SkillProgress> = {}
+  for (const [id, sp] of Object.entries(s.skills ?? {})) {
+    skills[id] =
+      sp.completed && (!sp.interval || !sp.due)
+        ? { ...sp, interval: FIRST_INTERVAL, due: today }
+        : sp
+  }
   return {
     ...s,
+    skills,
     collection: Array.isArray(s.collection) ? s.collection : [],
     badges: Array.isArray(s.badges) ? s.badges : [],
   }
@@ -689,9 +712,11 @@ export function exportState(s: ProgressState): string {
           .recordSolve(skill.id, ex.id, ex.xp, hintsShown, bank.exercises.length).gained
 ```
 
-- [ ] **Step 5: Run to verify pass** — progress suite 16; full `npm test` → 67 (13 compare + 13 xp + 12 errors + 16 progress + 8 review + 5 catches). `npm run build` green.
+- [ ] **Step 5: Run to verify pass** — progress suite 17; full `npm test` → 68 (13 compare + 13 xp + 12 errors + 17 progress + 8 review + 5 catches). `npm run build` green. Note: the new test file imports `todayString` from `'./xp'` — add it to the test file's imports.
 
-- [ ] **Step 6: Commit** — `feat: progress store gains collection, badges, and review scheduling`
+- [ ] **Step 6: Spec sync** — in `docs/superpowers/specs/2026-07-18-sql-learning-app-design.md`, three wording fixes reflecting implemented behavior: (a) in the mastery bullet, replace "its **displayed** mastery drops 1 level per full overdue interval (floor 1)" with "its **displayed** mastery drops one level when it comes due, then one more per full overdue interval (floor 1)"; (b) in the Daily Review bullet, replace "assembles 5–8 exercises" with "assembles up to 8 exercises"; (c) append to the first mastery bullet: " Skills completed before scheduling existed are backfilled (interval 2, due immediately) on first load."
+
+- [ ] **Step 7: Commit** — `feat: progress store gains collection, badges, and review scheduling`
 
 ---
 
@@ -817,7 +842,7 @@ export function exportState(s: ProgressState): string {
 
 and add `region={region}` to the `<ExerciseScreen>` element.
 
-- [ ] **Step 7: Verify** — `npm run build`, `npm test` (67). Browser check (dev server): solve a fresh exercise → "Caught: …" chip; finish a bank → completion card with wrap-up; collection persists (check via export).
+- [ ] **Step 7: Verify** — `npm run build`, `npm test` (68). Browser check (dev server): solve a fresh exercise → "Caught: …" chip; finish a bank → completion card with wrap-up; collection persists (check via export).
 
 - [ ] **Step 8: Commit** — `feat: catching, badges, and node-complete moment in exercise flow`
 
@@ -1385,7 +1410,7 @@ Notes: hints used → skill review fails → mastery 3→2 deterministically; th
 - Modify: `README.md`
 
 - [ ] **Step 1:** In README's feature intro paragraph, after "starting with Pokémon.", add: `Daily Review resurfaces rusty skills on an expanding schedule, and correct queries catch the Pokémon they return into your collection.`
-- [ ] **Step 2:** Full gate: `npm test && npm run validate && npm run build && npm run e2e` — all green (67 unit / 30 exercises / build / 5 e2e).
+- [ ] **Step 2:** Full gate: `npm test && npm run validate && npm run build && npm run e2e` — all green (68 unit / 30 exercises / build / 5 e2e).
 - [ ] **Step 3:** Commit — `docs: Stage 2 features in README`
 
 ---
