@@ -1,0 +1,77 @@
+{
+  "skillId": "left-join",
+  "exercises": [
+    {
+      "id": "lj-1",
+      "prompt": "Some cards have never been printed in any set. Using a LEFT JOIN from cards to card_sets, list these never-printed cards: return name and type, ordered by name ascending.",
+      "referenceSql": "SELECT c.name, c.type FROM cards c LEFT JOIN card_sets cs ON c.id = cs.card_id WHERE cs.card_id IS NULL ORDER BY c.name",
+      "orderMatters": true,
+      "hints": [
+        "A LEFT JOIN keeps cards even when no printing matches; those rows carry a NULL on the card_sets side — filter for exactly those.",
+        "LEFT JOIN card_sets cs ON c.id = cs.card_id WHERE cs.card_id IS NULL, then ORDER BY c.name.",
+        "```sql\nSELECT c.name, c.type FROM cards c LEFT JOIN card_sets cs ON c.id = cs.card_id WHERE cs.card_id IS NULL ORDER BY c.name\n```"
+      ],
+      "xp": 16
+    },
+    {
+      "id": "lj-2",
+      "prompt": "For every card in the 'Blackwing' archetype, show its TCG banlist status, labelling cards that are not on the TCG banlist as 'Unrestricted'. LEFT JOIN cards to banlist restricted to the TCG format, and return name and the status as tcg_status, ordered by name ascending.",
+      "referenceSql": "SELECT c.name, COALESCE(b.status, 'Unrestricted') AS tcg_status FROM cards c LEFT JOIN banlist b ON b.card_id = c.id AND b.format = 'tcg' WHERE c.archetype = 'Blackwing' ORDER BY c.name",
+      "orderMatters": true,
+      "hints": [
+        "Put the format test inside the ON clause so unmatched cards are kept, then COALESCE the NULL status into a label.",
+        "LEFT JOIN banlist b ON b.card_id = c.id AND b.format = 'tcg', SELECT COALESCE(b.status, 'Unrestricted') AS tcg_status, WHERE c.archetype = 'Blackwing'.",
+        "```sql\nSELECT c.name, COALESCE(b.status, 'Unrestricted') AS tcg_status FROM cards c LEFT JOIN banlist b ON b.card_id = c.id AND b.format = 'tcg' WHERE c.archetype = 'Blackwing' ORDER BY c.name\n```"
+      ],
+      "xp": 16
+    },
+    {
+      "id": "lj-3",
+      "prompt": "For every card in the 'Destiny HERO' archetype, count how many times it has been printed, counting 0 for cards never printed. Use a LEFT JOIN and return name and the count as printing_count — fewest printings first, breaking ties alphabetically by name.",
+      "referenceSql": "SELECT c.name, COUNT(cs.card_id) AS printing_count FROM cards c LEFT JOIN card_sets cs ON c.id = cs.card_id WHERE c.archetype = 'Destiny HERO' GROUP BY c.name ORDER BY printing_count ASC, c.name",
+      "orderMatters": true,
+      "hints": [
+        "COUNT(cs.card_id) counts only real matches, so it returns 0 for a card with no printing — where COUNT(*) would return 1.",
+        "LEFT JOIN card_sets, GROUP BY c.name, select COUNT(cs.card_id) AS printing_count, ORDER BY printing_count ASC, c.name.",
+        "```sql\nSELECT c.name, COUNT(cs.card_id) AS printing_count FROM cards c LEFT JOIN card_sets cs ON c.id = cs.card_id WHERE c.archetype = 'Destiny HERO' GROUP BY c.name ORDER BY printing_count ASC, c.name\n```"
+      ],
+      "xp": 17
+    },
+    {
+      "id": "lj-4",
+      "prompt": "For each card type, how many cards of that type have never been printed in any set? Use a LEFT JOIN to find the never-printed cards, then return type and the count as unprinted_count for every type that has at least one — most first, breaking ties alphabetically by type.",
+      "referenceSql": "SELECT c.type, COUNT(*) AS unprinted_count FROM cards c LEFT JOIN card_sets cs ON c.id = cs.card_id WHERE cs.card_id IS NULL GROUP BY c.type ORDER BY unprinted_count DESC, c.type",
+      "orderMatters": true,
+      "hints": [
+        "Filter to the never-printed cards with WHERE cs.card_id IS NULL first, then group the survivors by type and count them.",
+        "LEFT JOIN card_sets cs, WHERE cs.card_id IS NULL, GROUP BY c.type, ORDER BY unprinted_count DESC, c.type.",
+        "```sql\nSELECT c.type, COUNT(*) AS unprinted_count FROM cards c LEFT JOIN card_sets cs ON c.id = cs.card_id WHERE cs.card_id IS NULL GROUP BY c.type ORDER BY unprinted_count DESC, c.type\n```"
+      ],
+      "xp": 17
+    },
+    {
+      "id": "lj-5",
+      "prompt": "List every card with an ATK of 3000 or higher that has never appeared on any banlist. Use a LEFT JOIN from cards to banlist, and return name and atk — highest ATK first, breaking ties alphabetically by name.",
+      "referenceSql": "SELECT c.name, c.atk FROM cards c LEFT JOIN banlist b ON c.id = b.card_id WHERE b.card_id IS NULL AND c.atk >= 3000 ORDER BY c.atk DESC, c.name",
+      "orderMatters": true,
+      "hints": [
+        "LEFT JOIN to banlist and keep the unmatched rows (b.card_id IS NULL) — those are the never-banned cards — then add the ATK filter.",
+        "LEFT JOIN banlist b ON c.id = b.card_id WHERE b.card_id IS NULL AND c.atk >= 3000, ORDER BY c.atk DESC, c.name.",
+        "```sql\nSELECT c.name, c.atk FROM cards c LEFT JOIN banlist b ON c.id = b.card_id WHERE b.card_id IS NULL AND c.atk >= 3000 ORDER BY c.atk DESC, c.name\n```"
+      ],
+      "xp": 18
+    },
+    {
+      "id": "lj-6",
+      "prompt": "For each archetype, count how many of its cards have never been printed in any set; ignore cards with no archetype. Using a LEFT JOIN, return archetype and the count as unprinted_count for archetypes with at least 5 such cards — most first, breaking ties alphabetically by archetype.",
+      "referenceSql": "SELECT c.archetype, COUNT(*) AS unprinted_count FROM cards c LEFT JOIN card_sets cs ON c.id = cs.card_id WHERE cs.card_id IS NULL AND c.archetype IS NOT NULL GROUP BY c.archetype HAVING COUNT(*) >= 5 ORDER BY unprinted_count DESC, c.archetype",
+      "orderMatters": true,
+      "hints": [
+        "Keep only never-printed cards that have an archetype, group by archetype, then filter the groups with HAVING.",
+        "WHERE cs.card_id IS NULL AND c.archetype IS NOT NULL, GROUP BY c.archetype, HAVING COUNT(*) >= 5, ORDER BY unprinted_count DESC, c.archetype.",
+        "```sql\nSELECT c.archetype, COUNT(*) AS unprinted_count FROM cards c LEFT JOIN card_sets cs ON c.id = cs.card_id WHERE cs.card_id IS NULL AND c.archetype IS NOT NULL GROUP BY c.archetype HAVING COUNT(*) >= 5 ORDER BY unprinted_count DESC, c.archetype\n```"
+      ],
+      "xp": 19
+    }
+  ]
+}

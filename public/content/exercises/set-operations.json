@@ -1,0 +1,77 @@
+{
+  "skillId": "set-operations",
+  "exercises": [
+    {
+      "id": "so-1",
+      "prompt": "List the names of all cards that are Forbidden in the TCG format, the OCG format, or both, as one combined list with no duplicates. Use UNION of a TCG-Forbidden query and an OCG-Forbidden query, and return name, ordered by name ascending.",
+      "referenceSql": "SELECT c.name FROM cards c JOIN banlist b ON c.id = b.card_id WHERE b.format = 'tcg' AND b.status = 'Forbidden' UNION SELECT c.name FROM cards c JOIN banlist b ON c.id = b.card_id WHERE b.format = 'ocg' AND b.status = 'Forbidden' ORDER BY name",
+      "orderMatters": true,
+      "hints": [
+        "Write one query for the TCG-Forbidden names and another for the OCG-Forbidden names, then stack them with UNION — which drops duplicates for you.",
+        "SELECT ... WHERE b.format = 'tcg' AND b.status = 'Forbidden' UNION SELECT ... WHERE b.format = 'ocg' AND b.status = 'Forbidden', then ORDER BY name.",
+        "```sql\nSELECT c.name FROM cards c JOIN banlist b ON c.id = b.card_id WHERE b.format = 'tcg' AND b.status = 'Forbidden' UNION SELECT c.name FROM cards c JOIN banlist b ON c.id = b.card_id WHERE b.format = 'ocg' AND b.status = 'Forbidden' ORDER BY name\n```"
+      ],
+      "xp": 16
+    },
+    {
+      "id": "so-2",
+      "prompt": "Which cards are Forbidden in BOTH the TCG and OCG formats? Use INTERSECT of a TCG-Forbidden query and an OCG-Forbidden query, and return name, ordered by name ascending.",
+      "referenceSql": "SELECT c.name FROM cards c JOIN banlist b ON c.id = b.card_id WHERE b.format = 'tcg' AND b.status = 'Forbidden' INTERSECT SELECT c.name FROM cards c JOIN banlist b ON c.id = b.card_id WHERE b.format = 'ocg' AND b.status = 'Forbidden' ORDER BY name",
+      "orderMatters": true,
+      "hints": [
+        "INTERSECT returns only the rows present in both results — here, the names Forbidden in each format.",
+        "TCG-Forbidden SELECT INTERSECT OCG-Forbidden SELECT, then ORDER BY name.",
+        "```sql\nSELECT c.name FROM cards c JOIN banlist b ON c.id = b.card_id WHERE b.format = 'tcg' AND b.status = 'Forbidden' INTERSECT SELECT c.name FROM cards c JOIN banlist b ON c.id = b.card_id WHERE b.format = 'ocg' AND b.status = 'Forbidden' ORDER BY name\n```"
+      ],
+      "xp": 16
+    },
+    {
+      "id": "so-3",
+      "prompt": "Which cards are Forbidden in the TCG format but NOT Forbidden in the OCG format? Use EXCEPT (the TCG-Forbidden names minus the OCG-Forbidden names) and return name, ordered by name ascending.",
+      "referenceSql": "SELECT c.name FROM cards c JOIN banlist b ON c.id = b.card_id WHERE b.format = 'tcg' AND b.status = 'Forbidden' EXCEPT SELECT c.name FROM cards c JOIN banlist b ON c.id = b.card_id WHERE b.format = 'ocg' AND b.status = 'Forbidden' ORDER BY name",
+      "orderMatters": true,
+      "hints": [
+        "EXCEPT keeps rows from the first query that do not appear in the second — put TCG-Forbidden first, OCG-Forbidden second.",
+        "TCG-Forbidden SELECT EXCEPT OCG-Forbidden SELECT, then ORDER BY name.",
+        "```sql\nSELECT c.name FROM cards c JOIN banlist b ON c.id = b.card_id WHERE b.format = 'tcg' AND b.status = 'Forbidden' EXCEPT SELECT c.name FROM cards c JOIN banlist b ON c.id = b.card_id WHERE b.format = 'ocg' AND b.status = 'Forbidden' ORDER BY name\n```"
+      ],
+      "xp": 17
+    },
+    {
+      "id": "so-4",
+      "prompt": "Which cards are Limited in the TCG format yet appear nowhere on the OCG banlist (at any status)? Use EXCEPT: the TCG-Limited cards minus every card on the OCG list. Return name, ordered by name ascending.",
+      "referenceSql": "SELECT c.name FROM cards c JOIN banlist b ON c.id = b.card_id WHERE b.format = 'tcg' AND b.status = 'Limited' EXCEPT SELECT c.name FROM cards c JOIN banlist b ON c.id = b.card_id WHERE b.format = 'ocg' ORDER BY name",
+      "orderMatters": true,
+      "hints": [
+        "The second query should be every OCG-listed card with no status filter, so EXCEPT removes any TCG-Limited card that appears anywhere in the OCG.",
+        "TCG-Limited SELECT EXCEPT (SELECT ... WHERE b.format = 'ocg'), then ORDER BY name.",
+        "```sql\nSELECT c.name FROM cards c JOIN banlist b ON c.id = b.card_id WHERE b.format = 'tcg' AND b.status = 'Limited' EXCEPT SELECT c.name FROM cards c JOIN banlist b ON c.id = b.card_id WHERE b.format = 'ocg' ORDER BY name\n```"
+      ],
+      "xp": 17
+    },
+    {
+      "id": "so-5",
+      "prompt": "Which cards are Forbidden in the TCG format but only Limited in the OCG format? Use INTERSECT of the TCG-Forbidden cards and the OCG-Limited cards, and return name, ordered by name ascending.",
+      "referenceSql": "SELECT c.name FROM cards c JOIN banlist b ON c.id = b.card_id WHERE b.format = 'tcg' AND b.status = 'Forbidden' INTERSECT SELECT c.name FROM cards c JOIN banlist b ON c.id = b.card_id WHERE b.format = 'ocg' AND b.status = 'Limited' ORDER BY name",
+      "orderMatters": true,
+      "hints": [
+        "Intersect two different filters: TCG status Forbidden on one side, OCG status Limited on the other.",
+        "(TCG Forbidden SELECT) INTERSECT (OCG Limited SELECT), then ORDER BY name.",
+        "```sql\nSELECT c.name FROM cards c JOIN banlist b ON c.id = b.card_id WHERE b.format = 'tcg' AND b.status = 'Forbidden' INTERSECT SELECT c.name FROM cards c JOIN banlist b ON c.id = b.card_id WHERE b.format = 'ocg' AND b.status = 'Limited' ORDER BY name\n```"
+      ],
+      "xp": 18
+    },
+    {
+      "id": "so-6",
+      "prompt": "Which archetypes have at least one card Forbidden in the TCG format but no card Forbidden in the OCG format? Use EXCEPT on the archetypes: those with a TCG-Forbidden card minus those with an OCG-Forbidden card. Consider only cards that have an archetype, and return archetype, ordered by archetype ascending.",
+      "referenceSql": "SELECT c.archetype FROM cards c JOIN banlist b ON c.id = b.card_id WHERE b.format = 'tcg' AND b.status = 'Forbidden' AND c.archetype IS NOT NULL EXCEPT SELECT c.archetype FROM cards c JOIN banlist b ON c.id = b.card_id WHERE b.format = 'ocg' AND b.status = 'Forbidden' AND c.archetype IS NOT NULL ORDER BY archetype",
+      "orderMatters": true,
+      "hints": [
+        "Select the archetypes that have a TCG-Forbidden card, then EXCEPT the archetypes that have an OCG-Forbidden card; EXCEPT removes duplicates on its own.",
+        "(SELECT c.archetype ... tcg Forbidden, archetype IS NOT NULL) EXCEPT (SELECT c.archetype ... ocg Forbidden, archetype IS NOT NULL), then ORDER BY archetype.",
+        "```sql\nSELECT c.archetype FROM cards c JOIN banlist b ON c.id = b.card_id WHERE b.format = 'tcg' AND b.status = 'Forbidden' AND c.archetype IS NOT NULL EXCEPT SELECT c.archetype FROM cards c JOIN banlist b ON c.id = b.card_id WHERE b.format = 'ocg' AND b.status = 'Forbidden' AND c.archetype IS NOT NULL ORDER BY archetype\n```"
+      ],
+      "xp": 19
+    }
+  ]
+}

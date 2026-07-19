@@ -1,0 +1,78 @@
+{
+  "skillId": "inner-join",
+  "exercises": [
+    {
+      "id": "ij-1",
+      "prompt": "List every printing of the card 'Blue-Eyes White Dragon'. Join cards to card_sets and return the set_name, set_code, and rarity of each printing (one row per printing).",
+      "referenceSql": "SELECT cs.set_name, cs.set_code, cs.rarity FROM cards c JOIN card_sets cs ON c.id = cs.card_id WHERE c.name = 'Blue-Eyes White Dragon'",
+      "orderMatters": false,
+      "hints": [
+        "Match cards to their printings with JOIN ... ON c.id = cs.card_id, then filter to the single card by name.",
+        "FROM cards c JOIN card_sets cs ON c.id = cs.card_id WHERE c.name = 'Blue-Eyes White Dragon', selecting cs.set_name, cs.set_code, cs.rarity.",
+        "```sql\nSELECT cs.set_name, cs.set_code, cs.rarity FROM cards c JOIN card_sets cs ON c.id = cs.card_id WHERE c.name = 'Blue-Eyes White Dragon'\n```"
+      ],
+      "xp": 16,
+      "collectibles": ["Blue-Eyes White Dragon"]
+    },
+    {
+      "id": "ij-2",
+      "prompt": "Every card that is Forbidden in the TCG format and belongs to an archetype: return the card name and its archetype. Include only cards that have an archetype (ignore cards whose archetype is NULL), ordered by name ascending.",
+      "referenceSql": "SELECT c.name, c.archetype FROM cards c JOIN banlist b ON c.id = b.card_id WHERE b.format = 'tcg' AND b.status = 'Forbidden' AND c.archetype IS NOT NULL ORDER BY c.name",
+      "orderMatters": true,
+      "hints": [
+        "Join cards to banlist on c.id = b.card_id, then keep only the TCG rows whose status is Forbidden and whose card has an archetype.",
+        "WHERE b.format = 'tcg' AND b.status = 'Forbidden' AND c.archetype IS NOT NULL, then ORDER BY c.name.",
+        "```sql\nSELECT c.name, c.archetype FROM cards c JOIN banlist b ON c.id = b.card_id WHERE b.format = 'tcg' AND b.status = 'Forbidden' AND c.archetype IS NOT NULL ORDER BY c.name\n```"
+      ],
+      "xp": 16
+    },
+    {
+      "id": "ij-3",
+      "prompt": "For each card in the 'Dark Magician' archetype, how many times has it been printed? Join cards to card_sets and return name and the printing count as printing_count — most-printed first, breaking ties alphabetically by name.",
+      "referenceSql": "SELECT c.name, COUNT(*) AS printing_count FROM cards c JOIN card_sets cs ON c.id = cs.card_id WHERE c.archetype = 'Dark Magician' GROUP BY c.name ORDER BY printing_count DESC, c.name",
+      "orderMatters": true,
+      "hints": [
+        "After joining cards to their printings, group by the card name and COUNT the rows in each group.",
+        "GROUP BY c.name with COUNT(*) AS printing_count, then ORDER BY printing_count DESC, c.name.",
+        "```sql\nSELECT c.name, COUNT(*) AS printing_count FROM cards c JOIN card_sets cs ON c.id = cs.card_id WHERE c.archetype = 'Dark Magician' GROUP BY c.name ORDER BY printing_count DESC, c.name\n```"
+      ],
+      "xp": 17
+    },
+    {
+      "id": "ij-4",
+      "prompt": "Which cards have ever been printed at 'Starlight Rare' rarity? Return each qualifying card's name once, with no duplicates, ordered by name ascending.",
+      "referenceSql": "SELECT DISTINCT c.name FROM cards c JOIN card_sets cs ON c.id = cs.card_id WHERE cs.rarity = 'Starlight Rare' ORDER BY c.name",
+      "orderMatters": true,
+      "hints": [
+        "Join to card_sets and filter on the rarity; because a card can be printed at that rarity more than once, DISTINCT keeps it to one row.",
+        "SELECT DISTINCT c.name ... WHERE cs.rarity = 'Starlight Rare' ORDER BY c.name.",
+        "```sql\nSELECT DISTINCT c.name FROM cards c JOIN card_sets cs ON c.id = cs.card_id WHERE cs.rarity = 'Starlight Rare' ORDER BY c.name\n```"
+      ],
+      "xp": 17
+    },
+    {
+      "id": "ij-5",
+      "prompt": "How many Forbidden-in-TCG cards does each archetype have? Join cards to banlist, keep the TCG Forbidden cards that have an archetype, and return archetype with the count as forbidden_count — most first, breaking ties alphabetically by archetype.",
+      "referenceSql": "SELECT c.archetype, COUNT(*) AS forbidden_count FROM cards c JOIN banlist b ON c.id = b.card_id WHERE b.format = 'tcg' AND b.status = 'Forbidden' AND c.archetype IS NOT NULL GROUP BY c.archetype ORDER BY forbidden_count DESC, c.archetype",
+      "orderMatters": true,
+      "hints": [
+        "Join cards to banlist, filter to TCG Forbidden cards with an archetype, then group by archetype and count.",
+        "WHERE b.format = 'tcg' AND b.status = 'Forbidden' AND c.archetype IS NOT NULL, GROUP BY c.archetype, ORDER BY forbidden_count DESC, c.archetype.",
+        "```sql\nSELECT c.archetype, COUNT(*) AS forbidden_count FROM cards c JOIN banlist b ON c.id = b.card_id WHERE b.format = 'tcg' AND b.status = 'Forbidden' AND c.archetype IS NOT NULL GROUP BY c.archetype ORDER BY forbidden_count DESC, c.archetype\n```"
+      ],
+      "xp": 18
+    },
+    {
+      "id": "ij-6",
+      "prompt": "Which sets contain the most Forbidden-in-TCG cards? Join cards, banlist, and card_sets, and for each set count the distinct TCG-Forbidden cards printed in it. Return set_name and the count as forbidden_count for sets containing at least 5 such cards — most first, breaking ties alphabetically by set_name.",
+      "referenceSql": "SELECT cs.set_name, COUNT(DISTINCT c.id) AS forbidden_count FROM cards c JOIN banlist b ON c.id = b.card_id JOIN card_sets cs ON cs.card_id = c.id WHERE b.format = 'tcg' AND b.status = 'Forbidden' GROUP BY cs.set_name HAVING COUNT(DISTINCT c.id) >= 5 ORDER BY forbidden_count DESC, cs.set_name",
+      "orderMatters": true,
+      "hints": [
+        "Chain two joins off cards — one to banlist for the Forbidden filter, one to card_sets for the set — then group by set and count distinct cards.",
+        "GROUP BY cs.set_name, COUNT(DISTINCT c.id) AS forbidden_count, HAVING COUNT(DISTINCT c.id) >= 5, ORDER BY forbidden_count DESC, cs.set_name.",
+        "```sql\nSELECT cs.set_name, COUNT(DISTINCT c.id) AS forbidden_count FROM cards c JOIN banlist b ON c.id = b.card_id JOIN card_sets cs ON cs.card_id = c.id WHERE b.format = 'tcg' AND b.status = 'Forbidden' GROUP BY cs.set_name HAVING COUNT(DISTINCT c.id) >= 5 ORDER BY forbidden_count DESC, cs.set_name\n```"
+      ],
+      "xp": 19
+    }
+  ]
+}

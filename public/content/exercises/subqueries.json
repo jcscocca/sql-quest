@@ -1,0 +1,77 @@
+{
+  "skillId": "subqueries",
+  "exercises": [
+    {
+      "id": "sq-1",
+      "prompt": "Among cards in the 'Blue-Eyes' archetype, which have an ATK above the average ATK of all cards (ignoring cards with no ATK)? Use a scalar subquery for the average and return name and atk — highest ATK first, breaking ties alphabetically by name.",
+      "referenceSql": "SELECT name, atk FROM cards WHERE archetype = 'Blue-Eyes' AND atk IS NOT NULL AND atk > (SELECT AVG(atk) FROM cards WHERE atk IS NOT NULL) ORDER BY atk DESC, name",
+      "orderMatters": true,
+      "hints": [
+        "Compute the overall average once with a scalar subquery in the WHERE clause, then compare each Blue-Eyes card's atk to it.",
+        "WHERE archetype = 'Blue-Eyes' AND atk IS NOT NULL AND atk > (SELECT AVG(atk) FROM cards WHERE atk IS NOT NULL), ORDER BY atk DESC, name.",
+        "```sql\nSELECT name, atk FROM cards WHERE archetype = 'Blue-Eyes' AND atk IS NOT NULL AND atk > (SELECT AVG(atk) FROM cards WHERE atk IS NOT NULL) ORDER BY atk DESC, name\n```"
+      ],
+      "xp": 16
+    },
+    {
+      "id": "sq-2",
+      "prompt": "List the names of every card that appears on the TCG banlist (at any status). Use an IN subquery against the banlist table and return name, ordered by name ascending.",
+      "referenceSql": "SELECT name FROM cards WHERE id IN (SELECT card_id FROM banlist WHERE format = 'tcg') ORDER BY name",
+      "orderMatters": true,
+      "hints": [
+        "The inner query returns the card_ids on the TCG list; test each card's id for membership with IN.",
+        "WHERE id IN (SELECT card_id FROM banlist WHERE format = 'tcg'), then ORDER BY name.",
+        "```sql\nSELECT name FROM cards WHERE id IN (SELECT card_id FROM banlist WHERE format = 'tcg') ORDER BY name\n```"
+      ],
+      "xp": 16
+    },
+    {
+      "id": "sq-3",
+      "prompt": "List the names of 'Blackwing' archetype cards that do not appear on any banlist. Use a NOT IN subquery against the banlist table and return name, ordered by name ascending.",
+      "referenceSql": "SELECT name FROM cards WHERE archetype = 'Blackwing' AND id NOT IN (SELECT card_id FROM banlist) ORDER BY name",
+      "orderMatters": true,
+      "hints": [
+        "The inner query lists every banned card_id; NOT IN keeps the Blackwing cards whose id is absent from it.",
+        "WHERE archetype = 'Blackwing' AND id NOT IN (SELECT card_id FROM banlist), then ORDER BY name.",
+        "```sql\nSELECT name FROM cards WHERE archetype = 'Blackwing' AND id NOT IN (SELECT card_id FROM banlist) ORDER BY name\n```"
+      ],
+      "xp": 17
+    },
+    {
+      "id": "sq-4",
+      "prompt": "Which cards have the highest ATK of any card in the game? Use a scalar subquery to find that maximum ATK, and return name and atk, ordered by name ascending.",
+      "referenceSql": "SELECT name, atk FROM cards WHERE atk = (SELECT MAX(atk) FROM cards) ORDER BY name",
+      "orderMatters": true,
+      "hints": [
+        "A scalar subquery (SELECT MAX(atk) FROM cards) gives the single top value; keep the cards whose atk equals it.",
+        "WHERE atk = (SELECT MAX(atk) FROM cards), then ORDER BY name.",
+        "```sql\nSELECT name, atk FROM cards WHERE atk = (SELECT MAX(atk) FROM cards) ORDER BY name\n```"
+      ],
+      "xp": 17
+    },
+    {
+      "id": "sq-5",
+      "prompt": "List the names of all cards ever printed in the set 'Legend of Blue Eyes White Dragon'. Use an IN subquery against card_sets and return each qualifying card's name once, ordered by name ascending.",
+      "referenceSql": "SELECT name FROM cards WHERE id IN (SELECT card_id FROM card_sets WHERE set_name = 'Legend of Blue Eyes White Dragon') ORDER BY name",
+      "orderMatters": true,
+      "hints": [
+        "The inner query returns the card_ids printed in that set; IN de-duplicates them, so each card's name appears once.",
+        "WHERE id IN (SELECT card_id FROM card_sets WHERE set_name = 'Legend of Blue Eyes White Dragon'), then ORDER BY name.",
+        "```sql\nSELECT name FROM cards WHERE id IN (SELECT card_id FROM card_sets WHERE set_name = 'Legend of Blue Eyes White Dragon') ORDER BY name\n```"
+      ],
+      "xp": 18
+    },
+    {
+      "id": "sq-6",
+      "prompt": "Which archetypes have an average ATK higher than the average ATK across all cards? For each archetype, average only its cards that have an ATK, keep archetypes with at least 10 such cards whose average beats the global average, and return archetype and the average as avg_atk rounded to 2 decimals — highest average first, breaking ties alphabetically by archetype.",
+      "referenceSql": "SELECT archetype, ROUND(AVG(atk), 2) AS avg_atk FROM cards WHERE archetype IS NOT NULL AND atk IS NOT NULL GROUP BY archetype HAVING AVG(atk) > (SELECT AVG(atk) FROM cards WHERE atk IS NOT NULL) AND COUNT(atk) >= 10 ORDER BY avg_atk DESC, archetype",
+      "orderMatters": true,
+      "hints": [
+        "Group by archetype, then in HAVING compare each group's AVG(atk) to a scalar subquery for the global average and require COUNT(atk) >= 10.",
+        "GROUP BY archetype HAVING AVG(atk) > (SELECT AVG(atk) FROM cards WHERE atk IS NOT NULL) AND COUNT(atk) >= 10, ORDER BY avg_atk DESC, archetype.",
+        "```sql\nSELECT archetype, ROUND(AVG(atk), 2) AS avg_atk FROM cards WHERE archetype IS NOT NULL AND atk IS NOT NULL GROUP BY archetype HAVING AVG(atk) > (SELECT AVG(atk) FROM cards WHERE atk IS NOT NULL) AND COUNT(atk) >= 10 ORDER BY avg_atk DESC, archetype\n```"
+      ],
+      "xp": 19
+    }
+  ]
+}

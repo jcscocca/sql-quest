@@ -1,0 +1,77 @@
+{
+  "skillId": "correlated-subqueries",
+  "exercises": [
+    {
+      "id": "cs-1",
+      "prompt": "Among monsters of Level (or Rank) 10 or higher, which have an ATK greater than the average ATK of all cards that share their race? Use a correlated subquery keyed on race and return name, race, and atk — ordered by race ascending, then atk descending, then name ascending. Consider only cards that have an ATK.",
+      "referenceSql": "SELECT c.name, c.race, c.atk FROM cards c WHERE c.level >= 10 AND c.atk IS NOT NULL AND c.atk > (SELECT AVG(atk) FROM cards c2 WHERE c2.race = c.race AND c2.atk IS NOT NULL) ORDER BY c.race, c.atk DESC, c.name",
+      "orderMatters": true,
+      "hints": [
+        "The inner AVG must be computed per race by referencing the outer card's race (c2.race = c.race) — that correlation is what makes it re-run per row.",
+        "WHERE c.level >= 10 AND c.atk IS NOT NULL AND c.atk > (SELECT AVG(atk) FROM cards c2 WHERE c2.race = c.race AND c2.atk IS NOT NULL), ORDER BY c.race, c.atk DESC, c.name.",
+        "```sql\nSELECT c.name, c.race, c.atk FROM cards c WHERE c.level >= 10 AND c.atk IS NOT NULL AND c.atk > (SELECT AVG(atk) FROM cards c2 WHERE c2.race = c.race AND c2.atk IS NOT NULL) ORDER BY c.race, c.atk DESC, c.name\n```"
+      ],
+      "xp": 16
+    },
+    {
+      "id": "cs-2",
+      "prompt": "Which 'Blue-Eyes' archetype cards have been printed at least once? Use EXISTS with a correlated subquery against card_sets and return name, ordered by name ascending.",
+      "referenceSql": "SELECT c.name FROM cards c WHERE c.archetype = 'Blue-Eyes' AND EXISTS (SELECT 1 FROM card_sets cs WHERE cs.card_id = c.id) ORDER BY c.name",
+      "orderMatters": true,
+      "hints": [
+        "EXISTS (SELECT 1 FROM card_sets cs WHERE cs.card_id = c.id) is true when the card has at least one matching printing.",
+        "WHERE c.archetype = 'Blue-Eyes' AND EXISTS (SELECT 1 FROM card_sets cs WHERE cs.card_id = c.id), then ORDER BY c.name.",
+        "```sql\nSELECT c.name FROM cards c WHERE c.archetype = 'Blue-Eyes' AND EXISTS (SELECT 1 FROM card_sets cs WHERE cs.card_id = c.id) ORDER BY c.name\n```"
+      ],
+      "xp": 16
+    },
+    {
+      "id": "cs-3",
+      "prompt": "Which 'Blue-Eyes' archetype cards have never been printed in any set? Use NOT EXISTS with a correlated subquery against card_sets and return name, ordered by name ascending.",
+      "referenceSql": "SELECT c.name FROM cards c WHERE c.archetype = 'Blue-Eyes' AND NOT EXISTS (SELECT 1 FROM card_sets cs WHERE cs.card_id = c.id) ORDER BY c.name",
+      "orderMatters": true,
+      "hints": [
+        "NOT EXISTS flips the test — keep the cards for which no matching printing exists.",
+        "WHERE c.archetype = 'Blue-Eyes' AND NOT EXISTS (SELECT 1 FROM card_sets cs WHERE cs.card_id = c.id), then ORDER BY c.name.",
+        "```sql\nSELECT c.name FROM cards c WHERE c.archetype = 'Blue-Eyes' AND NOT EXISTS (SELECT 1 FROM card_sets cs WHERE cs.card_id = c.id) ORDER BY c.name\n```"
+      ],
+      "xp": 17
+    },
+    {
+      "id": "cs-4",
+      "prompt": "Which cards are Forbidden in the OCG format but have no entry at all on the TCG banlist? Use EXISTS for the OCG-Forbidden condition and NOT EXISTS for the missing TCG entry, and return name, ordered by name ascending.",
+      "referenceSql": "SELECT c.name FROM cards c WHERE EXISTS (SELECT 1 FROM banlist b WHERE b.card_id = c.id AND b.format = 'ocg' AND b.status = 'Forbidden') AND NOT EXISTS (SELECT 1 FROM banlist b2 WHERE b2.card_id = c.id AND b2.format = 'tcg') ORDER BY c.name",
+      "orderMatters": true,
+      "hints": [
+        "Two correlated tests on banlist: one EXISTS that finds an OCG-Forbidden row, and one NOT EXISTS that requires no TCG row of any status.",
+        "WHERE EXISTS (... b.format = 'ocg' AND b.status = 'Forbidden') AND NOT EXISTS (... b2.format = 'tcg'), then ORDER BY c.name.",
+        "```sql\nSELECT c.name FROM cards c WHERE EXISTS (SELECT 1 FROM banlist b WHERE b.card_id = c.id AND b.format = 'ocg' AND b.status = 'Forbidden') AND NOT EXISTS (SELECT 1 FROM banlist b2 WHERE b2.card_id = c.id AND b2.format = 'tcg') ORDER BY c.name\n```"
+      ],
+      "xp": 17
+    },
+    {
+      "id": "cs-5",
+      "prompt": "Which cards hold the highest ATK within their race (ties allowed)? Use a correlated subquery to compare each card's ATK to the maximum ATK of its race, and return name, race, and atk — ordered by race ascending, then name ascending. Consider only cards that have an ATK.",
+      "referenceSql": "SELECT c.name, c.race, c.atk FROM cards c WHERE c.atk IS NOT NULL AND c.atk = (SELECT MAX(atk) FROM cards c2 WHERE c2.race = c.race AND c2.atk IS NOT NULL) ORDER BY c.race, c.name",
+      "orderMatters": true,
+      "hints": [
+        "Correlate the inner MAX on race (c2.race = c.race) and keep cards whose atk equals that per-race maximum; equal ties all stay.",
+        "WHERE c.atk IS NOT NULL AND c.atk = (SELECT MAX(atk) FROM cards c2 WHERE c2.race = c.race AND c2.atk IS NOT NULL), ORDER BY c.race, c.name.",
+        "```sql\nSELECT c.name, c.race, c.atk FROM cards c WHERE c.atk IS NOT NULL AND c.atk = (SELECT MAX(atk) FROM cards c2 WHERE c2.race = c.race AND c2.atk IS NOT NULL) ORDER BY c.race, c.name\n```"
+      ],
+      "xp": 18
+    },
+    {
+      "id": "cs-6",
+      "prompt": "Which cards are the sole highest-ATK card of their race — strictly greater than every other card sharing that race? Use NOT EXISTS to assert that no other same-race card has an ATK greater than or equal to this one, and return name, race, and atk — ordered by race ascending, then name ascending. Consider only cards that have an ATK.",
+      "referenceSql": "SELECT c.name, c.race, c.atk FROM cards c WHERE c.atk IS NOT NULL AND NOT EXISTS (SELECT 1 FROM cards c2 WHERE c2.race = c.race AND c2.id <> c.id AND c2.atk >= c.atk) ORDER BY c.race, c.name",
+      "orderMatters": true,
+      "hints": [
+        "The card is a sole maximum when no other card of the same race (c2.id <> c.id) reaches its ATK — express that with NOT EXISTS and c2.atk >= c.atk.",
+        "WHERE c.atk IS NOT NULL AND NOT EXISTS (SELECT 1 FROM cards c2 WHERE c2.race = c.race AND c2.id <> c.id AND c2.atk >= c.atk), ORDER BY c.race, c.name.",
+        "```sql\nSELECT c.name, c.race, c.atk FROM cards c WHERE c.atk IS NOT NULL AND NOT EXISTS (SELECT 1 FROM cards c2 WHERE c2.race = c.race AND c2.id <> c.id AND c2.atk >= c.atk) ORDER BY c.race, c.name\n```"
+      ],
+      "xp": 19
+    }
+  ]
+}

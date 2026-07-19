@@ -122,6 +122,79 @@
           }
         }
       ]
+    },
+    {
+      "id": "combining",
+      "name": "Combining",
+      "world": "yugioh",
+      "skills": [
+        {
+          "id": "inner-join",
+          "name": "INNER JOIN",
+          "world": "yugioh",
+          "requires": ["null-handling"],
+          "lesson": {
+            "intro": "INNER JOIN stitches two tables together on a matching key, keeping only the rows that pair up on both sides. In the Yu-Gi-Oh data, cards.id matches card_sets.card_id, so joining them pairs each card with every set it was printed in — one result row per printing. You give each table an alias (cards c, card_sets cs) and state the match in ON: FROM cards c JOIN card_sets cs ON c.id = cs.card_id, after which columns from either side are yours to SELECT, filter, group, or count. The same key joins cards to banlist (c.id = b.card_id) to pair a card with its restriction history. Cards with no match simply vanish from an INNER JOIN — that dropping-out is the whole reason the LEFT JOIN you meet next exists.",
+            "exampleSql": "SELECT c.name, cs.set_name, cs.rarity FROM cards c JOIN card_sets cs ON c.id = cs.card_id WHERE c.name = 'Dark Magician' ORDER BY cs.set_code",
+            "wrapUp": "INNER JOIN pairs rows across tables on a key and keeps only the matches, letting one query span cards, their printings, and their banlist entries at once. Because unmatched rows drop out, an inner join quietly filters too. Next you'll use LEFT JOIN to keep those unmatched rows and see exactly what's missing."
+          }
+        },
+        {
+          "id": "left-join",
+          "name": "LEFT JOIN",
+          "world": "yugioh",
+          "requires": ["inner-join"],
+          "lesson": {
+            "intro": "A LEFT JOIN keeps every row from the left table even when the right table has no match — the right-side columns just come back NULL. That makes it the tool for 'what's missing' questions: LEFT JOIN card_sets, and cards that were never printed appear with a NULL card_sets side, which you isolate with WHERE cs.card_id IS NULL. Watch where conditions go: a filter in the ON clause (ON b.card_id = c.id AND b.format = 'tcg') is applied as part of the match and preserves unmatched rows, while that same test in WHERE would silently collapse the LEFT JOIN back into an inner one. COUNT is careful here too — COUNT(cs.card_id) tallies only real matches, reporting 0 for a card with no printing, whereas COUNT(*) would wrongly report 1. COALESCE(status, 'Unrestricted') swaps a friendly label in for the NULLs.",
+            "exampleSql": "SELECT c.name, cs.set_name FROM cards c LEFT JOIN card_sets cs ON c.id = cs.card_id WHERE c.archetype = 'Blue-Eyes' ORDER BY c.name, cs.set_name",
+            "wrapUp": "LEFT JOIN keeps unmatched left rows with NULLs on the right, turning 'which cards have no printing or no banlist entry' into a WHERE ... IS NULL filter and COUNT(column) into an honest zero. Keep the match conditions in ON and post-filters in WHERE and you control exactly which rows survive. Next you'll stack whole result sets with UNION, INTERSECT, and EXCEPT."
+          }
+        },
+        {
+          "id": "self-join",
+          "name": "Self Joins",
+          "world": "pokemon",
+          "requires": ["inner-join"],
+          "lesson": {
+            "intro": "A self-join joins a table to itself by listing it twice under different aliases — the same JOIN mechanic, both sides drawn from one table. In the Pokémon data, evolves_from names each species' pre-evolution, so pokemon p JOIN pokemon pre ON p.evolves_from = pre.name pairs every evolved Pokémon with the row of what it evolved from, letting you compare their stats or types side by side. Chain a third copy to reach a grandparent (pre.evolves_from = gp.name), or line up any two rows of the table you like. The identical idea reaches into a second table: pokemon p JOIN type_matchups tm ON tm.defender_type = p.type1 attaches each Pokémon to the rows describing what damages its type. Aliases are mandatory in a self-join — without them SQL cannot tell which copy of the table you mean.",
+            "exampleSql": "SELECT p.name, pre.name AS evolves_from, p.attack, pre.attack AS pre_attack FROM pokemon p JOIN pokemon pre ON p.evolves_from = pre.name ORDER BY p.name",
+            "wrapUp": "A self-join is just a table joined to aliased copies of itself — the trick is naming each copy so you can compare one row against another, whether that's an evolution and its pre-evolution or two links of a longer chain. The same JOIN also reaches sideways into the type-matchup chart. Next, set operations stack whole result sets instead of widening rows."
+          }
+        },
+        {
+          "id": "set-operations",
+          "name": "Set Operations",
+          "world": "yugioh",
+          "requires": ["left-join"],
+          "lesson": {
+            "intro": "Set operations stack the results of two queries that share the same columns. UNION returns rows appearing in either result with duplicates removed (UNION ALL keeps them); INTERSECT returns only rows present in both; EXCEPT returns rows in the first result that are absent from the second. They shine on the banlist, where a card may sit on the TCG list, the OCG list, or both: a Forbidden-in-TCG query INTERSECT a Forbidden-in-OCG query yields the cards banned in both worlds, and EXCEPT yields the TCG-only bans. Each side is an independent SELECT whose columns must line up in count and order, and a single trailing ORDER BY sorts the combined result.",
+            "exampleSql": "SELECT c.name FROM cards c JOIN banlist b ON c.id = b.card_id WHERE b.format = 'tcg' AND b.status = 'Forbidden' INTERSECT SELECT c.name FROM cards c JOIN banlist b ON c.id = b.card_id WHERE b.format = 'ocg' AND b.status = 'Forbidden' ORDER BY name",
+            "wrapUp": "UNION, INTERSECT, and EXCEPT combine two same-shaped result sets into their union, overlap, or difference — ideal for comparing the TCG and OCG banlists. The columns must align and only a trailing ORDER BY sorts the whole. Next you'll nest one query inside another with subqueries."
+          }
+        },
+        {
+          "id": "subqueries",
+          "name": "Subqueries",
+          "world": "yugioh",
+          "requires": ["left-join"],
+          "lesson": {
+            "intro": "A subquery is a query nested inside another. A scalar subquery returns a single value to compare against — WHERE atk > (SELECT AVG(atk) FROM cards WHERE atk IS NOT NULL) keeps only above-average attackers, computing that average once. An IN subquery returns a column of values to test membership: WHERE id IN (SELECT card_id FROM banlist WHERE format = 'tcg') keeps cards on the TCG banlist, and NOT IN keeps those absent from it. A subquery in HAVING lets a grouped query compare each group's aggregate against a table-wide figure. These inner queries run against the same tables and stand entirely on their own — you can always run one by itself to check it first.",
+            "exampleSql": "SELECT name, atk FROM cards WHERE atk > (SELECT AVG(atk) FROM cards WHERE atk IS NOT NULL) AND archetype = 'Blue-Eyes' ORDER BY atk DESC, name",
+            "wrapUp": "Subqueries let one query feed another: a scalar subquery supplies a single comparison value, an IN or NOT IN subquery supplies a membership list, and a HAVING subquery compares each group to a global figure. Each inner query is self-contained. When the inner query needs to reference the current outer row, you reach for the correlated subqueries you'll meet next."
+          }
+        },
+        {
+          "id": "correlated-subqueries",
+          "name": "Correlated Subqueries",
+          "world": "yugioh",
+          "requires": ["subqueries", "self-join"],
+          "lesson": {
+            "intro": "A correlated subquery references the outer row, so it is re-evaluated for each row instead of once. WHERE atk > (SELECT AVG(atk) FROM cards c2 WHERE c2.race = c.race) compares every card to the average ATK of its own race — the inner query depends on c.race from the outer card. EXISTS (SELECT 1 FROM card_sets cs WHERE cs.card_id = c.id) is true when at least one matching printing exists, and NOT EXISTS is the anti-join in subquery form: cards with no printing at all. Correlated subqueries express the per-row, per-group comparisons a flat query can't — 'above its race's average,' 'the top ATK in its race,' 'Forbidden in the OCG but nowhere on the TCG list.' They are powerful but re-run for every outer row, which is exactly the repeated work the next region streamlines.",
+            "exampleSql": "SELECT name, race, atk FROM cards c WHERE atk IS NOT NULL AND atk > (SELECT AVG(atk) FROM cards c2 WHERE c2.race = c.race AND c2.atk IS NOT NULL) AND race = 'Dragon' ORDER BY atk DESC, name",
+            "wrapUp": "A correlated subquery re-runs for every outer row, wiring the inner query to that row's values — the engine behind 'above its own group's average' and EXISTS / NOT EXISTS membership tests. That per-row power costs repeated work. In the Analyst region, CTEs name a result once and window functions compute across groups in a single pass, replacing many of these patterns."
+          }
+        }
+      ]
     }
   ]
 }

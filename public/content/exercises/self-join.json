@@ -1,0 +1,78 @@
+{
+  "skillId": "self-join",
+  "exercises": [
+    {
+      "id": "sj-1",
+      "prompt": "For every Pokémon that evolves from another, list the Pokémon's name and its pre-evolution's primary type. Self-join pokemon to itself on evolves_from, and return name and the pre-evolution's type as pre_type, ordered by name ascending.",
+      "referenceSql": "SELECT p.name, pre.type1 AS pre_type FROM pokemon p JOIN pokemon pre ON p.evolves_from = pre.name ORDER BY p.name",
+      "orderMatters": true,
+      "hints": [
+        "Join pokemon to a second aliased copy of itself, matching p.evolves_from to pre.name, then read type1 from the pre copy.",
+        "FROM pokemon p JOIN pokemon pre ON p.evolves_from = pre.name, SELECT p.name and pre.type1 AS pre_type, ORDER BY p.name.",
+        "```sql\nSELECT p.name, pre.type1 AS pre_type FROM pokemon p JOIN pokemon pre ON p.evolves_from = pre.name ORDER BY p.name\n```"
+      ],
+      "xp": 16
+    },
+    {
+      "id": "sj-2",
+      "prompt": "Which Pokémon have a higher base attack than the Pokémon they evolve from? Self-join pokemon to itself and return the Pokémon's name and its attack as attack — highest attack first, breaking ties alphabetically by name.",
+      "referenceSql": "SELECT p.name, p.attack AS attack FROM pokemon p JOIN pokemon pre ON p.evolves_from = pre.name WHERE p.attack > pre.attack ORDER BY p.attack DESC, p.name",
+      "orderMatters": true,
+      "hints": [
+        "Pair each Pokémon with its pre-evolution via the self-join, then compare the two attack values in the WHERE clause.",
+        "JOIN pokemon pre ON p.evolves_from = pre.name WHERE p.attack > pre.attack, ORDER BY p.attack DESC, p.name.",
+        "```sql\nSELECT p.name, p.attack AS attack FROM pokemon p JOIN pokemon pre ON p.evolves_from = pre.name WHERE p.attack > pre.attack ORDER BY p.attack DESC, p.name\n```"
+      ],
+      "xp": 16
+    },
+    {
+      "id": "sj-3",
+      "prompt": "Find every Pokémon whose primary type differs from its pre-evolution's primary type (like Eevee's evolutions). Self-join pokemon to itself and return the Pokémon's name, its type1 as pokemon_type, and its pre-evolution's type1 as pre_type, ordered by name ascending.",
+      "referenceSql": "SELECT p.name, p.type1 AS pokemon_type, pre.type1 AS pre_type FROM pokemon p JOIN pokemon pre ON p.evolves_from = pre.name WHERE p.type1 <> pre.type1 ORDER BY p.name",
+      "orderMatters": true,
+      "hints": [
+        "After the self-join, keep only the rows where the two type1 values disagree.",
+        "JOIN pokemon pre ON p.evolves_from = pre.name WHERE p.type1 <> pre.type1, selecting p.type1 and pre.type1 side by side.",
+        "```sql\nSELECT p.name, p.type1 AS pokemon_type, pre.type1 AS pre_type FROM pokemon p JOIN pokemon pre ON p.evolves_from = pre.name WHERE p.type1 <> pre.type1 ORDER BY p.name\n```"
+      ],
+      "xp": 17
+    },
+    {
+      "id": "sj-4",
+      "prompt": "For each Fire-type Pokémon, which attacking types deal double damage to it? Join pokemon to type_matchups, matching the Pokémon's type1 to defender_type, and keep the 2x matchups. Return the Pokémon's name and the attacker_type, ordered by name ascending, then attacker_type ascending.",
+      "referenceSql": "SELECT p.name, tm.attacker_type FROM pokemon p JOIN type_matchups tm ON tm.defender_type = p.type1 WHERE p.type1 = 'fire' AND tm.multiplier = 2 ORDER BY p.name, tm.attacker_type",
+      "orderMatters": true,
+      "hints": [
+        "Join pokemon to type_matchups on tm.defender_type = p.type1, then filter to Fire-type Pokémon and multiplier = 2.",
+        "FROM pokemon p JOIN type_matchups tm ON tm.defender_type = p.type1 WHERE p.type1 = 'fire' AND tm.multiplier = 2, ORDER BY p.name, tm.attacker_type.",
+        "```sql\nSELECT p.name, tm.attacker_type FROM pokemon p JOIN type_matchups tm ON tm.defender_type = p.type1 WHERE p.type1 = 'fire' AND tm.multiplier = 2 ORDER BY p.name, tm.attacker_type\n```"
+      ],
+      "xp": 17
+    },
+    {
+      "id": "sj-5",
+      "prompt": "Find every Pokémon that sits in the middle of an evolution line — it evolves from something, and something else evolves from it. Join pokemon to a copy for its pre-evolution and another copy for its next evolution, and return each such Pokémon's name once, with no duplicates, ordered by name ascending.",
+      "referenceSql": "SELECT DISTINCT p.name FROM pokemon p JOIN pokemon pre ON p.evolves_from = pre.name JOIN pokemon nxt ON nxt.evolves_from = p.name ORDER BY p.name",
+      "orderMatters": true,
+      "hints": [
+        "A middle Pokémon matches on both sides: p.evolves_from = pre.name AND some nxt.evolves_from = p.name. DISTINCT collapses Pokémon with more than one next evolution.",
+        "JOIN pokemon pre ON p.evolves_from = pre.name JOIN pokemon nxt ON nxt.evolves_from = p.name, SELECT DISTINCT p.name.",
+        "```sql\nSELECT DISTINCT p.name FROM pokemon p JOIN pokemon pre ON p.evolves_from = pre.name JOIN pokemon nxt ON nxt.evolves_from = p.name ORDER BY p.name\n```"
+      ],
+      "xp": 18
+    },
+    {
+      "id": "sj-6",
+      "prompt": "For every Pokémon whose evolution line runs three deep, list the Pokémon and its 'grandparent' — the Pokémon that its pre-evolution evolves from. Chain two self-joins and return the Pokémon's name and the grandparent's name as grandparent, ordered by name ascending.",
+      "referenceSql": "SELECT p.name, gp.name AS grandparent FROM pokemon p JOIN pokemon pre ON p.evolves_from = pre.name JOIN pokemon gp ON pre.evolves_from = gp.name ORDER BY p.name",
+      "orderMatters": true,
+      "hints": [
+        "Hop twice: p to its pre-evolution (p.evolves_from = pre.name), then pre to its own pre-evolution (pre.evolves_from = gp.name).",
+        "JOIN pokemon pre ON p.evolves_from = pre.name JOIN pokemon gp ON pre.evolves_from = gp.name, SELECT p.name and gp.name AS grandparent.",
+        "```sql\nSELECT p.name, gp.name AS grandparent FROM pokemon p JOIN pokemon pre ON p.evolves_from = pre.name JOIN pokemon gp ON pre.evolves_from = gp.name ORDER BY p.name\n```"
+      ],
+      "xp": 19,
+      "collectibles": ["charizard"]
+    }
+  ]
+}
