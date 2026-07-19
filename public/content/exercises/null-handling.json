@@ -1,0 +1,78 @@
+{
+  "skillId": "null-handling",
+  "exercises": [
+    {
+      "id": "nl-1",
+      "prompt": "In a single row, report the total number of cards as total_cards, how many have an ATK value as with_atk, and how many are missing one as missing_atk.",
+      "referenceSql": "SELECT COUNT(*) AS total_cards, COUNT(atk) AS with_atk, COUNT(*) - COUNT(atk) AS missing_atk FROM cards",
+      "orderMatters": false,
+      "hints": [
+        "COUNT(*) counts every row, but COUNT(atk) skips the NULLs — the gap between them is the missing count.",
+        "Select COUNT(*), COUNT(atk), and COUNT(*) - COUNT(atk).",
+        "```sql\nSELECT COUNT(*) AS total_cards, COUNT(atk) AS with_atk, COUNT(*) - COUNT(atk) AS missing_atk FROM cards\n```"
+      ],
+      "xp": 15
+    },
+    {
+      "id": "nl-2",
+      "prompt": "Some cards belong to no archetype at all. Replace a missing archetype with the text '(none)' and count how many cards fall under each archetype label. Return the label as archetype_label and the count as card_count for the 5 largest groups, most numerous first, breaking ties alphabetically by archetype_label.",
+      "referenceSql": "SELECT COALESCE(archetype, '(none)') AS archetype_label, COUNT(*) AS card_count FROM cards GROUP BY archetype_label ORDER BY card_count DESC, archetype_label LIMIT 5",
+      "orderMatters": true,
+      "hints": [
+        "COALESCE(archetype, '(none)') returns the archetype when present and '(none)' when it is NULL; you can group by that expression.",
+        "GROUP BY COALESCE(archetype, '(none)'), ORDER BY card_count DESC, archetype_label, LIMIT 5.",
+        "```sql\nSELECT COALESCE(archetype, '(none)') AS archetype_label, COUNT(*) AS card_count FROM cards GROUP BY archetype_label ORDER BY card_count DESC, archetype_label LIMIT 5\n```"
+      ],
+      "xp": 16
+    },
+    {
+      "id": "nl-3",
+      "prompt": "The Egyptian Gods have variable ATK that the data stores as NULL. List every DIVINE-attribute card that has no ATK value — return just the name, ordered by name ascending.",
+      "referenceSql": "SELECT name FROM cards WHERE attribute = 'DIVINE' AND atk IS NULL ORDER BY name",
+      "orderMatters": true,
+      "hints": [
+        "A missing value is tested with IS NULL, never with = NULL.",
+        "WHERE attribute = 'DIVINE' AND atk IS NULL, then ORDER BY name.",
+        "```sql\nSELECT name FROM cards WHERE attribute = 'DIVINE' AND atk IS NULL ORDER BY name\n```"
+      ],
+      "xp": 16,
+      "collectibles": ["The Winged Dragon of Ra"]
+    },
+    {
+      "id": "nl-4",
+      "prompt": "For Link Monsters, compare two averages of atk in one row: avg_real_atk, the average over only the cards that have an ATK value, and avg_with_zeros, the average when every missing ATK is treated as 0. Round both to 1 decimal place.",
+      "referenceSql": "SELECT ROUND(AVG(atk), 1) AS avg_real_atk, ROUND(AVG(COALESCE(atk, 0)), 1) AS avg_with_zeros FROM cards WHERE type = 'Link Monster'",
+      "orderMatters": false,
+      "hints": [
+        "AVG(atk) ignores NULLs, but AVG(COALESCE(atk, 0)) first turns each missing value into 0 so it drags the average down.",
+        "Select ROUND(AVG(atk), 1) and ROUND(AVG(COALESCE(atk, 0)), 1), filtered WHERE type = 'Link Monster'.",
+        "```sql\nSELECT ROUND(AVG(atk), 1) AS avg_real_atk, ROUND(AVG(COALESCE(atk, 0)), 1) AS avg_with_zeros FROM cards WHERE type = 'Link Monster'\n```"
+      ],
+      "xp": 17
+    },
+    {
+      "id": "nl-5",
+      "prompt": "Split every card into two groups by whether it has an ATK value: label it 'Has ATK' when atk is present and 'No ATK' when it is NULL. Return the label as atk_status and the count as card_count, most numerous first, breaking ties alphabetically by atk_status.",
+      "referenceSql": "SELECT CASE WHEN atk IS NULL THEN 'No ATK' ELSE 'Has ATK' END AS atk_status, COUNT(*) AS card_count FROM cards GROUP BY atk_status ORDER BY card_count DESC, atk_status",
+      "orderMatters": true,
+      "hints": [
+        "A CASE whose test is 'atk IS NULL' turns the presence or absence of a value into a label you can group by.",
+        "CASE WHEN atk IS NULL THEN 'No ATK' ELSE 'Has ATK' END AS atk_status, then GROUP BY atk_status.",
+        "```sql\nSELECT CASE WHEN atk IS NULL THEN 'No ATK' ELSE 'Has ATK' END AS atk_status, COUNT(*) AS card_count FROM cards GROUP BY atk_status ORDER BY card_count DESC, atk_status\n```"
+      ],
+      "xp": 17
+    },
+    {
+      "id": "nl-6",
+      "prompt": "Which monster card types have members with no level? Considering only cards whose type contains the word Monster, report for each type the total number of cards as total_cards and how many are missing a level as missing_level, keeping only types where at least one card is missing its level. Order by missing_level descending, breaking ties alphabetically by type.",
+      "referenceSql": "SELECT type, COUNT(*) AS total_cards, COUNT(*) - COUNT(level) AS missing_level FROM cards WHERE type LIKE '%Monster%' GROUP BY type HAVING COUNT(*) - COUNT(level) > 0 ORDER BY missing_level DESC, type",
+      "orderMatters": true,
+      "hints": [
+        "COUNT(*) - COUNT(level) is the number of NULL levels in each group, and you can filter groups on it with HAVING.",
+        "GROUP BY type HAVING COUNT(*) - COUNT(level) > 0, then ORDER BY missing_level DESC, type.",
+        "```sql\nSELECT type, COUNT(*) AS total_cards, COUNT(*) - COUNT(level) AS missing_level FROM cards WHERE type LIKE '%Monster%' GROUP BY type HAVING COUNT(*) - COUNT(level) > 0 ORDER BY missing_level DESC, type\n```"
+      ],
+      "xp": 18
+    }
+  ]
+}

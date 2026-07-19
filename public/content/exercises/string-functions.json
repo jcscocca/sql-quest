@@ -1,0 +1,78 @@
+{
+  "skillId": "string-functions",
+  "exercises": [
+    {
+      "id": "sf-1",
+      "prompt": "Which 5 cards have the longest names? Return name and its character count as name_length, longest first, breaking ties alphabetically by name.",
+      "referenceSql": "SELECT name, LENGTH(name) AS name_length FROM cards ORDER BY LENGTH(name) DESC, name LIMIT 5",
+      "orderMatters": true,
+      "hints": [
+        "LENGTH(name) gives each name's character count, and you can sort by that same expression.",
+        "ORDER BY LENGTH(name) DESC, name, then LIMIT 5.",
+        "```sql\nSELECT name, LENGTH(name) AS name_length FROM cards ORDER BY LENGTH(name) DESC, name LIMIT 5\n```"
+      ],
+      "xp": 16
+    },
+    {
+      "id": "sf-2",
+      "prompt": "Which starting letters are most common among card names? Take the first character of each name and count how many cards begin with it. Return that character as first_letter and the count as card_count for the 5 most common, most common first, breaking ties alphabetically by first_letter.",
+      "referenceSql": "SELECT SUBSTR(name, 1, 1) AS first_letter, COUNT(*) AS card_count FROM cards GROUP BY first_letter ORDER BY card_count DESC, first_letter LIMIT 5",
+      "orderMatters": true,
+      "hints": [
+        "SUBSTR(name, 1, 1) extracts the first character; group by it to count names per starting letter.",
+        "GROUP BY SUBSTR(name, 1, 1), ORDER BY card_count DESC, first_letter, LIMIT 5.",
+        "```sql\nSELECT SUBSTR(name, 1, 1) AS first_letter, COUNT(*) AS card_count FROM cards GROUP BY first_letter ORDER BY card_count DESC, first_letter LIMIT 5\n```"
+      ],
+      "xp": 16
+    },
+    {
+      "id": "sf-3",
+      "prompt": "Build a display label for each DIVINE-attribute card by joining its name, a space, and its attribute in parentheses — for example 'Obelisk the Tormentor (DIVINE)'. Return only that single column aliased as label, ordered by name ascending.",
+      "referenceSql": "SELECT name || ' (' || attribute || ')' AS label FROM cards WHERE attribute = 'DIVINE' ORDER BY name",
+      "orderMatters": true,
+      "hints": [
+        "The || operator concatenates strings; you can chain several together with literal text in between.",
+        "name || ' (' || attribute || ')' AS label, filtered WHERE attribute = 'DIVINE', ORDER BY name.",
+        "```sql\nSELECT name || ' (' || attribute || ')' AS label FROM cards WHERE attribute = 'DIVINE' ORDER BY name\n```"
+      ],
+      "xp": 16
+    },
+    {
+      "id": "sf-4",
+      "prompt": "The archive wants Blue-Eyes card names shown with spaces instead of hyphens. For every card whose name starts with 'Blue-Eyes', return the original name and a version with every hyphen replaced by a single space, aliased as spaced_name. Order by name ascending.",
+      "referenceSql": "SELECT name, REPLACE(name, '-', ' ') AS spaced_name FROM cards WHERE name LIKE 'Blue-Eyes%' ORDER BY name",
+      "orderMatters": true,
+      "hints": [
+        "REPLACE(text, from, to) swaps every occurrence of one substring for another.",
+        "REPLACE(name, '-', ' ') AS spaced_name, filtered WHERE name LIKE 'Blue-Eyes%', ORDER BY name.",
+        "```sql\nSELECT name, REPLACE(name, '-', ' ') AS spaced_name FROM cards WHERE name LIKE 'Blue-Eyes%' ORDER BY name\n```"
+      ],
+      "xp": 17,
+      "collectibles": ["Blue-Eyes White Dragon"]
+    },
+    {
+      "id": "sf-5",
+      "prompt": "The tournament announcer shouts every 'Dark Magician' archetype card name in all capitals. Return each card's name and its uppercased form as shout, ordered by name ascending.",
+      "referenceSql": "SELECT name, UPPER(name) AS shout FROM cards WHERE archetype = 'Dark Magician' ORDER BY name",
+      "orderMatters": true,
+      "hints": [
+        "UPPER(name) returns the name with every letter capitalized.",
+        "Select name and UPPER(name) AS shout, filtered WHERE archetype = 'Dark Magician', ORDER BY name.",
+        "```sql\nSELECT name, UPPER(name) AS shout FROM cards WHERE archetype = 'Dark Magician' ORDER BY name\n```"
+      ],
+      "xp": 17
+    },
+    {
+      "id": "sf-6",
+      "prompt": "Bucket every card by the length of its name: 'Short' when the name is 15 characters or fewer, 'Medium' when it is 16 to 30 characters, and 'Long' when it is 31 or more. Return the bucket as length_bucket and the count as card_count, most numerous first, breaking ties alphabetically by length_bucket.",
+      "referenceSql": "SELECT CASE WHEN LENGTH(name) <= 15 THEN 'Short' WHEN LENGTH(name) <= 30 THEN 'Medium' ELSE 'Long' END AS length_bucket, COUNT(*) AS card_count FROM cards GROUP BY length_bucket ORDER BY card_count DESC, length_bucket",
+      "orderMatters": true,
+      "hints": [
+        "Feed LENGTH(name) into a CASE expression to turn a character count into a labeled bucket, then group by that label.",
+        "CASE WHEN LENGTH(name) <= 15 THEN 'Short' WHEN LENGTH(name) <= 30 THEN 'Medium' ELSE 'Long' END, then GROUP BY the bucket.",
+        "```sql\nSELECT CASE WHEN LENGTH(name) <= 15 THEN 'Short' WHEN LENGTH(name) <= 30 THEN 'Medium' ELSE 'Long' END AS length_bucket, COUNT(*) AS card_count FROM cards GROUP BY length_bucket ORDER BY card_count DESC, length_bucket\n```"
+      ],
+      "xp": 18
+    }
+  ]
+}

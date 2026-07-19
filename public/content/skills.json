@@ -60,6 +60,68 @@
           }
         }
       ]
+    },
+    {
+      "id": "shaping",
+      "name": "Shaping",
+      "world": "yugioh",
+      "skills": [
+        {
+          "id": "group-by",
+          "name": "GROUP BY",
+          "world": "pokemon",
+          "requires": ["aggregates"],
+          "lesson": {
+            "intro": "GROUP BY collapses rows that share a value into one row per group, so aggregates like COUNT and AVG report per group instead of once for the whole table. SELECT generation, COUNT(*) FROM pokemon GROUP BY generation returns one count for each generation. The iron rule: every column in your SELECT must either sit inside an aggregate or appear in the GROUP BY — the grouping columns are what identify each output row. You can group by more than one column, like generation and type1 together, to get finer buckets.",
+            "exampleSql": "SELECT type1, COUNT(*) AS pokemon_count, ROUND(AVG(attack), 1) AS avg_attack FROM pokemon GROUP BY type1 ORDER BY pokemon_count DESC",
+            "wrapUp": "GROUP BY turns table-wide aggregates into per-group answers — one row per generation, per type, or per combination of both. Keep the iron rule in mind: every selected column is either aggregated or in the GROUP BY. Next you'll filter these groups themselves with HAVING."
+          }
+        },
+        {
+          "id": "having",
+          "name": "HAVING",
+          "world": "pokemon",
+          "requires": ["group-by"],
+          "lesson": {
+            "intro": "WHERE filters individual rows before grouping; HAVING filters whole groups after aggregating. To keep only the primary types with at least 50 Pokémon you can't use WHERE — that count doesn't exist until the group is formed — so you write GROUP BY type1 HAVING COUNT(*) >= 50. HAVING can test any aggregate: HAVING AVG(total) > 430, HAVING MAX(attack) >= 150. WHERE and HAVING often work together — WHERE trims the rows first, then HAVING trims the resulting groups.",
+            "exampleSql": "SELECT type1, COUNT(*) AS pokemon_count FROM pokemon GROUP BY type1 HAVING COUNT(*) >= 50 ORDER BY pokemon_count DESC",
+            "wrapUp": "HAVING is WHERE for groups — it tests aggregates that don't exist until grouping has happened. Remember the pipeline order: WHERE filters rows, GROUP BY forms groups, HAVING filters groups. With grouping mastered, you're ready to reshape values row by row with CASE."
+          }
+        },
+        {
+          "id": "case-when",
+          "name": "CASE Expressions",
+          "world": "yugioh",
+          "requires": ["group-by"],
+          "lesson": {
+            "intro": "CASE is SQL's if/else: it walks its WHEN tests in order and returns the first THEN whose condition passes, or the ELSE value if none do. On the Yu-Gi-Oh cards table you can turn a raw level into a tier — CASE WHEN level <= 4 THEN 'Low' WHEN level <= 8 THEN 'Mid' ELSE 'High' END — then GROUP BY that label to count each tier. A CASE expression fits almost anywhere a column can: in SELECT, in GROUP BY, even in ORDER BY to build a custom sort. Wrapped in SUM it becomes a conditional counter — SUM(CASE WHEN atk >= 3000 THEN 1 ELSE 0 END) tallies only the heavy hitters.",
+            "exampleSql": "SELECT CASE WHEN level <= 4 THEN 'Low' WHEN level <= 8 THEN 'Mid' ELSE 'High' END AS level_tier, COUNT(*) AS card_count FROM cards WHERE level IS NOT NULL GROUP BY level_tier ORDER BY card_count DESC",
+            "wrapUp": "CASE turns raw values into labels, buckets, and conditional counts, and it slots into SELECT, GROUP BY, or ORDER BY. This is your first tool on the Yu-Gi-Oh cards table — next you'll reshape the text of the card names themselves with string functions."
+          }
+        },
+        {
+          "id": "string-functions",
+          "name": "String Functions",
+          "world": "yugioh",
+          "requires": ["case-when"],
+          "lesson": {
+            "intro": "String functions reshape text. LENGTH(name) gives a card name's character count; UPPER(name) and LOWER(name) change its case; SUBSTR(name, 1, 1) pulls out a slice — here the first character; REPLACE(name, '-', ' ') swaps every hyphen for a space. You stitch strings together with the || operator: name || ' (' || type || ')' builds a label like \"Dark Magician (Normal Monster)\". Because these all return ordinary values, you can sort by them, group by them, or feed them into COUNT.",
+            "exampleSql": "SELECT name, LENGTH(name) AS name_length FROM cards ORDER BY LENGTH(name) DESC, name LIMIT 5",
+            "wrapUp": "String functions let you measure, slice, recase, and stitch text — and their outputs behave like any other column inside ORDER BY, GROUP BY, or an aggregate. You've now shaped both numbers (CASE) and text; the final Shaping skill confronts the values that aren't there at all — NULL."
+          }
+        },
+        {
+          "id": "null-handling",
+          "name": "NULL Handling",
+          "world": "yugioh",
+          "requires": ["having", "case-when"],
+          "lesson": {
+            "intro": "NULL means \"no value,\" and it runs all through Yu-Gi-Oh's data: Spell and Trap cards have NULL atk, def, and level; Link Monsters have NULL def and level; the Egyptian Gods' variable \"?\" ATK is stored as NULL. NULL is not zero and not empty — any comparison with it (atk = NULL) returns unknown, so you must test with IS NULL / IS NOT NULL. Aggregates quietly skip NULLs: COUNT(atk) counts only the cards that have one, so COUNT(*) - COUNT(atk) reveals how many are missing it, and AVG(atk) averages only the real values. COALESCE(atk, 0) substitutes a fallback, letting you fold the missing values back in when you want them to count.",
+            "exampleSql": "SELECT COUNT(*) AS total_cards, COUNT(atk) AS with_atk, COUNT(*) - COUNT(atk) AS missing_atk FROM cards",
+            "wrapUp": "NULL is absence, not zero: test it with IS NULL, and remember that COUNT and AVG skip it while COALESCE supplies a stand-in. Handling missing data deliberately is what separates queries that quietly mislead from ones you can trust. That completes Shaping — you can now group, filter groups, branch with CASE, reshape text, and tame NULLs."
+          }
+        }
+      ]
     }
   ]
 }

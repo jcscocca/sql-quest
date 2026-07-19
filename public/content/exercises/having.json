@@ -1,0 +1,77 @@
+{
+  "skillId": "having",
+  "exercises": [
+    {
+      "id": "hv-1",
+      "prompt": "Which primary types have at least 50 Pokémon? Return type1 and the count as pokemon_count, most common first, breaking ties alphabetically by type1.",
+      "referenceSql": "SELECT type1, COUNT(*) AS pokemon_count FROM pokemon GROUP BY type1 HAVING COUNT(*) >= 50 ORDER BY pokemon_count DESC, type1",
+      "orderMatters": true,
+      "hints": [
+        "A count-per-group filter goes in HAVING, not WHERE — the count only exists after grouping.",
+        "GROUP BY type1 HAVING COUNT(*) >= 50, then ORDER BY pokemon_count DESC, type1.",
+        "```sql\nSELECT type1, COUNT(*) AS pokemon_count FROM pokemon GROUP BY type1 HAVING COUNT(*) >= 50 ORDER BY pokemon_count DESC, type1\n```"
+      ],
+      "xp": 15
+    },
+    {
+      "id": "hv-2",
+      "prompt": "Which generations have an average total stat score above 430? Return generation and the average as avg_total rounded to 2 decimal places, ordered by generation ascending. Compare the true (unrounded) average against 430.",
+      "referenceSql": "SELECT generation, ROUND(AVG(total), 2) AS avg_total FROM pokemon GROUP BY generation HAVING AVG(total) > 430 ORDER BY generation",
+      "orderMatters": true,
+      "hints": [
+        "Filter groups by their average with HAVING; round only in the SELECT for display.",
+        "GROUP BY generation HAVING AVG(total) > 430, and select ROUND(AVG(total), 2).",
+        "```sql\nSELECT generation, ROUND(AVG(total), 2) AS avg_total FROM pokemon GROUP BY generation HAVING AVG(total) > 430 ORDER BY generation\n```"
+      ],
+      "xp": 16
+    },
+    {
+      "id": "hv-3",
+      "prompt": "Which primary types have an average attack of at least 90? Return type1 and the average as avg_attack rounded to 2 decimal places, highest average first, breaking ties alphabetically by type1. Compare the true (unrounded) average against 90.",
+      "referenceSql": "SELECT type1, ROUND(AVG(attack), 2) AS avg_attack FROM pokemon GROUP BY type1 HAVING AVG(attack) >= 90 ORDER BY avg_attack DESC, type1",
+      "orderMatters": true,
+      "hints": [
+        "HAVING can test AVG the same way it tests COUNT — group first, then keep groups whose average clears the bar.",
+        "GROUP BY type1 HAVING AVG(attack) >= 90, then ORDER BY avg_attack DESC, type1.",
+        "```sql\nSELECT type1, ROUND(AVG(attack), 2) AS avg_attack FROM pokemon GROUP BY type1 HAVING AVG(attack) >= 90 ORDER BY avg_attack DESC, type1\n```"
+      ],
+      "xp": 16
+    },
+    {
+      "id": "hv-4",
+      "prompt": "Among non-legendary Pokémon, which generations contain more than 100 species? Return generation and the count as species_count, ordered by generation ascending.",
+      "referenceSql": "SELECT generation, COUNT(*) AS species_count FROM pokemon WHERE NOT is_legendary GROUP BY generation HAVING COUNT(*) > 100 ORDER BY generation",
+      "orderMatters": true,
+      "hints": [
+        "WHERE removes the legendaries first, then GROUP BY forms generation groups, then HAVING keeps the big ones.",
+        "WHERE NOT is_legendary, GROUP BY generation HAVING COUNT(*) > 100, ORDER BY generation.",
+        "```sql\nSELECT generation, COUNT(*) AS species_count FROM pokemon WHERE NOT is_legendary GROUP BY generation HAVING COUNT(*) > 100 ORDER BY generation\n```"
+      ],
+      "xp": 17
+    },
+    {
+      "id": "hv-5",
+      "prompt": "Which primary types have at least one Pokémon with a total stat score of 680 or more? Return type1 and the group's highest total as max_total, largest first, breaking ties alphabetically by type1.",
+      "referenceSql": "SELECT type1, MAX(total) AS max_total FROM pokemon GROUP BY type1 HAVING MAX(total) >= 680 ORDER BY max_total DESC, type1",
+      "orderMatters": true,
+      "hints": [
+        "\"Has at least one member above a threshold\" is a test on the group's MAX — put it in HAVING.",
+        "GROUP BY type1 HAVING MAX(total) >= 680, then ORDER BY max_total DESC, type1.",
+        "```sql\nSELECT type1, MAX(total) AS max_total FROM pokemon GROUP BY type1 HAVING MAX(total) >= 680 ORDER BY max_total DESC, type1\n```"
+      ],
+      "xp": 17
+    },
+    {
+      "id": "hv-6",
+      "prompt": "Which primary types have at least 30 Pokémon and an average speed above 70? Return type1, the count as pokemon_count, and the average speed as avg_speed rounded to 2 decimal places — fastest average first, breaking ties alphabetically by type1.",
+      "referenceSql": "SELECT type1, COUNT(*) AS pokemon_count, ROUND(AVG(speed), 2) AS avg_speed FROM pokemon GROUP BY type1 HAVING COUNT(*) >= 30 AND AVG(speed) > 70 ORDER BY avg_speed DESC, type1",
+      "orderMatters": true,
+      "hints": [
+        "HAVING can combine several aggregate tests with AND — both must hold for the group to survive.",
+        "GROUP BY type1 HAVING COUNT(*) >= 30 AND AVG(speed) > 70, then ORDER BY avg_speed DESC, type1.",
+        "```sql\nSELECT type1, COUNT(*) AS pokemon_count, ROUND(AVG(speed), 2) AS avg_speed FROM pokemon GROUP BY type1 HAVING COUNT(*) >= 30 AND AVG(speed) > 70 ORDER BY avg_speed DESC, type1\n```"
+      ],
+      "xp": 18
+    }
+  ]
+}

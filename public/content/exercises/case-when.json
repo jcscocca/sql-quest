@@ -1,0 +1,77 @@
+{
+  "skillId": "case-when",
+  "exercises": [
+    {
+      "id": "cw-1",
+      "prompt": "Classify every card as 'Monster' (its type contains the word Monster), 'Spell' (type is exactly 'Spell Card'), or 'Trap' (type is exactly 'Trap Card'), and count how many fall in each class. Return the label as card_class and the count as card_count, most numerous first, breaking ties alphabetically by card_class.",
+      "referenceSql": "SELECT CASE WHEN type LIKE '%Monster%' THEN 'Monster' WHEN type = 'Spell Card' THEN 'Spell' ELSE 'Trap' END AS card_class, COUNT(*) AS card_count FROM cards GROUP BY card_class ORDER BY card_count DESC, card_class",
+      "orderMatters": true,
+      "hints": [
+        "Build the label with a CASE expression, then GROUP BY that same label to count each class.",
+        "CASE WHEN type LIKE '%Monster%' THEN 'Monster' WHEN type = 'Spell Card' THEN 'Spell' ELSE 'Trap' END AS card_class, then GROUP BY card_class.",
+        "```sql\nSELECT CASE WHEN type LIKE '%Monster%' THEN 'Monster' WHEN type = 'Spell Card' THEN 'Spell' ELSE 'Trap' END AS card_class, COUNT(*) AS card_count FROM cards GROUP BY card_class ORDER BY card_count DESC, card_class\n```"
+      ],
+      "xp": 16
+    },
+    {
+      "id": "cw-2",
+      "prompt": "Sort the leveled monsters into tiers: 'Low' for level 4 or below, 'Mid' for level 5 through 8, and 'High' for level 9 or above. Ignore cards whose level is NULL. Return the label as level_tier and the count as card_count, most numerous first, breaking ties alphabetically by level_tier.",
+      "referenceSql": "SELECT CASE WHEN level <= 4 THEN 'Low' WHEN level <= 8 THEN 'Mid' ELSE 'High' END AS level_tier, COUNT(*) AS card_count FROM cards WHERE level IS NOT NULL GROUP BY level_tier ORDER BY card_count DESC, level_tier",
+      "orderMatters": true,
+      "hints": [
+        "CASE tests its WHEN branches top to bottom, so an earlier 'level <= 4' claims the low cards before 'level <= 8' sees them.",
+        "Filter WHERE level IS NOT NULL, build the tier with CASE, GROUP BY the tier label.",
+        "```sql\nSELECT CASE WHEN level <= 4 THEN 'Low' WHEN level <= 8 THEN 'Mid' ELSE 'High' END AS level_tier, COUNT(*) AS card_count FROM cards WHERE level IS NOT NULL GROUP BY level_tier ORDER BY card_count DESC, level_tier\n```"
+      ],
+      "xp": 16
+    },
+    {
+      "id": "cw-3",
+      "prompt": "For every card in the 'Blue-Eyes' archetype that has an ATK value, label it 'Boss' when its atk is 3000 or more and 'Support' otherwise. Return name and the label as role, ordered by name ascending.",
+      "referenceSql": "SELECT name, CASE WHEN atk >= 3000 THEN 'Boss' ELSE 'Support' END AS role FROM cards WHERE archetype = 'Blue-Eyes' AND atk IS NOT NULL ORDER BY name",
+      "orderMatters": true,
+      "hints": [
+        "A two-branch CASE (WHEN … THEN … ELSE …) produces a per-row label right alongside the card's name.",
+        "Filter WHERE archetype = 'Blue-Eyes' AND atk IS NOT NULL, then select name and the CASE label.",
+        "```sql\nSELECT name, CASE WHEN atk >= 3000 THEN 'Boss' ELSE 'Support' END AS role FROM cards WHERE archetype = 'Blue-Eyes' AND atk IS NOT NULL ORDER BY name\n```"
+      ],
+      "xp": 16
+    },
+    {
+      "id": "cw-4",
+      "prompt": "For each monster attribute, count how many monsters are high level (level 7 or above) alongside the total number of monsters that have both an attribute and a level. Return attribute, the count as high_level_count, and the total as monster_count — most high-level monsters first, breaking ties alphabetically by attribute. Consider only cards where attribute and level are both present.",
+      "referenceSql": "SELECT attribute, SUM(CASE WHEN level >= 7 THEN 1 ELSE 0 END) AS high_level_count, COUNT(*) AS monster_count FROM cards WHERE attribute IS NOT NULL AND level IS NOT NULL GROUP BY attribute ORDER BY high_level_count DESC, attribute",
+      "orderMatters": true,
+      "hints": [
+        "SUM(CASE WHEN … THEN 1 ELSE 0 END) counts only the rows that satisfy the condition within each group.",
+        "GROUP BY attribute, use SUM(CASE WHEN level >= 7 THEN 1 ELSE 0 END) for the high-level tally and COUNT(*) for the total.",
+        "```sql\nSELECT attribute, SUM(CASE WHEN level >= 7 THEN 1 ELSE 0 END) AS high_level_count, COUNT(*) AS monster_count FROM cards WHERE attribute IS NOT NULL AND level IS NOT NULL GROUP BY attribute ORDER BY high_level_count DESC, attribute\n```"
+      ],
+      "xp": 17
+    },
+    {
+      "id": "cw-5",
+      "prompt": "Count the TCG-format banlist cards at each restriction status, and order them by severity — 'Forbidden' first, then 'Limited', then 'Semi-Limited'. Return status and the count as card_count.",
+      "referenceSql": "SELECT status, COUNT(*) AS card_count FROM banlist WHERE format = 'tcg' GROUP BY status ORDER BY CASE status WHEN 'Forbidden' THEN 1 WHEN 'Limited' THEN 2 ELSE 3 END",
+      "orderMatters": true,
+      "hints": [
+        "Alphabetical order won't give severity order — build a custom sort key with CASE inside ORDER BY.",
+        "GROUP BY status, then ORDER BY CASE status WHEN 'Forbidden' THEN 1 WHEN 'Limited' THEN 2 ELSE 3 END.",
+        "```sql\nSELECT status, COUNT(*) AS card_count FROM banlist WHERE format = 'tcg' GROUP BY status ORDER BY CASE status WHEN 'Forbidden' THEN 1 WHEN 'Limited' THEN 2 ELSE 3 END\n```"
+      ],
+      "xp": 17
+    },
+    {
+      "id": "cw-6",
+      "prompt": "Using only monsters that have both a level and an ATK value, group them into level tiers — 'Low' for level 4 or below, 'Mid' for level 5 through 8, 'High' for level 9 or above — and report the count as monster_count and the average ATK as avg_atk rounded to 1 decimal place. Order by avg_atk descending, breaking ties alphabetically by level_tier.",
+      "referenceSql": "SELECT CASE WHEN level <= 4 THEN 'Low' WHEN level <= 8 THEN 'Mid' ELSE 'High' END AS level_tier, COUNT(*) AS monster_count, ROUND(AVG(atk), 1) AS avg_atk FROM cards WHERE level IS NOT NULL AND atk IS NOT NULL GROUP BY level_tier ORDER BY avg_atk DESC, level_tier",
+      "orderMatters": true,
+      "hints": [
+        "Group by the CASE-built tier, then compute both an aggregate count and an aggregate average over each tier.",
+        "Filter WHERE level IS NOT NULL AND atk IS NOT NULL, GROUP BY the tier label, and select COUNT(*) plus ROUND(AVG(atk), 1).",
+        "```sql\nSELECT CASE WHEN level <= 4 THEN 'Low' WHEN level <= 8 THEN 'Mid' ELSE 'High' END AS level_tier, COUNT(*) AS monster_count, ROUND(AVG(atk), 1) AS avg_atk FROM cards WHERE level IS NOT NULL AND atk IS NOT NULL GROUP BY level_tier ORDER BY avg_atk DESC, level_tier\n```"
+      ],
+      "xp": 18
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "skillId": "group-by",
+  "exercises": [
+    {
+      "id": "gb-1",
+      "prompt": "How many Pokémon debuted in each generation? Return generation and the count as pokemon_count, ordered by generation ascending.",
+      "referenceSql": "SELECT generation, COUNT(*) AS pokemon_count FROM pokemon GROUP BY generation ORDER BY generation",
+      "orderMatters": true,
+      "hints": [
+        "One output row per generation means grouping by generation, with COUNT(*) counting the rows in each group.",
+        "GROUP BY generation, then ORDER BY generation to get them in order.",
+        "```sql\nSELECT generation, COUNT(*) AS pokemon_count FROM pokemon GROUP BY generation ORDER BY generation\n```"
+      ],
+      "xp": 15
+    },
+    {
+      "id": "gb-2",
+      "prompt": "How many Pokémon have each primary type? Return type1 and the count as pokemon_count, most common first, breaking ties alphabetically by type1.",
+      "referenceSql": "SELECT type1, COUNT(*) AS pokemon_count FROM pokemon GROUP BY type1 ORDER BY pokemon_count DESC, type1",
+      "orderMatters": true,
+      "hints": [
+        "Group by the primary type, count each group, then sort the counts from high to low.",
+        "GROUP BY type1, then ORDER BY pokemon_count DESC, type1 so ties fall alphabetically.",
+        "```sql\nSELECT type1, COUNT(*) AS pokemon_count FROM pokemon GROUP BY type1 ORDER BY pokemon_count DESC, type1\n```"
+      ],
+      "xp": 15
+    },
+    {
+      "id": "gb-3",
+      "prompt": "What is the average total stat score for each generation, rounded to 2 decimal places? Return generation and avg_total, ordered by generation ascending.",
+      "referenceSql": "SELECT generation, ROUND(AVG(total), 2) AS avg_total FROM pokemon GROUP BY generation ORDER BY generation",
+      "orderMatters": true,
+      "hints": [
+        "Group by generation and average the total column within each group.",
+        "ROUND(AVG(total), 2) gives the rounded average; GROUP BY generation, ORDER BY generation.",
+        "```sql\nSELECT generation, ROUND(AVG(total), 2) AS avg_total FROM pokemon GROUP BY generation ORDER BY generation\n```"
+      ],
+      "xp": 16
+    },
+    {
+      "id": "gb-4",
+      "prompt": "What is the highest attack found within each primary type? Return type1 and the value as max_attack, strongest first, breaking ties alphabetically by type1.",
+      "referenceSql": "SELECT type1, MAX(attack) AS max_attack FROM pokemon GROUP BY type1 ORDER BY max_attack DESC, type1",
+      "orderMatters": true,
+      "hints": [
+        "MAX inside a GROUP BY reports the biggest value in each group rather than across the whole table.",
+        "GROUP BY type1 with MAX(attack), then ORDER BY max_attack DESC, type1.",
+        "```sql\nSELECT type1, MAX(attack) AS max_attack FROM pokemon GROUP BY type1 ORDER BY max_attack DESC, type1\n```"
+      ],
+      "xp": 16
+    },
+    {
+      "id": "gb-5",
+      "prompt": "Among legendary Pokémon only, how many are there in each generation? Return generation and the count as legendary_count, ordered by generation ascending. Only generations that have at least one legendary should appear.",
+      "referenceSql": "SELECT generation, COUNT(*) AS legendary_count FROM pokemon WHERE is_legendary GROUP BY generation ORDER BY generation",
+      "orderMatters": true,
+      "hints": [
+        "Filter to legendaries with WHERE first, then group what survives by generation — WHERE runs before GROUP BY.",
+        "WHERE is_legendary, then GROUP BY generation and COUNT(*).",
+        "```sql\nSELECT generation, COUNT(*) AS legendary_count FROM pokemon WHERE is_legendary GROUP BY generation ORDER BY generation\n```"
+      ],
+      "xp": 17
+    },
+    {
+      "id": "gb-6",
+      "prompt": "For each generation, report the number of Pokémon as pokemon_count, the average total stat as avg_total rounded to 1 decimal place, and the highest total stat as max_total. Order by generation ascending.",
+      "referenceSql": "SELECT generation, COUNT(*) AS pokemon_count, ROUND(AVG(total), 1) AS avg_total, MAX(total) AS max_total FROM pokemon GROUP BY generation ORDER BY generation",
+      "orderMatters": true,
+      "hints": [
+        "You can compute several aggregates in one grouped query — each is evaluated per group.",
+        "GROUP BY generation, then select COUNT(*), ROUND(AVG(total), 1), and MAX(total) side by side.",
+        "```sql\nSELECT generation, COUNT(*) AS pokemon_count, ROUND(AVG(total), 1) AS avg_total, MAX(total) AS max_total FROM pokemon GROUP BY generation ORDER BY generation\n```"
+      ],
+      "xp": 18
+    }
+  ]
+}
