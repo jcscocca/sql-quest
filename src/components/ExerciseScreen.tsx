@@ -90,11 +90,14 @@ export function ExerciseScreen({ skill, bank, schema, onBack }: {
   function advance() {
     const nowSolved = useProgress.getState().skills[skill.id]?.solved ?? []
     const next = bank.exercises.findIndex(e => !nowSolved.includes(e.id))
-    if (next === -1) {
+    if (next !== -1) {
+      setIdx(next)
+    } else if (idx + 1 < bank.exercises.length) {
+      setIdx(idx + 1)
+    } else {
       onBack()
       return
     }
-    setIdx(next)
     setSqlText('')
     setResult(null)
     setFeedback(null)
@@ -129,7 +132,7 @@ export function ExerciseScreen({ skill, bank, schema, onBack }: {
         <button className="back" onClick={onBack}>← Back</button>
         <h2>{skill.name}</h2>
         <span className="progress-count">
-          {(useProgress.getState().skills[skill.id]?.solved.length ?? 0)}/{bank.exercises.length} solved
+          {solved.length}/{bank.exercises.length} solved
         </span>
       </header>
       <div className="exercise-layout">
@@ -147,7 +150,7 @@ export function ExerciseScreen({ skill, bank, schema, onBack }: {
             ))}
             {hintsShown < ex.hints.length && (
               <button onClick={() => setHintsShown(hintsShown + 1)}>
-                💡 Hint {hintsShown + 1}/3 (costs XP)
+                💡 Hint {hintsShown + 1}/{ex.hints.length} (costs XP)
               </button>
             )}
           </div>
