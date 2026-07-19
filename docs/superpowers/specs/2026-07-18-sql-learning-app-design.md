@@ -63,9 +63,9 @@ Datasets are "worlds": each region introduces one, and access is gated purely by
 | World | Region | Source | Tables | Entity (catching) |
 |---|---|---|---|---|
 | Pokémon | Foundations (live) | PokéAPI CSVs | pokemon; + `type_matchups` added in Stage 3 for joins | pokemon.name |
-| Yu-Gi-Oh | Shaping | YGOPRODeck static card dump | cards, card_sets, banlist | cards.name |
-| Movies | Combining | MovieLens ml-latest-small | movies, people, roles | movies.title |
-| Seattle 311 | Analyst Power | Seattle SODA CSV export | requests | none (no catching civic complaints) |
+| Yu-Gi-Oh | Shaping + Combining | YGOPRODeck static card dump | cards, card_sets, banlist | cards.name |
+| Movies | Analyst Power | MovieLens ml-latest-small | movies, ratings, tags | movies.title |
+| Seattle 311 | Analyst Power + Boss Arenas | Seattle SODA CSV export | requests | none (no catching civic complaints) |
 
 Regions may use ANY earlier-unlocked world in exercises (e.g., Combining self-joins on pokemon.evolves_from; Analyst Power recursive CTEs on evolution chains). `entity` gains an optional `labelColumn` (pokemon: type1; yugioh: card type; movies: genre) so the collection page can tile any world; the collection groups by world. Harness collectible checks resolve against each world's declared entity rather than a hardcoded table.
 
