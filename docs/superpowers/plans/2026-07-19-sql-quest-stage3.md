@@ -288,7 +288,7 @@ Each region task follows the SAME structure — listed once here, executed per r
   - Window/date results: pin ordering (orderMatters with full tiebreakers) OR make the result a stable aggregate; NEVER depend on row order of an unordered window result.
   - seattle311 has no entity → NO collectibles on its exercises (harness enforces).
   - Data-authenticity note for authors: yugioh banlist statuses are 'Forbidden'/'Limited'/'Semi-Limited' (the API never says 'Banned'); reference SQL must use the real values.
-- [ ] **Step 3: verify** — `npm run validate` green with the growing exercise count (C1: 60, C2: 96, C3: 126, C4: 141); run every reference + hint-3 through the real comparator (throwaway script, like Stage 2 Task 11); `npm test` and `npm run build` unchanged-green; browser spot-check: open the region's first skill, solve one exercise for real, confirm the world loads and (where entity exists) catches work.
+- [ ] **Step 3: verify** — `npm run validate` green with the growing exercise count (C1: 61 — gb-7 added in review, C2: 97, C3: 127, C4: 142); run every reference + hint-3 through the real comparator (throwaway script, like Stage 2 Task 11); `npm test` and `npm run build` unchanged-green; browser spot-check: open the region's first skill, solve one exercise for real, confirm the world loads and (where entity exists) catches work.
 - [ ] **Step 4: commit** — `feat: <Region> region (<n> skills, <m> exercises)`
 
 Content review after EACH region task (adversarial pedagogy pass, same brief as Stage 2 Task 11's review) before the next region begins.
@@ -306,7 +306,7 @@ Content review after EACH region task (adversarial pedagogy pass, same brief as 
 ### Task D2: README + final gate
 
 - [ ] **Step 1:** README: replace the feature paragraph's region/world description to cover all five regions and four worlds (2–3 sentences, factual).
-- [ ] **Step 2:** Full gate: `npm test && npm run validate && npm run build && npm run e2e` (expect: unit count recorded in A1 / 141 exercises across 4 worlds / build / 7 e2e).
+- [ ] **Step 2:** Full gate: `npm test && npm run validate && npm run build && npm run e2e` (expect: unit count recorded in A1 / 142 exercises across 4 worlds / build / 7 e2e).
 - [ ] **Step 3:** Commit — `docs: Stage 3 features in README`
 
 ---
