@@ -88,12 +88,24 @@ export function ExerciseScreen({ skill, bank, schema, region, onBack }: {
           .getState()
           .recordSolve(skill.id, ex.id, ex.xp, hintsShown, bank.exercises.length)
         let caught: string[] = []
-        if (res.gained > 0 && worldNames) {
-          const owned = new Set(useProgress.getState().collection)
-          caught = useProgress
-            .getState()
-            .addCatches(pickCatches(user, worldNames, owned, ex.collectibles ?? []))
-          if (caught.length > 0) setSessionCatches(prev => [...prev, ...caught])
+        if (res.gained > 0 && schema.entity) {
+          try {
+            let names = worldNames
+            if (!names) {
+              const r = await runQuery(
+                `SELECT DISTINCT ${schema.entity.column} FROM ${schema.entity.table}`,
+              )
+              names = new Set(r.rows.map(row => String(row[0])))
+              setWorldNames(names)
+            }
+            const owned = new Set(useProgress.getState().collection)
+            caught = useProgress
+              .getState()
+              .addCatches(pickCatches(user, names, owned, ex.collectibles ?? []))
+            if (caught.length > 0) setSessionCatches(prev => [...prev, ...caught])
+          } catch (err) {
+            console.error('Catch check failed', err)
+          }
         }
         if (res.newlyCompleted) {
           useProgress.getState().awardBadge(skill.id)
