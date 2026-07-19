@@ -1349,7 +1349,12 @@ export const useProgress = create<ProgressStore>((set, get) => ({
   hydrated: false,
 
   async hydrate() {
-    const saved = await idbGet<ProgressState>(KEY)
+    let saved: ProgressState | undefined
+    try {
+      saved = await idbGet<ProgressState>(KEY)
+    } catch (err) {
+      console.error('Failed to read saved progress', err)
+    }
     if (saved && !isProgressState(saved)) console.warn('Ignoring unrecognized saved progress')
     set({ ...(saved && isProgressState(saved) ? saved : empty), hydrated: true })
   },
