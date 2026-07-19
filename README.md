@@ -2,7 +2,7 @@
 
 A single-player SQL trainer: Duolingo-style skill tree over a real SQL engine
 (DuckDB-WASM, fully in-browser) querying datasets worth caring about — starting
-with Pokémon. See `docs/superpowers/specs/2026-07-18-sql-learning-app-design.md`
+with Pokémon. Daily Review resurfaces rusty skills on an expanding schedule, and correct queries catch the Pokémon they return into your collection. See `docs/superpowers/specs/2026-07-18-sql-learning-app-design.md`
 for the full design.
 
 ## Run it
