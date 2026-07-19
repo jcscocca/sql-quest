@@ -10,6 +10,7 @@
     "e2e": "playwright test",
     "build:world": "tsx scripts/build-pokemon-world.ts",
     "build:yugioh": "tsx scripts/build-yugioh-world.ts",
+    "build:movies": "tsx scripts/build-movies-world.ts",
     "validate": "tsx scripts/validate-content.ts"
   },
   "dependencies": {
