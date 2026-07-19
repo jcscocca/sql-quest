@@ -27,7 +27,7 @@
     },
     {
       "id": "nl-3",
-      "prompt": "The Egyptian Gods have variable ATK that the data stores as NULL. List every DIVINE-attribute card that has no ATK value — return just the name, ordered by name ascending.",
+      "prompt": "Some DIVINE-attribute cards have variable \"?\" ATK that the data stores as NULL. List every DIVINE-attribute card that has no ATK value — return just the name, ordered by name ascending.",
       "referenceSql": "SELECT name FROM cards WHERE attribute = 'DIVINE' AND atk IS NULL ORDER BY name",
       "orderMatters": true,
       "hints": [

@@ -52,13 +52,13 @@
     },
     {
       "id": "sf-5",
-      "prompt": "The tournament announcer shouts every 'Dark Magician' archetype card name in all capitals. Return each card's name and its uppercased form as shout, ordered by name ascending.",
-      "referenceSql": "SELECT name, UPPER(name) AS shout FROM cards WHERE archetype = 'Dark Magician' ORDER BY name",
+      "prompt": "A deck-builder app gives every 'Dark Magician' archetype card a URL handle: the name in all lowercase with each space replaced by a hyphen (any other punctuation stays as-is). Return each card's name and its handle as handle, ordered by name ascending.",
+      "referenceSql": "SELECT name, LOWER(REPLACE(name, ' ', '-')) AS handle FROM cards WHERE archetype = 'Dark Magician' ORDER BY name",
       "orderMatters": true,
       "hints": [
-        "UPPER(name) returns the name with every letter capitalized.",
-        "Select name and UPPER(name) AS shout, filtered WHERE archetype = 'Dark Magician', ORDER BY name.",
-        "```sql\nSELECT name, UPPER(name) AS shout FROM cards WHERE archetype = 'Dark Magician' ORDER BY name\n```"
+        "Chain two functions: one lowercases the text, the other swaps spaces for hyphens — either order works.",
+        "LOWER(REPLACE(name, ' ', '-')) AS handle, filtered WHERE archetype = 'Dark Magician', ORDER BY name.",
+        "```sql\nSELECT name, LOWER(REPLACE(name, ' ', '-')) AS handle FROM cards WHERE archetype = 'Dark Magician' ORDER BY name\n```"
       ],
       "xp": 17
     },

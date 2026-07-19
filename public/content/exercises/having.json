@@ -63,7 +63,7 @@
     },
     {
       "id": "hv-6",
-      "prompt": "Which primary types have at least 30 Pokémon and an average speed above 70? Return type1, the count as pokemon_count, and the average speed as avg_speed rounded to 2 decimal places — fastest average first, breaking ties alphabetically by type1.",
+      "prompt": "Which primary types have at least 30 Pokémon and an average speed above 70? Return type1, the count as pokemon_count, and the average speed as avg_speed rounded to 2 decimal places — fastest average first, breaking ties alphabetically by type1. Compare the true (unrounded) average against 70.",
       "referenceSql": "SELECT type1, COUNT(*) AS pokemon_count, ROUND(AVG(speed), 2) AS avg_speed FROM pokemon GROUP BY type1 HAVING COUNT(*) >= 30 AND AVG(speed) > 70 ORDER BY avg_speed DESC, type1",
       "orderMatters": true,
       "hints": [

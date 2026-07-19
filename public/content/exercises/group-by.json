@@ -72,6 +72,18 @@
         "```sql\nSELECT generation, COUNT(*) AS pokemon_count, ROUND(AVG(total), 1) AS avg_total, MAX(total) AS max_total FROM pokemon GROUP BY generation ORDER BY generation\n```"
       ],
       "xp": 18
+    },
+    {
+      "id": "gb-7",
+      "prompt": "How many Pokémon of each primary type were introduced in each generation? Return generation, type1, and the count as pokemon_count — one row per generation-and-type combination that exists. Order by generation ascending, then type1 ascending.",
+      "referenceSql": "SELECT generation, type1, COUNT(*) AS pokemon_count FROM pokemon GROUP BY generation, type1 ORDER BY generation, type1",
+      "orderMatters": true,
+      "hints": [
+        "Grouping by two columns makes one group per combination — a generation-1 water group is separate from a generation-2 water group.",
+        "GROUP BY generation, type1 — and both columns must also appear in the SELECT. ORDER BY generation, type1.",
+        "```sql\nSELECT generation, type1, COUNT(*) AS pokemon_count FROM pokemon GROUP BY generation, type1 ORDER BY generation, type1\n```"
+      ],
+      "xp": 18
     }
   ]
 }
