@@ -15,13 +15,13 @@
     },
     {
       "id": "so-2",
-      "prompt": "Which cards are Forbidden in BOTH the TCG and OCG formats? Use INTERSECT of a TCG-Forbidden query and an OCG-Forbidden query, and return name, ordered by name ascending.",
-      "referenceSql": "SELECT c.name FROM cards c JOIN banlist b ON c.id = b.card_id WHERE b.format = 'tcg' AND b.status = 'Forbidden' INTERSECT SELECT c.name FROM cards c JOIN banlist b ON c.id = b.card_id WHERE b.format = 'ocg' AND b.status = 'Forbidden' ORDER BY name",
+      "prompt": "Which cards are Limited in BOTH the TCG and OCG formats? Use INTERSECT of a TCG-Limited query and an OCG-Limited query, and return name, ordered by name ascending.",
+      "referenceSql": "SELECT c.name FROM cards c JOIN banlist b ON c.id = b.card_id WHERE b.format = 'tcg' AND b.status = 'Limited' INTERSECT SELECT c.name FROM cards c JOIN banlist b ON c.id = b.card_id WHERE b.format = 'ocg' AND b.status = 'Limited' ORDER BY name",
       "orderMatters": true,
       "hints": [
-        "INTERSECT returns only the rows present in both results — here, the names Forbidden in each format.",
-        "TCG-Forbidden SELECT INTERSECT OCG-Forbidden SELECT, then ORDER BY name.",
-        "```sql\nSELECT c.name FROM cards c JOIN banlist b ON c.id = b.card_id WHERE b.format = 'tcg' AND b.status = 'Forbidden' INTERSECT SELECT c.name FROM cards c JOIN banlist b ON c.id = b.card_id WHERE b.format = 'ocg' AND b.status = 'Forbidden' ORDER BY name\n```"
+        "INTERSECT returns only the rows present in both results — here, the names that are Limited in each format.",
+        "One SELECT joining cards to banlist WHERE b.format = 'tcg' AND b.status = 'Limited', INTERSECT the same for 'ocg', then ORDER BY name.",
+        "```sql\nSELECT c.name FROM cards c JOIN banlist b ON c.id = b.card_id WHERE b.format = 'tcg' AND b.status = 'Limited' INTERSECT SELECT c.name FROM cards c JOIN banlist b ON c.id = b.card_id WHERE b.format = 'ocg' AND b.status = 'Limited' ORDER BY name\n```"
       ],
       "xp": 16
     },

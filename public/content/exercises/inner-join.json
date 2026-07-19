@@ -3,16 +3,16 @@
   "exercises": [
     {
       "id": "ij-1",
-      "prompt": "List every printing of the card 'Blue-Eyes White Dragon'. Join cards to card_sets and return the set_name, set_code, and rarity of each printing (one row per printing).",
-      "referenceSql": "SELECT cs.set_name, cs.set_code, cs.rarity FROM cards c JOIN card_sets cs ON c.id = cs.card_id WHERE c.name = 'Blue-Eyes White Dragon'",
+      "prompt": "List every printing of the card 'Red-Eyes Black Dragon'. Join cards to card_sets and return the card name, set name, set code, and rarity of each printing (one row per printing), using the columns' own names.",
+      "referenceSql": "SELECT c.name, cs.set_name, cs.set_code, cs.rarity FROM cards c JOIN card_sets cs ON c.id = cs.card_id WHERE c.name = 'Red-Eyes Black Dragon'",
       "orderMatters": false,
       "hints": [
         "Match cards to their printings with JOIN ... ON c.id = cs.card_id, then filter to the single card by name.",
-        "FROM cards c JOIN card_sets cs ON c.id = cs.card_id WHERE c.name = 'Blue-Eyes White Dragon', selecting cs.set_name, cs.set_code, cs.rarity.",
-        "```sql\nSELECT cs.set_name, cs.set_code, cs.rarity FROM cards c JOIN card_sets cs ON c.id = cs.card_id WHERE c.name = 'Blue-Eyes White Dragon'\n```"
+        "FROM cards c JOIN card_sets cs ON c.id = cs.card_id WHERE c.name = 'Red-Eyes Black Dragon', selecting c.name, cs.set_name, cs.set_code, cs.rarity.",
+        "```sql\nSELECT c.name, cs.set_name, cs.set_code, cs.rarity FROM cards c JOIN card_sets cs ON c.id = cs.card_id WHERE c.name = 'Red-Eyes Black Dragon'\n```"
       ],
       "xp": 16,
-      "collectibles": ["Blue-Eyes White Dragon"]
+      "collectibles": ["Red-Eyes Black Dragon"]
     },
     {
       "id": "ij-2",

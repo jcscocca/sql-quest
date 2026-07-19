@@ -3,7 +3,7 @@
   "exercises": [
     {
       "id": "sj-1",
-      "prompt": "For every Pokémon that evolves from another, list the Pokémon's name and its pre-evolution's primary type. Self-join pokemon to itself on evolves_from, and return name and the pre-evolution's type as pre_type, ordered by name ascending.",
+      "prompt": "For each Pokémon whose evolves_from names another Pokémon in the table, list the Pokémon's name and its pre-evolution's primary type. Self-join pokemon to itself on evolves_from, and return name and the pre-evolution's type as pre_type, ordered by name ascending.",
       "referenceSql": "SELECT p.name, pre.type1 AS pre_type FROM pokemon p JOIN pokemon pre ON p.evolves_from = pre.name ORDER BY p.name",
       "orderMatters": true,
       "hints": [
