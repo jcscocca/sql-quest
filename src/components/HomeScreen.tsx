@@ -2,13 +2,14 @@ import { useRef } from 'react'
 import type { Curriculum } from '../lib/content'
 import { exportState, useProgress, type ProgressState } from '../lib/progress'
 
-export function HomeScreen({ curriculum, onOpenSkill, onOpenCollection, reviewCount, rustiest, onStartReview }: {
+export function HomeScreen({ curriculum, onOpenSkill, onOpenCollection, reviewCount, rustiest, onStartReview, worlds }: {
   curriculum: Curriculum
   onOpenSkill: (skillId: string) => void
   onOpenCollection: () => void
   reviewCount: number
   rustiest: { name: string; from: number; to: number } | null
   onStartReview: () => void
+  worlds: { name: string; regionName: string; state: 'active' | 'unlocked' | 'locked' }[]
 }) {
   const progress = useProgress()
   const fileRef = useRef<HTMLInputElement>(null)
@@ -67,6 +68,17 @@ export function HomeScreen({ curriculum, onOpenSkill, onOpenCollection, reviewCo
           <button onClick={onStartReview}>Start review</button>
         </div>
       )}
+      <div className="world-panel">
+        {worlds.map(w => (
+          <div key={`${w.regionName}-${w.name}`} className="world-row">
+            <span>🌍 {w.name}</span>
+            <span className="world-region">{w.regionName}</span>
+            <span className="world-state">
+              {w.state === 'unlocked' ? '✓' : w.state === 'active' ? '▶' : '🔒'}
+            </span>
+          </div>
+        ))}
+      </div>
       {curriculum.regions.map(region => (
         <section key={region.id} className="region">
           <h2>{region.name}</h2>

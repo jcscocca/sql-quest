@@ -190,7 +190,30 @@ with store-interface signature `addCatches(world: string, entries: { name: strin
 - Modify: `src/components/HomeScreen.tsx`, `src/App.tsx`, `src/styles.css`, `src/lib/content.ts` (Region.world already added in A1)
 
 - [ ] **Step 1:** HomeScreen props gain `worlds: { name: string; regionName: string; state: 'active' | 'unlocked' | 'locked' }[]`. Render a panel after the review callout: a `.world-panel` div listing each world (`🌍 {name}` + `{regionName}` + state icon ▶/✓/🔒). App computes it: for each region with a `world`, state = 'active' if any of its skills is unlocked-but-incomplete, 'unlocked' if all complete, 'locked' otherwise (reuse the unlock derivation used for nodes). Pokémon (Foundations) is always first.
-- [ ] **Step 2:** styles.css: `.world-panel` (bordered card, row list), `.world-row` flex with muted region name.
+- [ ] **Step 2:** styles.css: `.world-panel` (bordered card, row list), `.world-row` flex with muted region name. Also append the upcoming-worlds tile palette to the Task 10-era type-color section (sanctioned scope from A1's review — pre-seeds Yu-Gi-Oh/Movies tile colors ahead of Phase C):
+
+```css
+.type-effect-monster { border-left-color: #d97706; }
+.type-normal-monster { border-left-color: #eab308; }
+.type-fusion-monster { border-left-color: #8b5cf6; }
+.type-synchro-monster { border-left-color: #e5e7eb; }
+.type-xyz-monster { border-left-color: #1f2937; }
+.type-link-monster { border-left-color: #2563eb; }
+.type-ritual-monster { border-left-color: #38bdf8; }
+.type-spell-card { border-left-color: #10b981; }
+.type-trap-card { border-left-color: #be185d; }
+.type-action { border-left-color: #ef4444; }
+.type-adventure { border-left-color: #f59e0b; }
+.type-animation { border-left-color: #f472b6; }
+.type-comedy { border-left-color: #fbbf24; }
+.type-crime { border-left-color: #6b7280; }
+.type-documentary { border-left-color: #14b8a6; }
+.type-drama { border-left-color: #a78bfa; }
+.type-horror { border-left-color: #111827; }
+.type-romance { border-left-color: #fb7185; }
+.type-sci-fi { border-left-color: #22d3ee; }
+.type-thriller { border-left-color: #64748b; }
+```
 - [ ] **Step 3:** Verify build/tests/browser (panel renders; with only Foundations content it shows Pokémon only until Phase C adds regions — confirm graceful empty behavior for regions without `world`).
 - [ ] **Step 4:** Commit — `feat: home world panel`
 

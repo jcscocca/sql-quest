@@ -167,6 +167,24 @@ button:disabled { opacity: 0.45; cursor: default; }
 }
 .review-callout button { border-color: var(--accent); margin-left: auto; }
 
+.world-panel {
+  margin: 16px 24px 0;
+  padding: 4px 16px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.world-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.world-row:last-child { border-bottom: none; }
+.world-region { color: var(--muted); margin-left: auto; }
+.world-state { font-size: 16px; }
+
 .catch-chip {
   background: #14532d;
   border: 1px solid var(--green);
@@ -231,3 +249,24 @@ button:disabled { opacity: 0.45; cursor: default; }
 .type-steel { border-left-color: #94a3b8; }
 .type-fairy { border-left-color: #fbcfe8; }
 .type-unknown { border-left-color: var(--border); }
+
+.type-effect-monster { border-left-color: #d97706; }
+.type-normal-monster { border-left-color: #eab308; }
+.type-fusion-monster { border-left-color: #8b5cf6; }
+.type-synchro-monster { border-left-color: #e5e7eb; }
+.type-xyz-monster { border-left-color: #1f2937; }
+.type-link-monster { border-left-color: #2563eb; }
+.type-ritual-monster { border-left-color: #38bdf8; }
+.type-spell-card { border-left-color: #10b981; }
+.type-trap-card { border-left-color: #be185d; }
+.type-action { border-left-color: #ef4444; }
+.type-adventure { border-left-color: #f59e0b; }
+.type-animation { border-left-color: #f472b6; }
+.type-comedy { border-left-color: #fbbf24; }
+.type-crime { border-left-color: #6b7280; }
+.type-documentary { border-left-color: #14b8a6; }
+.type-drama { border-left-color: #a78bfa; }
+.type-horror { border-left-color: #111827; }
+.type-romance { border-left-color: #fb7185; }
+.type-sci-fi { border-left-color: #22d3ee; }
+.type-thriller { border-left-color: #64748b; }

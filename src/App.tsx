@@ -3,8 +3,8 @@ import { HomeScreen } from './components/HomeScreen'
 import { ExerciseScreen } from './components/ExerciseScreen'
 import { CollectionScreen } from './components/CollectionScreen'
 import { ReviewScreen } from './components/ReviewScreen'
-import { loadJson, type Curriculum, type ExerciseBank, type WorldSchema } from './lib/content'
-import { useProgress } from './lib/progress'
+import { loadJson, type Curriculum, type ExerciseBank, type Region, type WorldSchema } from './lib/content'
+import { useProgress, type SkillProgress } from './lib/progress'
 import { assembleReview, displayedMastery, type ReviewItem } from './lib/review'
 import { todayString } from './lib/xp'
 
@@ -88,6 +88,21 @@ export default function App() {
   const today = todayString()
   const reviewItems = assembleReview(skills, content.banks, today)
   const allSkills = content.curriculum.regions.flatMap(r => r.skills)
+  const foundationsRegion = content.curriculum.regions.find(r => r.id === 'foundations')
+  const worlds = [
+    {
+      name: 'Pokémon',
+      regionName: 'Foundations',
+      state: foundationsRegion ? worldState(foundationsRegion, skills) : ('locked' as const),
+    },
+    ...content.curriculum.regions
+      .filter((r): r is Region & { world: string } => !!r.world)
+      .map(r => ({
+        name: content.schemas[r.world]?.name ?? r.world,
+        regionName: r.name,
+        state: worldState(r, skills),
+      })),
+  ]
   let rustiest: { name: string; from: number; to: number } | null = null
   for (const sk of allSkills) {
     const sp = skills[sk.id]
@@ -104,8 +119,16 @@ export default function App() {
       reviewCount={reviewItems.length}
       rustiest={rustiest}
       onStartReview={() => setView({ screen: 'review', items: reviewItems })}
+      worlds={worlds}
     />
   )
+}
+
+function worldState(region: Region, skills: Record<string, SkillProgress>): 'active' | 'unlocked' | 'locked' {
+  const completed = (id: string) => skills[id]?.completed ?? false
+  if (region.skills.every(sk => completed(sk.id))) return 'unlocked'
+  if (region.skills.some(sk => sk.requires.every(completed) && !completed(sk.id))) return 'active'
+  return 'locked'
 }
 
 async function loadContent(): Promise<Content> {
