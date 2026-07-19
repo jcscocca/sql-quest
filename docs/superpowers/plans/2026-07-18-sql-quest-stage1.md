@@ -600,6 +600,28 @@ test('GROUP BY errors get the plain-language rule', () => {
 test('unrecognized errors translate to null', () => {
   expect(translateError('Parser Error: syntax error at or near "FORM"', schema)).toBeNull()
 })
+
+test('semicolons inside string literals are not multi-statement', () => {
+  expect(() => assertReadOnly("SELECT 'a;b' AS x")).not.toThrow()
+  expect(() => assertReadOnly("SELECT 'it''s; fine' AS x")).not.toThrow()
+})
+
+test('comment markers inside string literals cannot smuggle a second statement', () => {
+  expect(() => assertReadOnly("SELECT '--' AS x; DROP TABLE pokemon")).toThrow(TrainerError)
+})
+
+test('parenthesized queries are allowed', () => {
+  expect(() => assertReadOnly('(SELECT 1)')).not.toThrow()
+  expect(() => assertReadOnly('(SELECT 1) UNION (SELECT 2)')).not.toThrow()
+})
+
+test('WITH-prefixed mutations are rejected', () => {
+  expect(() => assertReadOnly('WITH x AS (SELECT 1) DELETE FROM pokemon')).toThrow(TrainerError)
+})
+
+test('TrainerError carries its name', () => {
+  expect(new TrainerError('x').name).toBe('TrainerError')
+})
 ```
 
 - [ ] **Step 2: Run tests to verify they fail**
@@ -613,18 +635,27 @@ Expected: FAIL — cannot resolve `./errors`.
 ```ts
 import type { WorldSchema } from './content'
 
-export class TrainerError extends Error {}
+export class TrainerError extends Error {
+  name = 'TrainerError'
+}
+
+const FORBIDDEN =
+  /\b(INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|ATTACH|COPY|INSTALL|LOAD|SET|CALL|BEGIN|COMMIT|ROLLBACK|VACUUM|EXPORT|IMPORT)\b/i
 
 export function assertReadOnly(sql: string): void {
-  const stripped = sql
+  const masked = sql.replace(/'(?:[^']|'')*'/g, "''")
+  const stripped = masked
     .replace(/--[^\n]*/g, ' ')
     .replace(/\/\*[\s\S]*?\*\//g, ' ')
     .trim()
   const statements = stripped.split(';').map(s => s.trim()).filter(Boolean)
   if (statements.length > 1) throw new TrainerError('One statement at a time, please.')
-  const first = statements[0]?.split(/\s+/)[0]?.toUpperCase() ?? ''
+  const only = statements[0] ?? ''
+  const first = only.match(/^\(*\s*([A-Za-z]+)/)?.[1]?.toUpperCase() ?? ''
   if (first !== 'SELECT' && first !== 'WITH')
     throw new TrainerError('This trainer is read-only — queries must start with SELECT (or WITH).')
+  if (FORBIDDEN.test(only))
+    throw new TrainerError('This trainer is read-only — data-modifying statements are not allowed.')
 }
 
 export function translateError(raw: string, schema: WorldSchema): string | null {
@@ -647,7 +678,7 @@ export function translateError(raw: string, schema: WorldSchema): string | null 
 - [ ] **Step 4: Run tests to verify they pass**
 
 Run: `npx vitest run src/lib/errors.test.ts`
-Expected: 7 tests PASS.
+Expected: 12 tests PASS.
 
 - [ ] **Step 5: Commit**
 

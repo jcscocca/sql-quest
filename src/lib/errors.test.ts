@@ -53,3 +53,25 @@ test('GROUP BY errors get the plain-language rule', () => {
 test('unrecognized errors translate to null', () => {
   expect(translateError('Parser Error: syntax error at or near "FORM"', schema)).toBeNull()
 })
+
+test('semicolons inside string literals are not multi-statement', () => {
+  expect(() => assertReadOnly("SELECT 'a;b' AS x")).not.toThrow()
+  expect(() => assertReadOnly("SELECT 'it''s; fine' AS x")).not.toThrow()
+})
+
+test('comment markers inside string literals cannot smuggle a second statement', () => {
+  expect(() => assertReadOnly("SELECT '--' AS x; DROP TABLE pokemon")).toThrow(TrainerError)
+})
+
+test('parenthesized queries are allowed', () => {
+  expect(() => assertReadOnly('(SELECT 1)')).not.toThrow()
+  expect(() => assertReadOnly('(SELECT 1) UNION (SELECT 2)')).not.toThrow()
+})
+
+test('WITH-prefixed mutations are rejected', () => {
+  expect(() => assertReadOnly('WITH x AS (SELECT 1) DELETE FROM pokemon')).toThrow(TrainerError)
+})
+
+test('TrainerError carries its name', () => {
+  expect(new TrainerError('x').name).toBe('TrainerError')
+})
