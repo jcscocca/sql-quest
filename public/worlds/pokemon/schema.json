@@ -1,6 +1,10 @@
 {
   "world": "pokemon",
   "name": "Pokémon",
+  "entity": {
+    "table": "pokemon",
+    "column": "name"
+  },
   "tables": [
     {
       "name": "pokemon",

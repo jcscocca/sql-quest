@@ -70,6 +70,7 @@ console.log(`wrote ${OUT}/pokemon.parquet with ${reader.getRows()[0][0]} rows`)
 const schema = {
   world: 'pokemon',
   name: 'Pokémon',
+  entity: { table: 'pokemon', column: 'name' },
   tables: [
     {
       name: 'pokemon',

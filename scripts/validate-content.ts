@@ -20,6 +20,13 @@ for (const w of worlds) {
   const schema = JSON.parse(readFileSync(`public/worlds/${w}/schema.json`, 'utf8')) as WorldSchema
   for (const t of schema.tables)
     await conn.run(`CREATE OR REPLACE TABLE ${t.name} AS SELECT * FROM 'public/worlds/${w}/${t.name}.parquet'`)
+  if (schema.entity) {
+    try {
+      await conn.run(`SELECT ${schema.entity.column} FROM ${schema.entity.table} LIMIT 1`)
+    } catch {
+      failures.push(`world ${w}: entity ${schema.entity.table}.${schema.entity.column} is not queryable`)
+    }
+  }
 }
 
 async function run(sql: string): Promise<QueryResult> {

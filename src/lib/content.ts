@@ -2,6 +2,7 @@ export interface WorldSchema {
   world: string
   name: string
   tables: TableSchema[]
+  entity?: { table: string; column: string }
 }
 
 export interface TableSchema {
@@ -25,7 +26,7 @@ export interface Skill {
   name: string
   world: string
   requires: string[]
-  lesson: { intro: string; exampleSql: string }
+  lesson: { intro: string; exampleSql: string; wrapUp?: string }
 }
 
 export interface Exercise {
