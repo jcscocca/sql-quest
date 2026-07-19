@@ -75,7 +75,7 @@ export function ExerciseScreen({ skill, bank, schema, onBack }: {
       if (outcome.equal) {
         const gained = useProgress
           .getState()
-          .recordSolve(skill.id, ex.id, ex.xp, hintsShown, bank.exercises.length)
+          .recordSolve(skill.id, ex.id, ex.xp, hintsShown, bank.exercises.length).gained
         setFeedback({ kind: 'success', gained })
       } else {
         setFeedback({ kind: 'wrong', message: `Not quite — ${outcome.reason}. Check the grid and try again.` })

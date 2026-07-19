@@ -45,9 +45,9 @@ Each skill node: short concept intro with a runnable example → 6–10 exercise
 
 ### Mastery + spaced repetition (mechanics finalized 2026-07-19)
 
-- Each skill has mastery 0–5 plus SM-2-lite scheduling state: `interval` (days) and `due` (date). Completing a node sets mastery 3, interval 2, due = today + 2.
-- A skill past `due` is rusty: its **displayed** mastery drops 1 level per full overdue interval (floor 1). Stored mastery only changes on review — decay is pressure, not punishment.
-- **Daily Review** assembles 5–8 exercises from the most-overdue skills, round-robin so no skill dominates, taking at most 2 exercises per skill per session, re-serving exercises from their banks (mixing worlds once more exist). Reviewing a skill successfully (its session exercises correct without hints): mastery +1 (max 5), interval ×2 (cap 30 days), due = today + interval. Failing or leaning on hints: mastery −1 (min 1), interval resets to 2. Review solves award reduced XP (base 5) and count toward the streak. This is the retention engine — the app is a gym, not just a course.
+- Each skill has mastery 0–5 plus SM-2-lite scheduling state: `interval` (days) and `due` (date). Completing a node sets mastery 3, interval 2, due = today + 2. Skills completed before scheduling existed are backfilled (interval 2, due immediately) on first load.
+- A skill past `due` is rusty: its **displayed** mastery drops one level when it comes due, then one more per full overdue interval (floor 1). Stored mastery only changes on review — decay is pressure, not punishment.
+- **Daily Review** assembles up to 8 exercises from the most-overdue skills, round-robin so no skill dominates, taking at most 2 exercises per skill per session, re-serving exercises from their banks (mixing worlds once more exist). Reviewing a skill successfully (its session exercises correct without hints): mastery +1 (max 5), interval ×2 (cap 30 days), due = today + interval. Failing or leaning on hints: mastery −1 (min 1), interval resets to 2. Review solves award reduced XP (base 5) and count toward the streak. This is the retention engine — the app is a gym, not just a course.
 
 ### XP, streaks, collection
 
