@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { computeXp, todayString, updateStreak } from './xp'
+import { addDays, computeXp, dayDiff, todayString, updateStreak } from './xp'
 
 test('full XP with no hints', () => {
   expect(computeXp(10, 0)).toBe(10)
@@ -45,4 +45,15 @@ test('malformed lastDay resets to 1', () => {
 
 test('todayString pads single-digit day and month', () => {
   expect(todayString(new Date(2026, 2, 5))).toBe('2026-03-05')
+})
+
+test('addDays walks forward across month boundaries', () => {
+  expect(addDays('2026-07-30', 2)).toBe('2026-08-01')
+  expect(addDays('2026-07-19', 30)).toBe('2026-08-18')
+})
+
+test('dayDiff counts whole days between ISO dates', () => {
+  expect(dayDiff('2026-07-19', '2026-07-21')).toBe(2)
+  expect(dayDiff('2026-07-21', '2026-07-19')).toBe(-2)
+  expect(dayDiff('2026-07-19', '2026-07-19')).toBe(0)
 })
