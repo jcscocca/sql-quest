@@ -6,8 +6,7 @@ const SRC = 'data-src/digimon'
 const OUT = 'public/worlds/digimon'
 
 interface ListPage {
-  content: { id: number }[]
-  pageable: { totalPages: number }
+  content?: { id: number }[]
 }
 interface Detail {
   id: number
@@ -38,7 +37,8 @@ async function fetchJson<T>(url: string): Promise<T> {
   }
 }
 
-// --- 1. id list (paged; nextPage URLs from the API are malformed, so page manually) ---
+// --- 1. id list (paged; nextPage URLs are malformed and pageable.totalPages
+// undercounts, so page manually until an empty page) ---
 const idsPath = `${SRC}/ids.json`
 let ids: number[]
 if (existsSync(idsPath)) {
@@ -46,15 +46,14 @@ if (existsSync(idsPath)) {
   console.log(`${idsPath} already cached (${ids.length} ids), skipping list fetch`)
 } else {
   ids = []
-  const first = await fetchJson<ListPage>(`${API}?pageSize=100&page=0`)
-  first.content.forEach(d => ids.push(d.id))
-  for (let p = 1; p < first.pageable.totalPages; p++) {
+  for (let p = 0; ; p++) {
     const page = await fetchJson<ListPage>(`${API}?pageSize=100&page=${p}`)
+    if (!page.content?.length) break // past-the-end pages return 200 with no content key
     page.content.forEach(d => ids.push(d.id))
     await sleep(200)
   }
   writeFileSync(idsPath, JSON.stringify(ids))
-  console.log(`fetched ${ids.length} ids across ${first.pageable.totalPages} pages`)
+  console.log(`fetched ${ids.length} ids`)
 }
 
 // --- 2. detail records, one file per id, skip-if-exists, ≤5 req/sec ---
