@@ -2,9 +2,10 @@ import { useRef } from 'react'
 import type { Curriculum } from '../lib/content'
 import { exportState, useProgress, type ProgressState } from '../lib/progress'
 
-export function HomeScreen({ curriculum, onOpenSkill }: {
+export function HomeScreen({ curriculum, onOpenSkill, onOpenCollection }: {
   curriculum: Curriculum
   onOpenSkill: (skillId: string) => void
+  onOpenCollection: () => void
 }) {
   const progress = useProgress()
   const fileRef = useRef<HTMLInputElement>(null)
@@ -36,6 +37,7 @@ export function HomeScreen({ curriculum, onOpenSkill }: {
         <div className="stats">
           <span>🔥 {progress.streak.count}-day streak</span>
           <span>⭐ {progress.xp} XP</span>
+          <button onClick={onOpenCollection}>📚 {progress.collection.length}</button>
           <button onClick={download}>Export</button>
           <button onClick={() => fileRef.current?.click()}>Import</button>
           <input

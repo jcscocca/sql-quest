@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { HomeScreen } from './components/HomeScreen'
 import { ExerciseScreen } from './components/ExerciseScreen'
+import { CollectionScreen } from './components/CollectionScreen'
 import { loadJson, type Curriculum, type ExerciseBank, type WorldSchema } from './lib/content'
 import { useProgress } from './lib/progress'
 
@@ -10,7 +11,7 @@ interface Content {
   schemas: Record<string, WorldSchema>
 }
 
-type View = { screen: 'home' } | { screen: 'exercise'; skillId: string }
+type View = { screen: 'home' } | { screen: 'exercise'; skillId: string } | { screen: 'collection' }
 
 export default function App() {
   const [content, setContent] = useState<Content | null>(null)
@@ -32,6 +33,15 @@ export default function App() {
     )
   if (!content || !hydrated) return <div className="loading">Loading…</div>
 
+  if (view.screen === 'collection')
+    return (
+      <CollectionScreen
+        schema={content.schemas.pokemon}
+        curriculum={content.curriculum}
+        onBack={() => setView({ screen: 'home' })}
+      />
+    )
+
   if (view.screen === 'exercise') {
     const skill = content.curriculum.regions.flatMap(r => r.skills).find(s => s.id === view.skillId)
     if (!skill) return <div className="load-error">Unknown skill: {view.skillId}</div>
@@ -51,6 +61,7 @@ export default function App() {
     <HomeScreen
       curriculum={content.curriculum}
       onOpenSkill={skillId => setView({ screen: 'exercise', skillId })}
+      onOpenCollection={() => setView({ screen: 'collection' })}
     />
   )
 }
