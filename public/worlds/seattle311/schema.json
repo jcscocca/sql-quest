@@ -1,0 +1,42 @@
+{
+  "world": "seattle311",
+  "name": "Seattle 311",
+  "tables": [
+    {
+      "name": "requests",
+      "description": "One row per Seattle city service request (311-style non-emergency reports and inquiries), most recent ~350k requests as of build time, from the City of Seattle \"Customer Service Requests\" open dataset. Note: the source has no closure-date field, so there is no closed_date column — only created_date and a terminal-or-not status string",
+      "columns": [
+        {
+          "name": "request_id",
+          "type": "VARCHAR",
+          "description": "Unique service request number, e.g. '26-00200215'"
+        },
+        {
+          "name": "service_request_type",
+          "type": "VARCHAR",
+          "description": "The service requested, e.g. 'Pothole', 'Illegal Dumping / Needles', 'Abandoned Vehicle'"
+        },
+        {
+          "name": "department",
+          "type": "VARCHAR",
+          "description": "City department responsible, e.g. 'SDOT-Seattle Department of Transportation'"
+        },
+        {
+          "name": "created_date",
+          "type": "DATE",
+          "description": "Date the request was created"
+        },
+        {
+          "name": "neighborhood",
+          "type": "VARCHAR",
+          "description": "Community reporting area, e.g. 'BALLARD', 'CAPITOL HILL' — NULL for a small share of requests (~1–2% in this recent slice; the source dataset does not assign one for every address)"
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR",
+          "description": "Current request status, one of 10 values: 'Closed', 'Reported', 'Open', 'New', 'Transferred to Other Dept', 'Duplicate (Closed)', 'Closed as Duplicate', 'Closed -Incomplete Information', 'Duplicate (Open)', 'Canceled'. The source dataset tracks no separate closure date — there is no closed_date column here; open-vs-closed state is only readable qualitatively from this text, not as a date difference"
+        }
+      ]
+    }
+  ]
+}
