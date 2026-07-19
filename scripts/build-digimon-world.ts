@@ -145,7 +145,7 @@ const schema = {
         { name: 'name', type: 'VARCHAR', description: 'Digimon name, e.g. Agumon' },
         { name: 'level', type: 'VARCHAR', description: "Primary evolution stage, e.g. 'Baby I', 'Child', 'Adult', 'Perfect', 'Ultimate' — NULL when unlisted" },
         { name: 'type', type: 'VARCHAR', description: "Primary type, e.g. 'Reptile', 'Machine' — NULL when unlisted" },
-        { name: 'attribute', type: 'VARCHAR', description: "Primary attribute: 'Vaccine', 'Virus', 'Data', 'Free', or 'Variable' — NULL when unlisted" },
+        { name: 'attribute', type: 'VARCHAR', description: "Primary attribute — common values 'Vaccine', 'Virus', 'Data', 'Free', 'Variable'; a few rows carry 'No Data'/'Unknown'; NULL when unlisted" },
         { name: 'x_antibody', type: 'BOOLEAN', description: 'TRUE for X-Antibody variants' },
         { name: 'release_year', type: 'BIGINT', description: 'Year the Digimon debuted — NULL when unknown' },
       ],

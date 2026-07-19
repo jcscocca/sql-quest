@@ -34,7 +34,7 @@
         {
           "name": "attribute",
           "type": "VARCHAR",
-          "description": "Primary attribute: 'Vaccine', 'Virus', 'Data', 'Free', or 'Variable' — NULL when unlisted"
+          "description": "Primary attribute — common values 'Vaccine', 'Virus', 'Data', 'Free', 'Variable'; a few rows carry 'No Data'/'Unknown'; NULL when unlisted"
         },
         {
           "name": "x_antibody",
