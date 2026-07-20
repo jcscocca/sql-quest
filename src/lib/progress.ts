@@ -52,6 +52,7 @@ const empty: ProgressState = {
   skills: {},
   collection: [],
   badges: [],
+  unlockAll: false,
 }
 
 function isProgressState(x: unknown): x is ProgressState {
@@ -211,7 +212,7 @@ export const useProgress = create<ProgressStore>((set, get) => ({
       skills: imported.skills,
       collection: imported.collection,
       badges: imported.badges,
-      unlockAll: imported.unlockAll,
+      unlockAll: imported.unlockAll ?? false,
     })
     set(next)
     persist(next)

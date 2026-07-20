@@ -3,16 +3,7 @@ import { exportState, useProgress, type CollectionEntry, type ProgressState } fr
 import { todayString } from './xp'
 
 beforeEach(() => {
-  useProgress.setState({
-    version: 1,
-    xp: 0,
-    streak: { count: 0, lastDay: '' },
-    skills: {},
-    collection: [],
-    badges: [],
-    unlockAll: undefined,
-    hydrated: true,
-  })
+  useProgress.setState({ ...useProgress.getInitialState(), hydrated: true }, true)
 })
 
 test('recordSolve awards XP and marks the exercise solved', () => {
@@ -60,7 +51,7 @@ test('importState rejects unknown versions', () => {
 test('exportState round-trips through importState', () => {
   useProgress.getState().recordSolve('select-basics', 'sb-1', 10, 0, 2)
   const json = exportState(useProgress.getState())
-  useProgress.setState({ version: 1, xp: 0, streak: { count: 0, lastDay: '' }, skills: {}, hydrated: true })
+  useProgress.setState({ ...useProgress.getInitialState(), hydrated: true }, true)
   useProgress.getState().importState(JSON.parse(json) as ProgressState)
   expect(useProgress.getState().xp).toBe(10)
 })
@@ -237,7 +228,7 @@ test('export round-trips collection entries, badges, and schedules', () => {
   useProgress.getState().addCatches('pokemon', [{ name: 'pikachu', label: 'electric' }])
   useProgress.getState().awardBadge('select-basics')
   const json = exportState(useProgress.getState())
-  useProgress.setState({ version: 1, xp: 0, streak: { count: 0, lastDay: '' }, skills: {}, collection: [], badges: [], hydrated: true })
+  useProgress.setState({ ...useProgress.getInitialState(), hydrated: true }, true)
   useProgress.getState().importState(JSON.parse(json) as ProgressState)
   const s = useProgress.getState()
   expect(s.collection).toEqual([{ world: 'pokemon', name: 'pikachu', label: 'electric' }])
@@ -272,6 +263,6 @@ test('a save without unlockAll hydrates falsy and is not rewritten', async () =>
   }
   await idbSet('sql-quest-progress', saved)
   await useProgress.getState().hydrate()
-  expect(useProgress.getState().unlockAll ?? false).toBe(false)
+  expect(useProgress.getState().unlockAll).toBe(false)
   expect(await idbGet('sql-quest-progress')).toEqual(saved)
 })
