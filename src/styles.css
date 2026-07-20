@@ -214,7 +214,7 @@ button:disabled { opacity: 0.45; cursor: default; }
 }
 .collection-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
   gap: 10px;
   padding: 10px 24px;
 }
@@ -229,39 +229,50 @@ button:disabled { opacity: 0.45; cursor: default; }
 }
 .tile-name { font-weight: 600; }
 .tile-type { font-size: 12px; color: var(--muted); text-transform: capitalize; }
+.tile-sprite {
+  align-items: center;
+  text-align: center;
+  padding: 8px 4px;
+  border-left-width: 1px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--type-color, var(--border)) 22%, var(--panel)), var(--panel));
+}
+.tile-sprite img { width: 56px; height: 56px; object-fit: contain; }
+.tile-sprite .tile-name { font-size: 11px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pixelated { image-rendering: pixelated; }
+.catch-chip img { width: 24px; height: 24px; object-fit: contain; vertical-align: -7px; margin-right: 3px; }
 
-.type-normal { border-left-color: #a8a29e; }
-.type-fire { border-left-color: #f97316; }
-.type-water { border-left-color: #3b82f6; }
-.type-electric { border-left-color: #facc15; }
-.type-grass { border-left-color: #4ade80; }
-.type-ice { border-left-color: #67e8f9; }
-.type-fighting { border-left-color: #b91c1c; }
-.type-poison { border-left-color: #a855f7; }
-.type-ground { border-left-color: #ca8a04; }
-.type-flying { border-left-color: #93c5fd; }
-.type-psychic { border-left-color: #f472b6; }
-.type-bug { border-left-color: #84cc16; }
-.type-rock { border-left-color: #92400e; }
-.type-ghost { border-left-color: #6d28d9; }
-.type-dragon { border-left-color: #4f46e5; }
-.type-dark { border-left-color: #57534e; }
-.type-steel { border-left-color: #94a3b8; }
-.type-fairy { border-left-color: #fbcfe8; }
-.type-unknown { border-left-color: var(--border); }
+.type-normal { --type-color: #a8a29e; border-left-color: var(--type-color); }
+.type-fire { --type-color: #f97316; border-left-color: var(--type-color); }
+.type-water { --type-color: #3b82f6; border-left-color: var(--type-color); }
+.type-electric { --type-color: #facc15; border-left-color: var(--type-color); }
+.type-grass { --type-color: #4ade80; border-left-color: var(--type-color); }
+.type-ice { --type-color: #67e8f9; border-left-color: var(--type-color); }
+.type-fighting { --type-color: #b91c1c; border-left-color: var(--type-color); }
+.type-poison { --type-color: #a855f7; border-left-color: var(--type-color); }
+.type-ground { --type-color: #ca8a04; border-left-color: var(--type-color); }
+.type-flying { --type-color: #93c5fd; border-left-color: var(--type-color); }
+.type-psychic { --type-color: #f472b6; border-left-color: var(--type-color); }
+.type-bug { --type-color: #84cc16; border-left-color: var(--type-color); }
+.type-rock { --type-color: #92400e; border-left-color: var(--type-color); }
+.type-ghost { --type-color: #6d28d9; border-left-color: var(--type-color); }
+.type-dragon { --type-color: #4f46e5; border-left-color: var(--type-color); }
+.type-dark { --type-color: #57534e; border-left-color: var(--type-color); }
+.type-steel { --type-color: #94a3b8; border-left-color: var(--type-color); }
+.type-fairy { --type-color: #fbcfe8; border-left-color: var(--type-color); }
+.type-unknown { --type-color: var(--border); border-left-color: var(--type-color); }
 
-.type-effect-monster { border-left-color: #d97706; }
-.type-normal-monster { border-left-color: #eab308; }
-.type-fusion-monster { border-left-color: #8b5cf6; }
-.type-synchro-monster { border-left-color: #e5e7eb; }
-.type-xyz-monster { border-left-color: #1f2937; }
-.type-link-monster { border-left-color: #2563eb; }
-.type-ritual-monster { border-left-color: #38bdf8; }
-.type-spell-card { border-left-color: #10b981; }
-.type-trap-card { border-left-color: #be185d; }
-.type-vaccine { border-left-color: #16a34a; }
-.type-virus { border-left-color: #9333ea; }
-.type-data { border-left-color: #0ea5e9; }
-.type-free { border-left-color: #78716c; }
-.type-variable { border-left-color: #f59e0b; }
-.type-no-data { border-left-color: var(--border); }
+.type-effect-monster { --type-color: #d97706; border-left-color: var(--type-color); }
+.type-normal-monster { --type-color: #eab308; border-left-color: var(--type-color); }
+.type-fusion-monster { --type-color: #8b5cf6; border-left-color: var(--type-color); }
+.type-synchro-monster { --type-color: #e5e7eb; border-left-color: var(--type-color); }
+.type-xyz-monster { --type-color: #1f2937; border-left-color: var(--type-color); }
+.type-link-monster { --type-color: #2563eb; border-left-color: var(--type-color); }
+.type-ritual-monster { --type-color: #38bdf8; border-left-color: var(--type-color); }
+.type-spell-card { --type-color: #10b981; border-left-color: var(--type-color); }
+.type-trap-card { --type-color: #be185d; border-left-color: var(--type-color); }
+.type-vaccine { --type-color: #16a34a; border-left-color: var(--type-color); }
+.type-virus { --type-color: #9333ea; border-left-color: var(--type-color); }
+.type-data { --type-color: #0ea5e9; border-left-color: var(--type-color); }
+.type-free { --type-color: #78716c; border-left-color: var(--type-color); }
+.type-variable { --type-color: #f59e0b; border-left-color: var(--type-color); }
+.type-no-data { --type-color: var(--border); border-left-color: var(--type-color); }

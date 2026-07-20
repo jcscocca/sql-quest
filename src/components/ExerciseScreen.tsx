@@ -7,6 +7,7 @@ import { loadWorld, runQuery } from '../lib/duckdb'
 import { translateError, TrainerError } from '../lib/errors'
 import { pickCatches } from '../lib/catches'
 import { useProgress } from '../lib/progress'
+import { loadManifest, spriteUrl, type SpriteManifest } from '../lib/sprites'
 import type { ExerciseBank, Region, Skill, WorldSchema } from '../lib/content'
 
 type Feedback =
@@ -37,6 +38,16 @@ export function ExerciseScreen({ skill, bank, schema, region, onBack }: {
   const [worldNames, setWorldNames] = useState<Set<string> | null>(null)
   const [sessionCatches, setSessionCatches] = useState<string[]>([])
   const [completion, setCompletion] = useState<{ catches: string[] } | null>(null)
+  const [spriteManifest, setSpriteManifest] = useState<SpriteManifest | null>(null)
+  useEffect(() => {
+    let live = true
+    void loadManifest(skill.world).then(m => {
+      if (live) setSpriteManifest(m)
+    })
+    return () => {
+      live = false
+    }
+  }, [skill.world])
 
   const ex = bank.exercises[idx]
   const exSolved = solved.includes(ex.id)
@@ -233,7 +244,20 @@ export function ExerciseScreen({ skill, bank, schema, region, onBack }: {
             <div className="feedback success">
               ✓ Correct! {feedback.gained > 0 ? `+${feedback.gained} XP` : 'Already solved — no XP this time.'}
               {feedback.caught.length > 0 && (
-                <span className="catch-chip">Caught: {feedback.caught.join(', ')}!</span>
+                <span className="catch-chip">
+                  Caught:{' '}
+                  {feedback.caught.map((n, i) => {
+                    const url = spriteUrl(skill.world, spriteManifest, n)
+                    return (
+                      <span key={n}>
+                        {i > 0 && ', '}
+                        {url && <img src={url} alt="" className={url.endsWith('.png') ? 'pixelated' : undefined} />}
+                        {n}
+                      </span>
+                    )
+                  })}
+                  !
+                </span>
               )}
               {feedback.finished ? (
                 <button onClick={() => setCompletion({ catches: sessionCatches })}>Finish node →</button>

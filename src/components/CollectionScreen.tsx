@@ -1,4 +1,6 @@
+import { useEffect, useState } from 'react'
 import { useProgress } from '../lib/progress'
+import { loadManifest, spriteUrl, type SpriteManifest } from '../lib/sprites'
 import type { Curriculum } from '../lib/content'
 
 const slugify = (s: string) =>
@@ -18,6 +20,18 @@ export function CollectionScreen({ curriculum, worldNames, onBack }: {
     curriculum.regions.find(r => `region:${r.id}` === id)?.name ?? id.replace('region:', '')
 
   const worlds = [...new Set(collection.map(e => e.world))].sort()
+
+  const [manifests, setManifests] = useState<Record<string, SpriteManifest | null>>({})
+  useEffect(() => {
+    let live = true
+    for (const w of worlds)
+      void loadManifest(w).then(m => {
+        if (live) setManifests(prev => ({ ...prev, [w]: m }))
+      })
+    return () => {
+      live = false
+    }
+  }, [worlds.join(',')])
 
   return (
     <div className="collection">
@@ -41,12 +55,20 @@ export function CollectionScreen({ curriculum, worldNames, onBack }: {
             {collection
               .filter(e => e.world === world)
               .sort((a, b) => a.name.localeCompare(b.name))
-              .map(entry => (
-                <div key={`${entry.world}:${entry.name}`} className={`tile type-${slugify(entry.label)}`}>
-                  <span className="tile-name">{entry.name}</span>
-                  <span className="tile-type">{entry.label}</span>
-                </div>
-              ))}
+              .map(entry => {
+                const url = spriteUrl(world, manifests[world] ?? null, entry.name)
+                return url ? (
+                  <div key={`${entry.world}:${entry.name}`} className={`tile tile-sprite type-${slugify(entry.label)}`}>
+                    <img src={url} alt="" loading="lazy" className={url.endsWith('.png') ? 'pixelated' : undefined} />
+                    <span className="tile-name">{entry.name}</span>
+                  </div>
+                ) : (
+                  <div key={`${entry.world}:${entry.name}`} className={`tile type-${slugify(entry.label)}`}>
+                    <span className="tile-name">{entry.name}</span>
+                    <span className="tile-type">{entry.label}</span>
+                  </div>
+                )
+              })}
           </div>
         </section>
       ))}

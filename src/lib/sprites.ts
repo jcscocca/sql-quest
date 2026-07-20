@@ -9,7 +9,11 @@ export function loadManifest(world: string): Promise<SpriteManifest | null> {
   if (!p) {
     p = fetch(`${import.meta.env.BASE_URL}sprites/${world}/manifest.json`)
       .then(r => (r.ok ? (r.json() as Promise<SpriteManifest>) : null))
-      .catch(() => null)
+      .catch(err => {
+        manifests.delete(world)
+        console.warn('Sprite manifest load failed', world, err)
+        return null
+      })
     manifests.set(world, p)
   }
   return p
@@ -20,6 +24,7 @@ export function spriteUrl(world: string, manifest: SpriteManifest | null, name: 
   return file ? `${import.meta.env.BASE_URL}sprites/${world}/${file}` : null
 }
 
+/** Test-only: resets the module-level manifest cache. */
 export function clearManifestCache(): void {
   manifests.clear()
 }
