@@ -24,6 +24,7 @@ export interface ProgressState {
   skills: Record<string, SkillProgress>
   collection: CollectionEntry[]
   badges: string[]
+  unlockAll?: boolean
 }
 
 export interface SolveResult {
@@ -40,6 +41,7 @@ interface ProgressStore extends ProgressState {
   recordReview(skillId: string, success: boolean): void
   recordReviewSolve(hintsUsed: number): number
   importState(imported: ProgressState): void
+  setUnlockAll(value: boolean): void
 }
 
 const KEY = 'sql-quest-progress'
@@ -87,7 +89,15 @@ function normalize(s: ProgressState): ProgressState {
 }
 
 function dataOf(s: ProgressStore): ProgressState {
-  return { version: 1, xp: s.xp, streak: s.streak, skills: s.skills, collection: s.collection, badges: s.badges }
+  return {
+    version: 1,
+    xp: s.xp,
+    streak: s.streak,
+    skills: s.skills,
+    collection: s.collection,
+    badges: s.badges,
+    unlockAll: s.unlockAll,
+  }
 }
 
 function persist(next: ProgressState): void {
@@ -201,7 +211,14 @@ export const useProgress = create<ProgressStore>((set, get) => ({
       skills: imported.skills,
       collection: imported.collection,
       badges: imported.badges,
+      unlockAll: imported.unlockAll,
     })
+    set(next)
+    persist(next)
+  },
+
+  setUnlockAll(value) {
+    const next: ProgressState = { ...dataOf(get()), unlockAll: value }
     set(next)
     persist(next)
   },
@@ -209,7 +226,15 @@ export const useProgress = create<ProgressStore>((set, get) => ({
 
 export function exportState(s: ProgressState): string {
   return JSON.stringify(
-    { version: s.version, xp: s.xp, streak: s.streak, skills: s.skills, collection: s.collection, badges: s.badges },
+    {
+      version: s.version,
+      xp: s.xp,
+      streak: s.streak,
+      skills: s.skills,
+      collection: s.collection,
+      badges: s.badges,
+      unlockAll: s.unlockAll,
+    },
     null,
     2,
   )

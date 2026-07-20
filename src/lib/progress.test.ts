@@ -10,6 +10,7 @@ beforeEach(() => {
     skills: {},
     collection: [],
     badges: [],
+    unlockAll: undefined,
     hydrated: true,
   })
 })
@@ -241,4 +242,36 @@ test('export round-trips collection entries, badges, and schedules', () => {
   const s = useProgress.getState()
   expect(s.collection).toEqual([{ world: 'pokemon', name: 'pikachu', label: 'electric' }])
   expect(s.badges).toEqual(['select-basics'])
+})
+
+test('setUnlockAll survives a later mutation', () => {
+  useProgress.getState().setUnlockAll(true)
+  expect(useProgress.getState().unlockAll).toBe(true)
+  useProgress.getState().recordSolve('select-basics', 'sb-1', 10, 0, 2)
+  expect(useProgress.getState().unlockAll).toBe(true)
+})
+
+test('unlockAll round-trips through export and import', () => {
+  useProgress.getState().setUnlockAll(true)
+  const json = exportState(useProgress.getState())
+  expect(JSON.parse(json).unlockAll).toBe(true)
+  useProgress.getState().setUnlockAll(false)
+  useProgress.getState().importState(JSON.parse(json) as ProgressState)
+  expect(useProgress.getState().unlockAll).toBe(true)
+})
+
+test('a save without unlockAll hydrates falsy and is not rewritten', async () => {
+  const { set: idbSet, get: idbGet } = await import('idb-keyval')
+  const saved = {
+    version: 1,
+    xp: 30,
+    streak: { count: 1, lastDay: '2026-07-19' },
+    skills: { 'select-basics': { solved: ['sb-1'], completed: false, mastery: 0 } },
+    collection: [],
+    badges: [],
+  }
+  await idbSet('sql-quest-progress', saved)
+  await useProgress.getState().hydrate()
+  expect(useProgress.getState().unlockAll ?? false).toBe(false)
+  expect(await idbGet('sql-quest-progress')).toEqual(saved)
 })
