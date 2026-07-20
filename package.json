@@ -11,6 +11,7 @@
     "build:world": "tsx scripts/build-pokemon-world.ts",
     "build:yugioh": "tsx scripts/build-yugioh-world.ts",
     "build:digimon": "tsx scripts/build-digimon-world.ts",
+    "build:sprites": "tsx scripts/build-sprites.ts",
     "build:seattle311": "tsx scripts/build-seattle311-world.ts",
     "validate": "tsx scripts/validate-content.ts"
   },
@@ -31,6 +32,7 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.3",
     "fake-indexeddb": "^6.2.5",
+    "sharp": "^0.35.3",
     "tsx": "^4.23.1",
     "typescript": "^7.0.2",
     "vite": "^8.1.5",
