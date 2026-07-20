@@ -11,7 +11,6 @@
     "build:world": "tsx scripts/build-pokemon-world.ts",
     "build:yugioh": "tsx scripts/build-yugioh-world.ts",
     "build:digimon": "tsx scripts/build-digimon-world.ts",
-    "build:movies": "tsx scripts/build-movies-world.ts",
     "build:seattle311": "tsx scripts/build-seattle311-world.ts",
     "validate": "tsx scripts/validate-content.ts"
   },
