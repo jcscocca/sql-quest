@@ -14,6 +14,8 @@ design.
 
 ## Run it
 
+Live: https://jcscocca.github.io/sql-quest/ (deployed from main by GitHub Actions)
+
     npm install
     npm run dev        # → http://localhost:5173
 
