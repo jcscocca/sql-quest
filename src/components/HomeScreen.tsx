@@ -44,6 +44,12 @@ export function HomeScreen({ curriculum, onOpenSkill, onOpenCollection, reviewCo
           <button onClick={onOpenCollection}>📚 {progress.collection.length}</button>
           <button onClick={download}>Export</button>
           <button onClick={() => fileRef.current?.click()}>Import</button>
+          <button
+            onClick={() => useProgress.getState().setUnlockAll(!progress.unlockAll)}
+            title="Open every skill regardless of prerequisites"
+          >
+            {progress.unlockAll ? '🔓 Free roam: on' : '🔒 Free roam: off'}
+          </button>
           <input
             ref={fileRef}
             type="file"
@@ -85,16 +91,17 @@ export function HomeScreen({ curriculum, onOpenSkill, onOpenCollection, reviewCo
           <div className="nodes">
             {region.skills.map(skill => {
               const done = completed(skill.id)
-              const unlocked = skill.requires.every(completed)
+              const earned = skill.requires.every(completed)
+              const unlocked = earned || progress.unlockAll
               const solvedCount = progress.skills[skill.id]?.solved.length ?? 0
               return (
                 <button
                   key={skill.id}
                   disabled={!unlocked}
-                  className={`node ${done ? 'done' : unlocked ? 'open' : 'locked'}`}
+                  className={`node ${done ? 'done' : earned ? 'open' : 'locked'}`}
                   onClick={() => onOpenSkill(skill.id)}
                 >
-                  <span className="badge">{done ? '✓' : unlocked ? '▶' : '🔒'}</span>
+                  <span className="badge">{done ? '✓' : earned ? '▶' : unlocked ? '🔓' : '🔒'}</span>
                   <span className="node-name">{skill.name}</span>
                   {solvedCount > 0 && !done && <span className="count">{solvedCount} solved</span>}
                 </button>
