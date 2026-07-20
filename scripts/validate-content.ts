@@ -18,6 +18,7 @@ const conn = await db.connect()
 const worlds = new Set(skills.map(s => s.world))
 const worldSchemas: Record<string, WorldSchema> = {}
 const entityNames: Record<string, Set<string>> = {}
+// mirrors pickCatches (src/lib/catches.ts) and build-sprites.ts catchable() — keep matching semantics in lockstep
 const catchableByWorld: Record<string, Set<string>> = {}
 for (const w of worlds) {
   const schema = JSON.parse(readFileSync(`public/worlds/${w}/schema.json`, 'utf8')) as WorldSchema
@@ -93,7 +94,7 @@ for (const skill of skills) {
           for (const c of ex.collectibles ?? []) {
             const hit = await run(`SELECT 1 FROM ${entity.table} WHERE ${entity.column} = '${c.replace(/'/g, "''")}'`)
             if (hit.rows.length === 0) failures.push(`${tag}: collectible "${c}" not found in world`)
-            catchableByWorld[skill.world].add(c)
+            else (catchableByWorld[skill.world] ??= new Set()).add(c)
           }
         }
       }

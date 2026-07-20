@@ -56,6 +56,7 @@ async function fetchJson(url: string): Promise<unknown | null> {
   }
 }
 
+// mirrors pickCatches (src/lib/catches.ts) and validate-content.ts catchableByWorld — keep matching semantics in lockstep
 async function catchable(world: string, entityTable: string, entityColumn: string): Promise<Set<string>> {
   const nameReader = await conn.runAndReadAll(`SELECT DISTINCT ${entityColumn} FROM ${entityTable}`)
   const names = new Set(nameReader.getRows().map(r => String(r[0])))
