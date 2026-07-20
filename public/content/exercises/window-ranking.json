@@ -8,7 +8,7 @@
       "orderMatters": true,
       "hints": [
         "ROW_NUMBER() OVER (ORDER BY ...) numbers the rows 1, 2, 3, ... in the order you specify; put release_year then name in that OVER clause so the numbering is oldest-first with name breaking year ties.",
-        "SELECT name, release_year, ROW_NUMBER() OVER (ORDER BY release_year, name) AS debut_rank FROM digimon WHERE level = 'Armor' ORDER BY debut_rank.",
+        "SELECT name, release_year, ROW_NUMBER() OVER (ORDER BY ...) AS debut_rank FROM digimon WHERE level = ... ORDER BY ....",
         "```sql\nSELECT name, release_year, ROW_NUMBER() OVER (ORDER BY release_year, name) AS debut_rank FROM digimon WHERE level = 'Armor' ORDER BY debut_rank\n```"
       ],
       "xp": 17
@@ -20,7 +20,7 @@
       "orderMatters": true,
       "hints": [
         "RANK() OVER (ORDER BY release_year DESC) gives every Digimon of the same year the same rank and then jumps the count ahead — that shared-then-skipped behavior is exactly what RANK does.",
-        "SELECT name, release_year, RANK() OVER (ORDER BY release_year DESC) AS year_rank FROM digimon WHERE type = 'Fairy' ORDER BY year_rank, name.",
+        "SELECT name, release_year, RANK() OVER (ORDER BY ...) AS year_rank FROM digimon WHERE type = ... ORDER BY ....",
         "```sql\nSELECT name, release_year, RANK() OVER (ORDER BY release_year DESC) AS year_rank FROM digimon WHERE type = 'Fairy' ORDER BY year_rank, name\n```"
       ],
       "xp": 17
@@ -32,7 +32,7 @@
       "orderMatters": true,
       "hints": [
         "First a CTE that counts debuts per year and keeps years with at least 48 (GROUP BY release_year HAVING COUNT(*) >= 48). Then apply DENSE_RANK() OVER (ORDER BY debut_count DESC) so tied counts share a rank with no gaps.",
-        "WITH yc AS (SELECT release_year, COUNT(*) AS debut_count FROM digimon GROUP BY release_year HAVING COUNT(*) >= 48) SELECT release_year, debut_count, DENSE_RANK() OVER (ORDER BY debut_count DESC) AS popularity_rank FROM yc ORDER BY popularity_rank, release_year.",
+        "WITH yc AS (SELECT release_year, COUNT(*) AS debut_count FROM digimon GROUP BY ... HAVING COUNT(*) >= ...) SELECT release_year, debut_count, DENSE_RANK() OVER (ORDER BY ...) AS popularity_rank FROM yc ORDER BY ....",
         "```sql\nWITH yc AS (SELECT release_year, COUNT(*) AS debut_count FROM digimon GROUP BY release_year HAVING COUNT(*) >= 48) SELECT release_year, debut_count, DENSE_RANK() OVER (ORDER BY debut_count DESC) AS popularity_rank FROM yc ORDER BY popularity_rank, release_year\n```"
       ],
       "xp": 18
@@ -44,7 +44,7 @@
       "orderMatters": true,
       "hints": [
         "NTILE(4) OVER (ORDER BY release_year, name) walks the rows in that order and stamps each with a bucket number 1 through 4, filling the buckets as evenly as it can.",
-        "SELECT name, release_year, NTILE(4) OVER (ORDER BY release_year, name) AS quartile FROM digimon WHERE type = 'God Man' ORDER BY quartile, release_year, name.",
+        "SELECT name, release_year, NTILE(...) OVER (ORDER BY ...) AS quartile FROM digimon WHERE type = ... ORDER BY ....",
         "```sql\nSELECT name, release_year, NTILE(4) OVER (ORDER BY release_year, name) AS quartile FROM digimon WHERE type = 'God Man' ORDER BY quartile, release_year, name\n```"
       ],
       "xp": 18
@@ -56,7 +56,7 @@
       "orderMatters": true,
       "hints": [
         "Because a window function can't go in WHERE, compute ROW_NUMBER() OVER (PARTITION BY level ORDER BY release_year DESC, name) inside a CTE, then filter recency_rank <= 2 in the outer query. PARTITION BY level restarts the numbering for each level.",
-        "WITH ranked AS (SELECT level, name, release_year, ROW_NUMBER() OVER (PARTITION BY level ORDER BY release_year DESC, name) AS recency_rank FROM digimon WHERE level IS NOT NULL) SELECT level, name, release_year, recency_rank FROM ranked WHERE recency_rank <= 2 ORDER BY level, recency_rank.",
+        "WITH ranked AS (SELECT level, name, release_year, ROW_NUMBER() OVER (PARTITION BY ... ORDER BY ...) AS recency_rank FROM digimon WHERE ...) SELECT level, name, release_year, recency_rank FROM ranked WHERE recency_rank <= ... ORDER BY ....",
         "```sql\nWITH ranked AS (SELECT level, name, release_year, ROW_NUMBER() OVER (PARTITION BY level ORDER BY release_year DESC, name) AS recency_rank FROM digimon WHERE level IS NOT NULL) SELECT level, name, release_year, recency_rank FROM ranked WHERE recency_rank <= 2 ORDER BY level, recency_rank\n```"
       ],
       "xp": 19
@@ -68,7 +68,7 @@
       "orderMatters": true,
       "hints": [
         "In a CTE over the four named attributes, compute two windows partitioned by attribute: ROW_NUMBER() OVER (PARTITION BY attribute ORDER BY release_year, name) for debut order and COUNT(*) OVER (PARTITION BY attribute) for the roster size that rides on every row. Then filter debut_rank <= 3.",
-        "WITH ranked AS (SELECT attribute, name, release_year, ROW_NUMBER() OVER (PARTITION BY attribute ORDER BY release_year, name) AS debut_rank, COUNT(*) OVER (PARTITION BY attribute) AS attr_size FROM digimon WHERE attribute IN ('Vaccine', 'Virus', 'Data', 'Free')) SELECT attribute, name, release_year, debut_rank, attr_size FROM ranked WHERE debut_rank <= 3 ORDER BY attribute, debut_rank.",
+        "WITH ranked AS (SELECT attribute, name, release_year, ROW_NUMBER() OVER (PARTITION BY ... ORDER BY ...) AS debut_rank, COUNT(*) OVER (PARTITION BY ...) AS attr_size FROM digimon WHERE attribute IN (...)) SELECT attribute, name, release_year, debut_rank, attr_size FROM ranked WHERE debut_rank <= ... ORDER BY ....",
         "```sql\nWITH ranked AS (SELECT attribute, name, release_year, ROW_NUMBER() OVER (PARTITION BY attribute ORDER BY release_year, name) AS debut_rank, COUNT(*) OVER (PARTITION BY attribute) AS attr_size FROM digimon WHERE attribute IN ('Vaccine', 'Virus', 'Data', 'Free')) SELECT attribute, name, release_year, debut_rank, attr_size FROM ranked WHERE debut_rank <= 3 ORDER BY attribute, debut_rank\n```"
       ],
       "xp": 20

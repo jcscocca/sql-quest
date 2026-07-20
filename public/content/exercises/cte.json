@@ -8,7 +8,7 @@
       "orderMatters": true,
       "hints": [
         "Define the CTE with WITH vaccine_mon AS (SELECT ... WHERE attribute = 'Vaccine'), then write a normal SELECT that reads from vaccine_mon and filters to release_year = 1997.",
-        "WITH vaccine_mon AS (SELECT name, release_year FROM digimon WHERE attribute = 'Vaccine') SELECT name, release_year FROM vaccine_mon WHERE release_year = 1997 ORDER BY name.",
+        "WITH vaccine_mon AS (SELECT name, release_year FROM digimon WHERE attribute = ...) SELECT name, release_year FROM vaccine_mon WHERE release_year = ... ORDER BY ....",
         "```sql\nWITH vaccine_mon AS (SELECT name, release_year FROM digimon WHERE attribute = 'Vaccine') SELECT name, release_year FROM vaccine_mon WHERE release_year = 1997 ORDER BY name\n```"
       ],
       "xp": 17,
@@ -21,7 +21,7 @@
       "orderMatters": true,
       "hints": [
         "Put the grouped count inside the CTE — SELECT level, COUNT(*) AS digimon_count ... GROUP BY level with level IS NOT NULL — then filter the CTE's rows to digimon_count >= 100 in the outer query.",
-        "WITH by_level AS (SELECT level, COUNT(*) AS digimon_count FROM digimon WHERE level IS NOT NULL GROUP BY level) SELECT level, digimon_count FROM by_level WHERE digimon_count >= 100 ORDER BY digimon_count DESC, level.",
+        "WITH by_level AS (SELECT level, COUNT(*) AS digimon_count FROM digimon WHERE ... GROUP BY ...) SELECT level, digimon_count FROM by_level WHERE digimon_count >= ... ORDER BY ....",
         "```sql\nWITH by_level AS (SELECT level, COUNT(*) AS digimon_count FROM digimon WHERE level IS NOT NULL GROUP BY level) SELECT level, digimon_count FROM by_level WHERE digimon_count >= 100 ORDER BY digimon_count DESC, level\n```"
       ],
       "xp": 17
@@ -33,7 +33,7 @@
       "orderMatters": true,
       "hints": [
         "The CTE narrows digimon to the Armor level; then treat it like any table and JOIN it to evolutions on the id/from_id key, keeping only rows whose condition IS NULL.",
-        "WITH armor_mon AS (SELECT id, name FROM digimon WHERE level = 'Armor') SELECT a.name AS armor_name, e.to_name FROM armor_mon a JOIN evolutions e ON a.id = e.from_id WHERE e.condition IS NULL ORDER BY a.name, e.to_name.",
+        "WITH armor_mon AS (SELECT id, name FROM digimon WHERE level = ...) SELECT a.name AS armor_name, e.to_name FROM armor_mon a JOIN evolutions e ON ... WHERE ... IS NULL ORDER BY ....",
         "```sql\nWITH armor_mon AS (SELECT id, name FROM digimon WHERE level = 'Armor') SELECT a.name AS armor_name, e.to_name FROM armor_mon a JOIN evolutions e ON a.id = e.from_id WHERE e.condition IS NULL ORDER BY a.name, e.to_name\n```"
       ],
       "xp": 18
@@ -45,7 +45,7 @@
       "orderMatters": true,
       "hints": [
         "Chain two CTEs: attr_counts holds the per-attribute counts, and avg_count reads from attr_counts to get the single average. Then compare each attribute's count to that average, pulled in as a scalar subquery.",
-        "WITH attr_counts AS (SELECT attribute, COUNT(*) AS digimon_count FROM digimon WHERE attribute IS NOT NULL GROUP BY attribute), avg_count AS (SELECT AVG(digimon_count) AS avg_n FROM attr_counts) SELECT attribute, digimon_count FROM attr_counts WHERE digimon_count > (SELECT avg_n FROM avg_count) ORDER BY digimon_count DESC, attribute.",
+        "WITH attr_counts AS (SELECT attribute, COUNT(*) AS digimon_count FROM digimon WHERE ... GROUP BY ...), avg_count AS (SELECT AVG(...) AS avg_n FROM attr_counts) SELECT attribute, digimon_count FROM attr_counts WHERE digimon_count > (SELECT ... FROM avg_count) ORDER BY ....",
         "```sql\nWITH attr_counts AS (SELECT attribute, COUNT(*) AS digimon_count FROM digimon WHERE attribute IS NOT NULL GROUP BY attribute), avg_count AS (SELECT AVG(digimon_count) AS avg_n FROM attr_counts) SELECT attribute, digimon_count FROM attr_counts WHERE digimon_count > (SELECT avg_n FROM avg_count) ORDER BY digimon_count DESC, attribute\n```"
       ],
       "xp": 18
@@ -57,7 +57,7 @@
       "orderMatters": true,
       "hints": [
         "Do the grouping, counting, averaging, and the at-least-30 cut all inside the CTE with GROUP BY type HAVING COUNT(*) >= 30; wrap the average in ROUND(AVG(release_year), 1) for one decimal place.",
-        "WITH type_stats AS (SELECT type, COUNT(*) AS digimon_count, ROUND(AVG(release_year), 1) AS avg_year FROM digimon WHERE type IS NOT NULL GROUP BY type HAVING COUNT(*) >= 30) SELECT type, digimon_count, avg_year FROM type_stats ORDER BY digimon_count DESC, type.",
+        "WITH type_stats AS (SELECT type, COUNT(*) AS digimon_count, ROUND(AVG(...), 1) AS avg_year FROM digimon WHERE ... GROUP BY ... HAVING COUNT(*) >= ...) SELECT type, digimon_count, avg_year FROM type_stats ORDER BY ....",
         "```sql\nWITH type_stats AS (SELECT type, COUNT(*) AS digimon_count, ROUND(AVG(release_year), 1) AS avg_year FROM digimon WHERE type IS NOT NULL GROUP BY type HAVING COUNT(*) >= 30) SELECT type, digimon_count, avg_year FROM type_stats ORDER BY digimon_count DESC, type\n```"
       ],
       "xp": 19
@@ -69,7 +69,7 @@
       "orderMatters": true,
       "hints": [
         "Two CTEs: vaccine_mon restricts digimon to the Vaccine attribute, and evo_counts joins it to evolutions and groups by name so COUNT(DISTINCT e.to_id) is each hub's distinct-form count — filter that with HAVING COUNT(DISTINCT e.to_id) >= 60.",
-        "WITH vaccine_mon AS (SELECT id, name FROM digimon WHERE attribute = 'Vaccine'), evo_counts AS (SELECT v.name, COUNT(DISTINCT e.to_id) AS form_count FROM vaccine_mon v JOIN evolutions e ON v.id = e.from_id GROUP BY v.name HAVING COUNT(DISTINCT e.to_id) >= 60) SELECT name, form_count FROM evo_counts ORDER BY form_count DESC, name.",
+        "WITH vaccine_mon AS (SELECT id, name FROM digimon WHERE ...), evo_counts AS (SELECT v.name, COUNT(DISTINCT ...) AS form_count FROM vaccine_mon v JOIN evolutions e ON ... GROUP BY ... HAVING COUNT(DISTINCT ...) >= ...) SELECT name, form_count FROM evo_counts ORDER BY ....",
         "```sql\nWITH vaccine_mon AS (SELECT id, name FROM digimon WHERE attribute = 'Vaccine'), evo_counts AS (SELECT v.name, COUNT(DISTINCT e.to_id) AS form_count FROM vaccine_mon v JOIN evolutions e ON v.id = e.from_id GROUP BY v.name HAVING COUNT(DISTINCT e.to_id) >= 60) SELECT name, form_count FROM evo_counts ORDER BY form_count DESC, name\n```"
       ],
       "xp": 20
