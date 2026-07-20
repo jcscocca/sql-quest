@@ -193,3 +193,33 @@ test('seeded two-world collection groups by world section', async ({ page }) => 
   await expect(page.locator('.tile-sprite img').first()).toBeVisible()
   await expect(page.locator('.tile-sprite img[src*="/sprites/pokemon/"]')).toHaveCount(1)
 })
+
+test('free roam opens a skill whose prerequisites are unmet', async ({ page }) => {
+  await page.addInitScript(() => {
+    const req = indexedDB.open('keyval-store')
+    req.onupgradeneeded = () => req.result.createObjectStore('keyval')
+    req.onsuccess = () => {
+      const tx = req.result.transaction('keyval', 'readwrite')
+      tx.objectStore('keyval').put(
+        {
+          version: 1,
+          xp: 0,
+          streak: { count: 0, lastDay: '' },
+          skills: {},
+          collection: [],
+          badges: [],
+          unlockAll: true,
+        },
+        'sql-quest-progress',
+      )
+    }
+  })
+  await page.goto('/')
+  await page.getByRole('button', { name: /Free roam: on/ }).click({ trial: true })
+  const roamed = page.getByRole('button', { name: /Recursive CTEs/ })
+  await expect(roamed).toHaveClass(/locked/)
+  await expect(roamed).toContainText('🔓')
+  await roamed.click()
+  await expect(page.getByRole('heading', { name: 'Recursive CTEs' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Start exercises' })).toBeVisible()
+})

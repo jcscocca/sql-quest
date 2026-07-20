@@ -47,6 +47,7 @@ export function HomeScreen({ curriculum, onOpenSkill, onOpenCollection, reviewCo
           <button
             onClick={() => useProgress.getState().setUnlockAll(!progress.unlockAll)}
             title="Open every skill regardless of prerequisites"
+            aria-pressed={progress.unlockAll}
           >
             {progress.unlockAll ? '🔓 Free roam: on' : '🔒 Free roam: off'}
           </button>

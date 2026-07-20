@@ -44,3 +44,8 @@ non-commercial use.
 
 Stored in IndexedDB (no accounts). Export/Import buttons on the home screen
 back up progress as JSON.
+
+**Free roam** — a header toggle that opens every skill regardless of prerequisites, for
+practice outside the progression order. Off by default. It only changes what you can open:
+anything you actually solve in a roamed skill still earns XP, can complete the node, and
+enters the Daily Review rotation exactly as it would in order.
