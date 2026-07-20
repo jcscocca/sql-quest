@@ -58,16 +58,16 @@ Each skill node: short concept intro with a runnable example → 6–10 exercise
 
 ### Worlds (Stage 3 mapping finalized 2026-07-19)
 
-Datasets are "worlds": each region introduces one, and access is gated purely by skill unlock edges (the world panel on Home is informational — skills are the gate). Digimon is a candidate later world (same builder pattern).
+Datasets are "worlds": each region introduces one, and access is gated purely by skill unlock edges (the world panel on Home is informational — skills are the gate). Digimon was a candidate later world (same builder pattern) — it replaced Movies below on 2026-07-19 (world-swap).
 
 | World | Region | Source | Tables | Entity (catching) |
 |---|---|---|---|---|
 | Pokémon | Foundations (live) | PokéAPI CSVs | pokemon; + `type_matchups` added in Stage 3 for joins | pokemon.name |
 | Yu-Gi-Oh | Shaping + Combining | YGOPRODeck static card dump | cards, card_sets, banlist | cards.name |
-| Movies | Analyst Power | MovieLens ml-latest-small | movies, ratings, tags | movies.title |
+| Digimon | Analyst Power (cte, window-ranking) + Boss Arena | DAPI (digi-api.com) | digimon; evolutions | digimon.name / attribute |
 | Seattle 311 | Analyst Power + Boss Arenas | Seattle SODA CSV export | requests | none (no catching civic complaints) |
 
-Regions may use ANY earlier-unlocked world in exercises (e.g., Combining self-joins on pokemon.evolves_from; Analyst Power recursive CTEs on evolution chains). `entity` gains an optional `labelColumn` (pokemon: type1; yugioh: card type; movies: genre) so the collection page can tile any world; the collection groups by world. Harness collectible checks resolve against each world's declared entity rather than a hardcoded table.
+Regions may use ANY earlier-unlocked world in exercises (e.g., Combining self-joins on pokemon.evolves_from; Analyst Power recursive CTEs on evolution chains). `entity` gains an optional `labelColumn` (pokemon: type1; yugioh: card type; digimon: attribute) so the collection page can tile any world; the collection groups by world. Harness collectible checks resolve against each world's declared entity rather than a hardcoded table.
 
 ## Architecture
 
@@ -89,7 +89,7 @@ Pick node → lazy-load world Parquet into DuckDB → render exercise → **Run*
 
 ## Content pipeline (repo scripts, run in Claude Code sessions)
 
-1. **Dataset builders** — one script per world: PokéAPI, YGOPRODeck, Socrata export for civic; the exact movies/music source (TMDB, MusicBrainz, or similar free dump) gets chosen when that world is built in Stage 3. Output Parquet + `schema.json`. Built datasets are committed for reproducibility.
+1. **Dataset builders** — one script per world: PokéAPI, YGOPRODeck, Socrata export for civic; the exact movies/music source (TMDB, MusicBrainz, or similar free dump) gets chosen when that world is built in Stage 3 (Stage 3 ultimately built Digimon via DAPI instead of a movies/music world — world-swap, 2026-07-19). Output Parquet + `schema.json`. Built datasets are committed for reproducibility.
 2. **Curriculum skeleton** — `skills.json` drafted by hand (Claude drafts, Jacob reviews once). Pedagogy order is deliberate, not generated.
 3. **Exercise generation** — per skill × world, Claude authoring sessions generate banks in batches: real-question prompts, reference SQL, hints, collectible awards. Jacob spot-reviews samples, not every item. Exercises whose answer is a computed decimal must specify the rounding in the prompt and apply it in the reference SQL (the comparator only tolerates representation noise, not rounding differences).
 4. **Validation harness** — Node script: loads every world into DuckDB, runs every reference SQL (must succeed, non-empty, deterministic), verifies hint snippets parse and collectible IDs exist. Gates all content changes.
@@ -125,7 +125,7 @@ Header (streak · XP · collection count) / Daily Review callout with rusty-skil
 
 1. **Stage 1 (MVP)**: Pokémon world + Foundations region, full exercise loop with results-diff, hints, XP/streak, IndexedDB progress. No review scheduler yet.
 2. **Stage 2**: mastery decay + Daily Review (SM-2-lite mechanics above); collection page + badges with capped dynamic catching; node-complete moment with lesson wrap-ups (deferred from Stage 1; `lesson.wrapUp` authored for all 5 Foundations skills); Foundations bank top-up to 6–8 exercises per skill via authoring sessions through the validation harness. Progress schema stays version 1 — all new fields additive with defaults so Stage 1 saves survive untouched.
-3. **Stage 3**: all remaining regions and worlds. Curriculum: **Shaping** (group-by, having, case-when, string-functions, null-handling — Pokémon + Yu-Gi-Oh), **Combining** (inner-join, left-join, self-join, set-operations, subqueries, correlated-subqueries — Yu-Gi-Oh + Pokémon), **Analyst Power** (cte, window-ranking, window-offsets, window-frames, recursive-cte — Movies + Seattle 311 + Pokémon evolution chains), **Boss Arenas** (three arena skills, one per new world; 4–6 multi-step business questions each, standard exercise mechanics — no new app machinery). Each skill: lesson intro + example + wrapUp, 6-exercise bank through the harness. App work: Home active-world panel, collection page world grouping via entity.labelColumn, harness generalization. First skill of each region requires the prior region's final skills (unlock edges in skills.json).
+3. **Stage 3**: all remaining regions and worlds. Curriculum: **Shaping** (group-by, having, case-when, string-functions, null-handling — Pokémon + Yu-Gi-Oh), **Combining** (inner-join, left-join, self-join, set-operations, subqueries, correlated-subqueries — Yu-Gi-Oh + Pokémon), **Analyst Power** (cte, window-ranking, window-offsets, window-frames, recursive-cte — Movies (replaced by Digimon, world-swap 2026-07-19) + Seattle 311 + Pokémon evolution chains), **Boss Arenas** (three arena skills, one per new world; 4–6 multi-step business questions each, standard exercise mechanics — no new app machinery). Each skill: lesson intro + example + wrapUp, 6-exercise bank through the harness. App work: Home active-world panel, collection page world grouping via entity.labelColumn, harness generalization. First skill of each region requires the prior region's final skills (unlock edges in skills.json).
 4. **Later (optional)**: "Ask Claude about my query" button (bring-your-own-key, style feedback on correct-but-clunky SQL) — additive, no architecture change.
 
 ## Out of scope

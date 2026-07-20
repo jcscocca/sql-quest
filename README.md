@@ -4,7 +4,7 @@ A single-player SQL trainer: Duolingo-style skill tree over a real SQL engine
 (DuckDB-WASM, fully in-browser) querying datasets worth caring about. The
 142-exercise curriculum spans five regions — Foundations, Shaping, Combining,
 Analyst Power, and Boss Arenas — across four worlds (Pokémon, Yu-Gi-Oh!,
-Movies, Seattle 311), from SELECT basics through joins, subqueries, and
+Digimon, Seattle 311), from SELECT basics through joins, subqueries, and
 window functions to multi-step Boss Arena challenges. Daily Review resurfaces
 rusty skills on an expanding schedule, and correct queries catch the entities
 they return into a collection you build across every world. See
