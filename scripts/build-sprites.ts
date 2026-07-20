@@ -41,6 +41,21 @@ async function fetchImage(url: string): Promise<Buffer | null> {
   }
 }
 
+// 404 => null (a recorded miss); network/server errors retry then throw BLOCKED.
+async function fetchJson(url: string): Promise<unknown | null> {
+  for (let attempt = 1; ; attempt++) {
+    try {
+      const res = await fetch(url)
+      if (res.status === 404) return null
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      return await res.json()
+    } catch (err) {
+      if (attempt === 3) throw new Error(`BLOCKED: ${url} failed after 3 attempts: ${err}`)
+      await sleep(1000 * attempt)
+    }
+  }
+}
+
 async function catchable(world: string, entityTable: string, entityColumn: string): Promise<Set<string>> {
   const nameReader = await conn.runAndReadAll(`SELECT DISTINCT ${entityColumn} FROM ${entityTable}`)
   const names = new Set(nameReader.getRows().map(r => String(r[0])))
@@ -58,7 +73,7 @@ async function catchable(world: string, entityTable: string, entityColumn: strin
 }
 
 function writeManifest(world: SpriteWorld, entities: Map<string, string>): void {
-  const sorted = Object.fromEntries([...entities.entries()].sort(([a], [b]) => a.localeCompare(b)))
+  const sorted = Object.fromEntries([...entities.entries()].sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)))
   writeFileSync(`public/sprites/${world}/manifest.json`, JSON.stringify({ entities: sorted }, null, 2))
 }
 
@@ -89,6 +104,8 @@ async function buildPokemon(): Promise<BuildResult> {
     }
     entities.set(String(name), file)
   }
+  const tolerance = Math.ceil(rows.length * 0.02)
+  if (misses.length > tolerance) throw new Error(`BLOCKED: ${misses.length} pokemon sprites missing (tolerance ${tolerance}) — refusing to write a degraded manifest`)
   writeManifest('pokemon', entities)
   return { world: 'pokemon', entries: entities.size, downloaded, misses }
 }
@@ -121,6 +138,8 @@ async function buildYugioh(): Promise<BuildResult> {
     }
     entities.set(name, file)
   }
+  const tolerance = Math.ceil(wanted.size * 0.02)
+  if (misses.length > tolerance) throw new Error(`BLOCKED: ${misses.length} yugioh sprites missing (tolerance ${tolerance}) — refusing to write a degraded manifest`)
   writeManifest('yugioh', entities)
   return { world: 'yugioh', entries: entities.size, downloaded, misses }
 }
@@ -145,10 +164,14 @@ async function buildDigimon(): Promise<BuildResult> {
       let imageUrl: string | undefined
       const cached = `data-src/digimon/detail/${id}.json`
       if (existsSync(cached)) {
-        imageUrl = (JSON.parse(readFileSync(cached, 'utf8')) as { images?: { href: string }[] }).images?.[0]?.href
+        try {
+          imageUrl = (JSON.parse(readFileSync(cached, 'utf8')) as { images?: { href: string }[] }).images?.[0]?.href
+        } catch (err) {
+          throw new Error(`corrupt cache file ${cached} — delete it and re-run to re-fetch (${err})`)
+        }
       } else {
-        const res = await fetch(`https://digi-api.com/api/v1/digimon/${id}`)
-        if (res.ok) imageUrl = ((await res.json()) as { images?: { href: string }[] }).images?.[0]?.href
+        const detail = (await fetchJson(`https://digi-api.com/api/v1/digimon/${id}`)) as { images?: { href: string }[] } | null
+        imageUrl = detail?.images?.[0]?.href
         await sleep(200)
       }
       const buf = imageUrl ? await fetchImage(encodeURI(imageUrl)) : null
@@ -162,6 +185,8 @@ async function buildDigimon(): Promise<BuildResult> {
     }
     entities.set(name, file)
   }
+  const tolerance = Math.ceil(wanted.size * 0.02)
+  if (misses.length > tolerance) throw new Error(`BLOCKED: ${misses.length} digimon sprites missing (tolerance ${tolerance}) — refusing to write a degraded manifest`)
   writeManifest('digimon', entities)
   return { world: 'digimon', entries: entities.size, downloaded, misses }
 }
