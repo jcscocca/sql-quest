@@ -67,7 +67,7 @@ button:disabled { opacity: 0.45; cursor: default; }
 }
 .node.done { border-color: var(--green); }
 .node.open { border-color: var(--accent); }
-.node.locked { border-style: dashed; color: var(--muted); }
+.node.locked:not(:disabled) { border-style: dashed; color: var(--muted); }
 .node .badge { font-size: 16px; }
 .node .count { color: var(--muted); font-size: 12px; }
 
