@@ -251,7 +251,7 @@ export function ExerciseScreen({ skill, bank, schema, region, onBack }: {
                     return (
                       <span key={n}>
                         {i > 0 && ', '}
-                        {url && <img src={url} alt="" className={url.endsWith('.png') ? 'pixelated' : undefined} />}
+                        {url && <img src={url} alt="" className={url.endsWith('.png') ? 'pixelated' : undefined} onError={e => { e.currentTarget.style.display = 'none' }} />}
                         {n}
                       </span>
                     )

@@ -1,5 +1,6 @@
 import type { QueryResult } from './compare'
 
+// matching semantics mirrored by build-sprites.ts catchable() and validate-content.ts catchableByWorld — keep in lockstep
 export function pickCatches(
   result: QueryResult,
   worldNames: Set<string>,

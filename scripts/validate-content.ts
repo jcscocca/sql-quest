@@ -115,7 +115,7 @@ for (const w of Object.keys(catchableByWorld)) {
   }
   const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as { entities: Record<string, string> }
   for (const name of catchableByWorld[w])
-    if (!manifest.entities[name])
+    if (!manifest.entities[name] || !existsSync(`public/sprites/${w}/${manifest.entities[name]}`))
       failures.push(`${w}: catchable entity "${name}" has no sprite — run: npm run build:sprites ${w}`)
 }
 

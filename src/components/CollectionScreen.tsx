@@ -59,7 +59,7 @@ export function CollectionScreen({ curriculum, worldNames, onBack }: {
                 const url = spriteUrl(world, manifests[world] ?? null, entry.name)
                 return url ? (
                   <div key={`${entry.world}:${entry.name}`} className={`tile tile-sprite type-${slugify(entry.label)}`}>
-                    <img src={url} alt="" loading="lazy" className={url.endsWith('.png') ? 'pixelated' : undefined} />
+                    <img src={url} alt="" loading="lazy" className={url.endsWith('.png') ? 'pixelated' : undefined} onError={e => { e.currentTarget.style.display = 'none' }} />
                     <span className="tile-name">{entry.name}</span>
                   </div>
                 ) : (
