@@ -276,7 +276,7 @@
         },
         {
           "id": "arena-digimon",
-          "name": "Digimon Arena",
+          "name": "Arena: Tamer Analytics",
           "world": "digimon",
           "requires": ["recursive-cte", "window-frames", "window-offsets"],
           "lesson": {
