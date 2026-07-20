@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { DuckDBInstance } from '@duckdb/node-api'
 import { compareResults, type QueryResult } from '../src/lib/compare'
 import type { Curriculum, ExerciseBank, WorldSchema } from '../src/lib/content'
@@ -17,6 +17,8 @@ const conn = await db.connect()
 
 const worlds = new Set(skills.map(s => s.world))
 const worldSchemas: Record<string, WorldSchema> = {}
+const entityNames: Record<string, Set<string>> = {}
+const catchableByWorld: Record<string, Set<string>> = {}
 for (const w of worlds) {
   const schema = JSON.parse(readFileSync(`public/worlds/${w}/schema.json`, 'utf8')) as WorldSchema
   worldSchemas[w] = schema
@@ -25,6 +27,9 @@ for (const w of worlds) {
   if (schema.entity) {
     try {
       await conn.run(`SELECT ${schema.entity.column} FROM ${schema.entity.table} LIMIT 1`)
+      const nameReader = await conn.runAndReadAll(`SELECT DISTINCT ${schema.entity.column} FROM ${schema.entity.table}`)
+      entityNames[w] = new Set(nameReader.getRows().map(r => String(r[0])))
+      catchableByWorld[w] = new Set()
     } catch {
       failures.push(`world ${w}: entity ${schema.entity.table}.${schema.entity.column} is not queryable`)
     }
@@ -66,6 +71,10 @@ for (const skill of skills) {
         failures.push(`${tag}: reference query returns no rows`)
         continue
       }
+      const names = entityNames[skill.world]
+      if (names)
+        for (const row of a.rows)
+          for (const cell of row) if (typeof cell === 'string' && names.has(cell)) catchableByWorld[skill.world].add(cell)
       const b = await run(ex.referenceSql)
       if (!compareResults(a, b, { orderMatters: ex.orderMatters }).equal)
         failures.push(`${tag}: reference query is nondeterministic — add a tiebreaker to ORDER BY`)
@@ -84,6 +93,7 @@ for (const skill of skills) {
           for (const c of ex.collectibles ?? []) {
             const hit = await run(`SELECT 1 FROM ${entity.table} WHERE ${entity.column} = '${c.replace(/'/g, "''")}'`)
             if (hit.rows.length === 0) failures.push(`${tag}: collectible "${c}" not found in world`)
+            catchableByWorld[skill.world].add(c)
           }
         }
       }
@@ -95,6 +105,18 @@ for (const skill of skills) {
 
 for (const [id, banks] of idBanks)
   if (banks.length > 1) failures.push(`duplicate exercise id "${id}" in banks ${banks.join(' and ')}`)
+
+for (const w of Object.keys(catchableByWorld)) {
+  const manifestPath = `public/sprites/${w}/manifest.json`
+  if (!existsSync(manifestPath)) {
+    console.warn(`${w}: no sprite manifest, skipping sprite coverage check`)
+    continue
+  }
+  const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as { entities: Record<string, string> }
+  for (const name of catchableByWorld[w])
+    if (!manifest.entities[name])
+      failures.push(`${w}: catchable entity "${name}" has no sprite — run: npm run build:sprites ${w}`)
+}
 
 if (failures.length > 0) {
   console.error(`✗ ${failures.length} problem(s):`)
