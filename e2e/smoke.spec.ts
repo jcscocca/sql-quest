@@ -159,6 +159,7 @@ test('seeded Foundations+Shaping unlocks Combining, world panel shows Yu-Gi-Oh a
   await page.keyboard.type(sql)
   await page.getByRole('button', { name: 'Submit' }).click()
   await expect(page.getByText(/✓ Correct!/)).toBeVisible({ timeout: 30_000 })
+  await expect(page.locator('.catch-chip img').first()).toBeVisible()
   await expect(page.getByText(/Caught: Red-Eyes Black Dragon!/)).toBeVisible()
 })
 
@@ -189,4 +190,6 @@ test('seeded two-world collection groups by world section', async ({ page }) => 
   await expect(page.getByRole('heading', { name: 'Pokémon', level: 3 })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Yu-Gi-Oh!', level: 3 })).toBeVisible()
   await expect(page.locator('.tile')).toHaveCount(2)
+  await expect(page.locator('.tile-sprite img').first()).toBeVisible()
+  await expect(page.locator('.tile-sprite img[src*="/sprites/pokemon/"]')).toHaveCount(1)
 })
