@@ -41,3 +41,9 @@ test('duplicate cells produce one catch', () => {
   const out = pickCatches(res([['mew'], ['mew'], ['mew']]), names, new Set(), [], 3, zero)
   expect(out).toEqual(['mew'])
 })
+
+test('defaults to a single random catch when cap is omitted', () => {
+  const out = pickCatches(res([['pikachu'], ['mew'], ['eevee'], ['ditto']]), names, new Set(), [])
+  expect(out.length).toBe(1)
+  expect(names.has(out[0])).toBe(true)
+})

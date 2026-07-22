@@ -6,7 +6,7 @@ export function pickCatches(
   worldNames: Set<string>,
   owned: Set<string>,
   authored: string[] = [],
-  cap = 3,
+  cap = 1,
   rng: () => number = Math.random,
 ): string[] {
   const seen = new Set<string>()
