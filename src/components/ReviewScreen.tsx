@@ -1,9 +1,11 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Editor } from './Editor'
 import { ResultGrid } from './ResultGrid'
-import { compareResults, type QueryResult } from '../lib/compare'
+import { type QueryResult } from '../lib/compare'
 import { loadWorld, runQuery } from '../lib/duckdb'
 import { translateError, TrainerError } from '../lib/errors'
+import { getTrack } from '../lib/tracks/registry'
+import type { Track } from '../lib/tracks/types'
 import { useProgress } from '../lib/progress'
 import type { ReviewItem } from '../lib/review'
 import type { Curriculum, WorldSchema } from '../lib/content'
@@ -39,9 +41,15 @@ export function ReviewScreen({ items, schemas, curriculum, onDone }: {
   const allSkills = useMemo(() => curriculum.regions.flatMap(r => r.skills), [curriculum])
   const world = allSkills.find(s => s.id === item?.skillId)?.world ?? 'pokemon'
   const schema = schemas[world]
+  const trackRef = useRef<Track | null>(null)
+  if (!trackRef.current) {
+    const sk = allSkills.find(s => s.id === item?.skillId)
+    if (sk) trackRef.current = getTrack(sk, { runQuery, loadWorld })
+  }
+  const track = trackRef.current
 
   useEffect(() => {
-    loadWorld(schema.world, schema.tables.map(t => t.name))
+    track?.prepare(allSkills.find(s => s.id === item?.skillId), schema)
       .then(() => setEngineReady(true))
       .catch(e => setFeedback({ kind: 'error', friendly: String(e), raw: '' }))
   }, [schema])
@@ -60,7 +68,7 @@ export function ReviewScreen({ items, schemas, curriculum, onDone }: {
     setBusy(true)
     setFeedback(null)
     try {
-      setResult(await runQuery(sqlText))
+      setResult(await track!.run(sqlText))
     } catch (e) {
       showError(e)
     } finally {
@@ -72,11 +80,10 @@ export function ReviewScreen({ items, schemas, curriculum, onDone }: {
     setBusy(true)
     setFeedback(null)
     try {
-      const user = await runQuery(sqlText)
+      const user = await track!.run(sqlText)
       setResult(user)
-      const ref = await runQuery(item.exercise.referenceSql)
-      const outcome = compareResults(user, ref, { orderMatters: item.exercise.orderMatters })
-      if (outcome.equal) {
+      const outcome = await track!.check(user, item.exercise)
+      if (outcome.correct) {
         const gained = useProgress.getState().recordReviewSolve(hintsShown)
         setXpEarned(x => x + gained)
         setFeedback({ kind: 'success', gained })

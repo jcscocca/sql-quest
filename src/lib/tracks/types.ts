@@ -18,7 +18,7 @@ export interface RewardContext {
 export interface Track {
   id: string
   /** Load any engine state the exercises in this skill need. SQL: load the world's tables. */
-  prepare(skill: Skill, schema: WorldSchema | undefined): Promise<void>
+  prepare(skill: Skill | undefined, schema: WorldSchema | undefined): Promise<void>
   /** Run the learner's submission and return the result the UI grid renders. */
   run(submission: string): Promise<QueryResult>
   /** Judge a run result against the exercise. SQL: run the reference query and diff. */

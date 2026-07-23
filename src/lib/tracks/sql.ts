@@ -26,7 +26,7 @@ export function createSqlTrack(deps: SqlDeps): Track {
   return {
     id: 'sql',
 
-    async prepare(_skill: Skill, s: WorldSchema | undefined) {
+    async prepare(_skill: Skill | undefined, s: WorldSchema | undefined) {
       schema = s
       worldNames = null
       if (schema) await deps.loadWorld(schema.world, schema.tables.map(t => t.name))
