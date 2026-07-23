@@ -1,0 +1,113 @@
+{
+  "skillId": "review-boss",
+  "exercises": [
+    {
+      "type": "choice",
+      "id": "rb1",
+      "xp": 12,
+      "prompt": "Buenas noches",
+      "promptLang": "es",
+      "choices": ["Good night", "Good morning", "Goodbye", "Thank you"],
+      "answer": "Good night"
+    },
+    {
+      "type": "match",
+      "id": "rb2",
+      "xp": 12,
+      "pairs": [
+        { "es": "seis", "en": "six" },
+        { "es": "siete", "en": "seven" },
+        { "es": "ocho", "en": "eight" },
+        { "es": "nueve", "en": "nine" }
+      ]
+    },
+    {
+      "type": "build",
+      "id": "rb3",
+      "xp": 14,
+      "prompt": "the black dog",
+      "answer": "el perro negro",
+      "tokens": ["el", "perro", "negro", "gato"]
+    },
+    {
+      "type": "type",
+      "id": "rb4",
+      "xp": 14,
+      "prompt": "Type “thank you very much” in Spanish.",
+      "promptLang": "en",
+      "answerLang": "es",
+      "accept": ["muchas gracias"]
+    },
+    {
+      "type": "listen",
+      "id": "rb5",
+      "xp": 15,
+      "audio": "Tengo un gato.",
+      "accept": ["tengo un gato"],
+      "translation": "I have a cat."
+    },
+    {
+      "type": "choice",
+      "id": "rb6",
+      "xp": 12,
+      "prompt": "Hablo español.",
+      "promptLang": "es",
+      "choices": ["I speak Spanish.", "I want Spanish.", "I live in Spain.", "I am Spanish."],
+      "answer": "I speak Spanish."
+    },
+    {
+      "type": "build",
+      "id": "rb7",
+      "xp": 15,
+      "prompt": "I want water, please.",
+      "answer": "Quiero agua, por favor",
+      "tokens": ["Quiero", "agua", "por", "favor", "gracias"]
+    },
+    {
+      "type": "type",
+      "id": "rb8",
+      "xp": 14,
+      "prompt": "la familia",
+      "promptLang": "es",
+      "answerLang": "en",
+      "accept": ["the family", "family"]
+    },
+    {
+      "type": "choice",
+      "id": "rb9",
+      "xp": 12,
+      "prompt": "Estoy bien.",
+      "promptLang": "es",
+      "choices": ["I am well.", "I am hungry.", "I have a dog.", "I am from Spain."],
+      "answer": "I am well."
+    },
+    {
+      "type": "match",
+      "id": "rb10",
+      "xp": 12,
+      "pairs": [
+        { "es": "rojo", "en": "red" },
+        { "es": "verde", "en": "green" },
+        { "es": "azul", "en": "blue" },
+        { "es": "amarillo", "en": "yellow" }
+      ]
+    },
+    {
+      "type": "listen",
+      "id": "rb11",
+      "xp": 15,
+      "audio": "Buenos días, ¿cómo estás?",
+      "accept": ["buenos días ¿cómo estás?", "buenos días cómo estás", "buenos dias como estas"],
+      "translation": "Good morning, how are you?"
+    },
+    {
+      "type": "choice",
+      "id": "rb12",
+      "xp": 12,
+      "prompt": "¿Cuántos años tienes?",
+      "promptLang": "es",
+      "choices": ["How old are you?", "How are you?", "What is your name?", "Where do you live?"],
+      "answer": "How old are you?"
+    }
+  ]
+}

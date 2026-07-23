@@ -1,0 +1,93 @@
+{
+  "skillId": "colors",
+  "exercises": [
+    {
+      "type": "match",
+      "id": "co1",
+      "xp": 10,
+      "pairs": [
+        { "es": "rojo", "en": "red" },
+        { "es": "azul", "en": "blue" },
+        { "es": "verde", "en": "green" },
+        { "es": "amarillo", "en": "yellow" }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "co2",
+      "xp": 10,
+      "prompt": "negro",
+      "promptLang": "es",
+      "choices": ["black", "white", "blue", "brown"],
+      "answer": "black",
+      "teach": [{ "es": "negro", "en": "black", "pos": "adjective" }]
+    },
+    {
+      "type": "choice",
+      "id": "co3",
+      "xp": 10,
+      "prompt": "blanco",
+      "promptLang": "es",
+      "choices": ["white", "black", "yellow", "green"],
+      "answer": "white",
+      "teach": [{ "es": "blanco", "en": "white", "pos": "adjective" }]
+    },
+    {
+      "type": "type",
+      "id": "co4",
+      "xp": 12,
+      "prompt": "Type “red” in Spanish.",
+      "promptLang": "en",
+      "answerLang": "es",
+      "accept": ["rojo"],
+      "teach": [{ "es": "rojo", "en": "red", "pos": "adjective" }]
+    },
+    {
+      "type": "type",
+      "id": "co5",
+      "xp": 12,
+      "prompt": "verde",
+      "promptLang": "es",
+      "answerLang": "en",
+      "accept": ["green"],
+      "teach": [{ "es": "verde", "en": "green", "pos": "adjective" }]
+    },
+    {
+      "type": "build",
+      "id": "co6",
+      "xp": 12,
+      "prompt": "red and blue",
+      "answer": "rojo y azul",
+      "tokens": ["rojo", "y", "azul", "verde"],
+      "teach": [{ "es": "azul", "en": "blue", "pos": "adjective" }]
+    },
+    {
+      "type": "listen",
+      "id": "co7",
+      "xp": 14,
+      "audio": "verde, blanco y rojo",
+      "accept": ["verde blanco y rojo", "verde, blanco y rojo"],
+      "translation": "green, white and red"
+    },
+    {
+      "type": "choice",
+      "id": "co8",
+      "xp": 10,
+      "prompt": "How do you say “yellow”?",
+      "promptLang": "en",
+      "choices": ["amarillo", "azul", "negro", "rojo"],
+      "answer": "amarillo",
+      "teach": [{ "es": "amarillo", "en": "yellow", "pos": "adjective" }]
+    },
+    {
+      "type": "type",
+      "id": "co9",
+      "xp": 12,
+      "prompt": "Type “blue” in Spanish.",
+      "promptLang": "en",
+      "answerLang": "es",
+      "accept": ["azul"],
+      "teach": [{ "es": "azul", "en": "blue", "pos": "adjective" }]
+    }
+  ]
+}

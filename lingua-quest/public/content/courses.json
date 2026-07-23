@@ -1,0 +1,12 @@
+{
+  "courses": [
+    {
+      "id": "es",
+      "name": "Spanish",
+      "nativeName": "Español",
+      "flag": "🇪🇸",
+      "voice": "es-ES",
+      "blurb": "Start speaking Spanish — greetings, numbers, food, family and your first sentences."
+    }
+  ]
+}

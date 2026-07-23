@@ -1,0 +1,104 @@
+{
+  "skillId": "ser-estar",
+  "exercises": [
+    {
+      "type": "choice",
+      "id": "se1",
+      "xp": 10,
+      "prompt": "Soy Ana.",
+      "promptLang": "es",
+      "choices": ["I am Ana.", "You are Ana.", "She is Ana.", "I have Ana."],
+      "answer": "I am Ana.",
+      "explanation": "soy = I am (from ser), used for identity.",
+      "teach": [{ "es": "soy", "en": "I am (ser)", "pos": "verb" }]
+    },
+    {
+      "type": "choice",
+      "id": "se2",
+      "xp": 10,
+      "prompt": "Estoy bien.",
+      "promptLang": "es",
+      "choices": ["I am well.", "I am Ana.", "You are well.", "I am a boy."],
+      "answer": "I am well.",
+      "explanation": "estoy = I am (from estar), used for states like feeling well.",
+      "teach": [{ "es": "estoy", "en": "I am (estar)", "pos": "verb" }]
+    },
+    {
+      "type": "match",
+      "id": "se3",
+      "xp": 12,
+      "pairs": [
+        { "es": "soy Ana", "en": "I am Ana" },
+        { "es": "eres mi amigo", "en": "you are my friend" },
+        { "es": "es un gato", "en": "it is a cat" },
+        { "es": "estoy bien", "en": "I am well" }
+      ]
+    },
+    {
+      "type": "type",
+      "id": "se4",
+      "xp": 12,
+      "prompt": "Type “I am well” in Spanish.",
+      "promptLang": "en",
+      "answerLang": "es",
+      "accept": ["estoy bien"],
+      "hints": ["Feeling well is a state → use estar."],
+      "teach": [{ "es": "estoy bien", "en": "I am well", "pos": "phrase" }]
+    },
+    {
+      "type": "choice",
+      "id": "se5",
+      "xp": 10,
+      "prompt": "¿___ española? (Are you Spanish?)",
+      "promptLang": "es",
+      "choices": ["Eres", "Estás", "Soy", "Es"],
+      "answer": "Eres",
+      "explanation": "Nationality is identity → ser. eres = you are.",
+      "teach": [{ "es": "eres", "en": "you are (ser)", "pos": "verb" }]
+    },
+    {
+      "type": "build",
+      "id": "se6",
+      "xp": 14,
+      "prompt": "She is my friend.",
+      "answer": "Ella es mi amiga",
+      "tokens": ["Ella", "es", "mi", "amiga", "soy"],
+      "explanation": "es = he/she/it is (ser).",
+      "teach": [{ "es": "es", "en": "he/she/it is (ser)", "pos": "verb" }]
+    },
+    {
+      "type": "listen",
+      "id": "se7",
+      "xp": 14,
+      "audio": "Yo soy de España.",
+      "accept": ["yo soy de españa", "soy de españa"],
+      "translation": "I am from Spain.",
+      "teach": [
+        { "es": "de", "en": "of / from", "pos": "preposition" },
+        { "es": "España", "en": "Spain", "pos": "noun" }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "se8",
+      "xp": 10,
+      "prompt": "Estoy en casa.",
+      "promptLang": "es",
+      "choices": ["I am at home.", "I am a house.", "I have a house.", "You are home."],
+      "answer": "I am at home.",
+      "explanation": "Location uses estar: estoy en casa. en = in/at, la casa = house.",
+      "teach": [{ "es": "la casa", "en": "house / home", "pos": "noun" }]
+    },
+    {
+      "type": "choice",
+      "id": "se9",
+      "xp": 10,
+      "prompt": "To say WHERE something is, which verb do you use?",
+      "promptLang": "en",
+      "choices": ["estar", "ser", "tener", "querer"],
+      "answer": "estar",
+      "explanation": "estar → location and states. ser → identity and traits.",
+      "teach": [{ "es": "está", "en": "he/she/it is (estar)", "pos": "verb" }]
+    }
+  ]
+}

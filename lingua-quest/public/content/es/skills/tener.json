@@ -1,0 +1,98 @@
+{
+  "skillId": "tener",
+  "exercises": [
+    {
+      "type": "choice",
+      "id": "t1",
+      "xp": 10,
+      "prompt": "Tengo un perro.",
+      "promptLang": "es",
+      "choices": ["I have a dog.", "You have a dog.", "I am a dog.", "I want a dog."],
+      "answer": "I have a dog.",
+      "teach": [{ "es": "tengo", "en": "I have", "pos": "verb" }]
+    },
+    {
+      "type": "type",
+      "id": "t2",
+      "xp": 12,
+      "prompt": "Type “I have a cat” in Spanish.",
+      "promptLang": "en",
+      "answerLang": "es",
+      "accept": ["tengo un gato"],
+      "teach": [{ "es": "tener", "en": "to have", "pos": "verb" }]
+    },
+    {
+      "type": "match",
+      "id": "t3",
+      "xp": 12,
+      "pairs": [
+        { "es": "tengo", "en": "I have" },
+        { "es": "tienes", "en": "you have" },
+        { "es": "tiene", "en": "he/she has" },
+        { "es": "tenemos", "en": "we have" }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "t4",
+      "xp": 10,
+      "prompt": "Tengo hambre.",
+      "promptLang": "es",
+      "choices": ["I am hungry.", "I am thirsty.", "I have a dog.", "I am tired."],
+      "answer": "I am hungry.",
+      "explanation": "Spanish uses tener for hunger: literally “I have hunger”.",
+      "teach": [{ "es": "tener hambre", "en": "to be hungry", "pos": "phrase" }]
+    },
+    {
+      "type": "build",
+      "id": "t5",
+      "xp": 14,
+      "prompt": "I have two brothers.",
+      "answer": "Tengo dos hermanos",
+      "tokens": ["Tengo", "dos", "hermanos", "tienes"],
+      "teach": [{ "es": "tienes", "en": "you have", "pos": "verb" }]
+    },
+    {
+      "type": "listen",
+      "id": "t6",
+      "xp": 14,
+      "audio": "Tengo diez años.",
+      "accept": ["tengo diez años", "tengo diez anos"],
+      "translation": "I am ten years old.",
+      "explanation": "Age uses tener + años (literally “I have ten years”).",
+      "teach": [{ "es": "años", "en": "years", "pos": "noun" }]
+    },
+    {
+      "type": "choice",
+      "id": "t7",
+      "xp": 10,
+      "prompt": "¿Cuántos años tienes?",
+      "promptLang": "es",
+      "choices": ["How old are you?", "How are you?", "What is your name?", "Where are you?"],
+      "answer": "How old are you?",
+      "explanation": "Literally “How many years do you have?”",
+      "teach": [{ "es": "¿cuántos años tienes?", "en": "how old are you?", "pos": "phrase" }]
+    },
+    {
+      "type": "type",
+      "id": "t8",
+      "xp": 12,
+      "prompt": "tiene",
+      "promptLang": "es",
+      "answerLang": "en",
+      "accept": ["he has", "she has", "it has", "has", "he/she has"],
+      "teach": [{ "es": "tiene", "en": "he/she has", "pos": "verb" }]
+    },
+    {
+      "type": "choice",
+      "id": "t9",
+      "xp": 10,
+      "prompt": "Tengo sed.",
+      "promptLang": "es",
+      "choices": ["I am thirsty.", "I am hungry.", "I have a sister.", "I am well."],
+      "answer": "I am thirsty.",
+      "explanation": "tener sed = to be thirsty (“to have thirst”).",
+      "teach": [{ "es": "tener sed", "en": "to be thirsty", "pos": "phrase" }]
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "skillId": "family",
+  "exercises": [
+    {
+      "type": "match",
+      "id": "fa1",
+      "xp": 10,
+      "pairs": [
+        { "es": "madre", "en": "mother" },
+        { "es": "padre", "en": "father" },
+        { "es": "hermano", "en": "brother" },
+        { "es": "hermana", "en": "sister" }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "fa2",
+      "xp": 10,
+      "prompt": "el hijo",
+      "promptLang": "es",
+      "choices": ["the son", "the daughter", "the brother", "the father"],
+      "answer": "the son",
+      "teach": [{ "es": "el hijo", "en": "son", "pos": "noun" }]
+    },
+    {
+      "type": "choice",
+      "id": "fa3",
+      "xp": 10,
+      "prompt": "la hija",
+      "promptLang": "es",
+      "choices": ["the daughter", "the son", "the sister", "the mother"],
+      "answer": "the daughter",
+      "teach": [{ "es": "la hija", "en": "daughter", "pos": "noun" }]
+    },
+    {
+      "type": "type",
+      "id": "fa4",
+      "xp": 12,
+      "prompt": "Type “family” in Spanish.",
+      "promptLang": "en",
+      "answerLang": "es",
+      "accept": ["familia", "la familia"],
+      "teach": [{ "es": "la familia", "en": "family", "pos": "noun" }]
+    },
+    {
+      "type": "type",
+      "id": "fa5",
+      "xp": 12,
+      "prompt": "madre",
+      "promptLang": "es",
+      "answerLang": "en",
+      "accept": ["mother", "mom", "mum"],
+      "teach": [{ "es": "la madre", "en": "mother", "pos": "noun" }]
+    },
+    {
+      "type": "build",
+      "id": "fa6",
+      "xp": 14,
+      "prompt": "my mother and my father",
+      "answer": "mi madre y mi padre",
+      "tokens": ["mi", "madre", "y", "mi", "padre", "hermana"],
+      "explanation": "mi = my.",
+      "teach": [{ "es": "mi", "en": "my", "pos": "possessive" }]
+    },
+    {
+      "type": "listen",
+      "id": "fa7",
+      "xp": 14,
+      "audio": "mi hermano y mi hermana",
+      "accept": ["mi hermano y mi hermana"],
+      "translation": "my brother and my sister"
+    },
+    {
+      "type": "choice",
+      "id": "fa8",
+      "xp": 10,
+      "prompt": "How do you say “the father”?",
+      "promptLang": "en",
+      "choices": ["el padre", "la madre", "el hermano", "el hijo"],
+      "answer": "el padre",
+      "teach": [{ "es": "el padre", "en": "father", "pos": "noun" }]
+    },
+    {
+      "type": "choice",
+      "id": "fa9",
+      "xp": 10,
+      "prompt": "la hermana",
+      "promptLang": "es",
+      "choices": ["the sister", "the brother", "the daughter", "the family"],
+      "answer": "the sister",
+      "teach": [{ "es": "la hermana", "en": "sister", "pos": "noun" }]
+    }
+  ]
+}

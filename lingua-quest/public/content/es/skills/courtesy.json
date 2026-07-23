@@ -1,0 +1,102 @@
+{
+  "skillId": "courtesy",
+  "exercises": [
+    {
+      "type": "choice",
+      "id": "c1",
+      "xp": 10,
+      "prompt": "How do you say “please”?",
+      "promptLang": "en",
+      "choices": ["Por favor", "De nada", "Lo siento", "Gracias"],
+      "answer": "Por favor",
+      "teach": [{ "es": "por favor", "en": "please", "pos": "phrase" }]
+    },
+    {
+      "type": "choice",
+      "id": "c2",
+      "xp": 10,
+      "prompt": "Gracias",
+      "promptLang": "es",
+      "choices": ["Thank you", "Please", "Sorry", "Hello"],
+      "answer": "Thank you",
+      "teach": [{ "es": "gracias", "en": "thank you", "pos": "phrase" }]
+    },
+    {
+      "type": "match",
+      "id": "c3",
+      "xp": 10,
+      "pairs": [
+        { "es": "por favor", "en": "please" },
+        { "es": "gracias", "en": "thank you" },
+        { "es": "de nada", "en": "you're welcome" },
+        { "es": "lo siento", "en": "I'm sorry" }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "c4",
+      "xp": 10,
+      "prompt": "Someone says “gracias”. You reply…",
+      "promptLang": "es",
+      "speak": "Gracias",
+      "choices": ["De nada", "Por favor", "Adiós", "Sí"],
+      "answer": "De nada",
+      "explanation": "de nada = you're welcome (literally “of nothing”).",
+      "teach": [{ "es": "de nada", "en": "you're welcome", "pos": "phrase" }]
+    },
+    {
+      "type": "type",
+      "id": "c5",
+      "xp": 12,
+      "prompt": "Type “thank you very much” in Spanish.",
+      "promptLang": "en",
+      "answerLang": "es",
+      "accept": ["muchas gracias"],
+      "hints": ["muchas = many, so “many thanks”."],
+      "teach": [{ "es": "muchas gracias", "en": "thank you very much", "pos": "phrase" }]
+    },
+    {
+      "type": "build",
+      "id": "c6",
+      "xp": 12,
+      "prompt": "Water, please.",
+      "answer": "Agua, por favor",
+      "tokens": ["Agua", "por", "favor", "gracias"],
+      "explanation": "Add por favor to any request to be polite.",
+      "teach": [{ "es": "agua", "en": "water", "pos": "noun" }]
+    },
+    {
+      "type": "type",
+      "id": "c7",
+      "xp": 12,
+      "prompt": "perdón",
+      "promptLang": "es",
+      "answerLang": "en",
+      "accept": ["excuse me", "sorry", "pardon", "pardon me"],
+      "teach": [{ "es": "perdón", "en": "excuse me / sorry", "pos": "phrase" }]
+    },
+    {
+      "type": "listen",
+      "id": "c8",
+      "xp": 14,
+      "audio": "Lo siento.",
+      "accept": ["lo siento"],
+      "translation": "I'm sorry.",
+      "teach": [{ "es": "lo siento", "en": "I'm sorry", "pos": "phrase" }]
+    },
+    {
+      "type": "choice",
+      "id": "c9",
+      "xp": 10,
+      "prompt": "Which word means “yes”?",
+      "promptLang": "en",
+      "choices": ["Sí", "No", "Y", "Con"],
+      "answer": "Sí",
+      "explanation": "sí (with an accent) = yes. si (no accent) = if.",
+      "teach": [
+        { "es": "sí", "en": "yes", "pos": "adverb" },
+        { "es": "no", "en": "no", "pos": "adverb" }
+      ]
+    }
+  ]
+}

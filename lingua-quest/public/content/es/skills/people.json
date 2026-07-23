@@ -1,0 +1,101 @@
+{
+  "skillId": "people",
+  "exercises": [
+    {
+      "type": "choice",
+      "id": "p1",
+      "xp": 10,
+      "prompt": "Which pronoun means “I”?",
+      "promptLang": "en",
+      "choices": ["yo", "tú", "él", "ella"],
+      "answer": "yo",
+      "teach": [{ "es": "yo", "en": "I", "pos": "pronoun" }]
+    },
+    {
+      "type": "choice",
+      "id": "p2",
+      "xp": 10,
+      "prompt": "el hombre",
+      "promptLang": "es",
+      "choices": ["the man", "the woman", "the boy", "the friend"],
+      "answer": "the man",
+      "explanation": "el marks a masculine noun: el hombre.",
+      "teach": [{ "es": "el hombre", "en": "the man", "pos": "noun" }]
+    },
+    {
+      "type": "match",
+      "id": "p3",
+      "xp": 10,
+      "pairs": [
+        { "es": "yo", "en": "I" },
+        { "es": "tú", "en": "you" },
+        { "es": "él", "en": "he" },
+        { "es": "ella", "en": "she" }
+      ]
+    },
+    {
+      "type": "type",
+      "id": "p4",
+      "xp": 12,
+      "prompt": "Type “the woman” in Spanish.",
+      "promptLang": "en",
+      "answerLang": "es",
+      "accept": ["la mujer"],
+      "hints": ["mujer is feminine, so it takes la."],
+      "teach": [{ "es": "la mujer", "en": "the woman", "pos": "noun" }]
+    },
+    {
+      "type": "choice",
+      "id": "p5",
+      "xp": 10,
+      "prompt": "una niña",
+      "promptLang": "es",
+      "choices": ["a girl", "a boy", "a friend", "a woman"],
+      "answer": "a girl",
+      "explanation": "el niño = the boy, la niña = the girl.",
+      "teach": [{ "es": "la niña", "en": "the girl", "pos": "noun" }]
+    },
+    {
+      "type": "build",
+      "id": "p6",
+      "xp": 14,
+      "prompt": "the boy and the girl",
+      "answer": "el niño y la niña",
+      "tokens": ["el", "niño", "y", "la", "niña", "mujer"],
+      "explanation": "y = and.",
+      "teach": [
+        { "es": "el niño", "en": "the boy", "pos": "noun" },
+        { "es": "y", "en": "and", "pos": "conjunction" }
+      ]
+    },
+    {
+      "type": "type",
+      "id": "p7",
+      "xp": 12,
+      "prompt": "el amigo",
+      "promptLang": "es",
+      "answerLang": "en",
+      "accept": ["the friend", "a friend", "friend", "the male friend"],
+      "explanation": "un amigo (male friend), una amiga (female friend).",
+      "teach": [{ "es": "el amigo", "en": "the friend", "pos": "noun" }]
+    },
+    {
+      "type": "listen",
+      "id": "p8",
+      "xp": 14,
+      "audio": "el hombre y la mujer",
+      "accept": ["el hombre y la mujer"],
+      "translation": "the man and the woman"
+    },
+    {
+      "type": "choice",
+      "id": "p9",
+      "xp": 10,
+      "prompt": "Which pronoun means “she”?",
+      "promptLang": "en",
+      "choices": ["ella", "él", "yo", "tú"],
+      "answer": "ella",
+      "teach": [{ "es": "ella", "en": "she", "pos": "pronoun" }]
+    }
+  ]
+}

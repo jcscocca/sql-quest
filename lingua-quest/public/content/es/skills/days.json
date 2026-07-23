@@ -1,0 +1,96 @@
+{
+  "skillId": "days",
+  "exercises": [
+    {
+      "type": "match",
+      "id": "d1",
+      "xp": 10,
+      "pairs": [
+        { "es": "lunes", "en": "Monday" },
+        { "es": "martes", "en": "Tuesday" },
+        { "es": "miércoles", "en": "Wednesday" },
+        { "es": "jueves", "en": "Thursday" }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "d2",
+      "xp": 10,
+      "prompt": "viernes",
+      "promptLang": "es",
+      "choices": ["Friday", "Thursday", "Saturday", "Monday"],
+      "answer": "Friday",
+      "teach": [{ "es": "viernes", "en": "Friday", "pos": "noun" }]
+    },
+    {
+      "type": "choice",
+      "id": "d3",
+      "xp": 10,
+      "prompt": "sábado",
+      "promptLang": "es",
+      "choices": ["Saturday", "Sunday", "Friday", "Tuesday"],
+      "answer": "Saturday",
+      "teach": [{ "es": "sábado", "en": "Saturday", "pos": "noun" }]
+    },
+    {
+      "type": "type",
+      "id": "d4",
+      "xp": 12,
+      "prompt": "Type “Sunday” in Spanish.",
+      "promptLang": "en",
+      "answerLang": "es",
+      "accept": ["domingo"],
+      "teach": [{ "es": "domingo", "en": "Sunday", "pos": "noun" }]
+    },
+    {
+      "type": "choice",
+      "id": "d5",
+      "xp": 10,
+      "prompt": "hoy",
+      "promptLang": "es",
+      "choices": ["today", "tomorrow", "yesterday", "now"],
+      "answer": "today",
+      "teach": [{ "es": "hoy", "en": "today", "pos": "adverb" }]
+    },
+    {
+      "type": "type",
+      "id": "d6",
+      "xp": 12,
+      "prompt": "mañana",
+      "promptLang": "es",
+      "answerLang": "en",
+      "accept": ["tomorrow", "morning"],
+      "explanation": "mañana means both “tomorrow” and “morning”.",
+      "teach": [{ "es": "mañana", "en": "tomorrow / morning", "pos": "adverb" }]
+    },
+    {
+      "type": "build",
+      "id": "d7",
+      "xp": 12,
+      "prompt": "today and tomorrow",
+      "answer": "hoy y mañana",
+      "tokens": ["hoy", "y", "mañana", "ayer"],
+      "teach": [{ "es": "ayer", "en": "yesterday", "pos": "adverb" }]
+    },
+    {
+      "type": "listen",
+      "id": "d8",
+      "xp": 14,
+      "audio": "lunes, martes, miércoles",
+      "accept": ["lunes martes miércoles", "lunes, martes, miércoles"],
+      "translation": "Monday, Tuesday, Wednesday"
+    },
+    {
+      "type": "choice",
+      "id": "d9",
+      "xp": 10,
+      "prompt": "Which day comes right after viernes?",
+      "promptLang": "es",
+      "speak": "viernes",
+      "choices": ["sábado", "domingo", "jueves", "lunes"],
+      "answer": "sábado",
+      "explanation": "…jueves, viernes, sábado, domingo.",
+      "teach": [{ "es": "jueves", "en": "Thursday", "pos": "noun" }]
+    }
+  ]
+}

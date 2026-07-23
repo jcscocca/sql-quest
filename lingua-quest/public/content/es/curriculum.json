@@ -1,0 +1,221 @@
+{
+  "units": [
+    {
+      "id": "fundamentos",
+      "name": "Fundamentos",
+      "subtitle": "The basics",
+      "skills": [
+        {
+          "id": "greetings",
+          "name": "Saludos",
+          "icon": "👋",
+          "requires": [],
+          "lesson": {
+            "intro": "Every conversation starts with a greeting. Learn to say hello, goodbye, and ask how someone is.",
+            "tips": [
+              "hola = hello, and it works any time of day.",
+              "buenos días = good morning, buenas tardes = good afternoon, buenas noches = good evening/night.",
+              "¿Cómo estás? = How are you? Answer with bien (well) or muy bien (very well)."
+            ]
+          }
+        },
+        {
+          "id": "courtesy",
+          "name": "Cortesía",
+          "icon": "🙏",
+          "requires": ["greetings"],
+          "lesson": {
+            "intro": "A few polite words go a long way. Learn please, thank you, and how to excuse yourself.",
+            "tips": [
+              "por favor = please, gracias = thank you.",
+              "de nada = you're welcome (literally 'of nothing').",
+              "perdón / lo siento = excuse me / I'm sorry."
+            ]
+          }
+        },
+        {
+          "id": "people",
+          "name": "Personas",
+          "icon": "🧑",
+          "requires": ["greetings"],
+          "lesson": {
+            "intro": "Meet the people. Learn the subject pronouns and words for man, woman, boy, girl and friend.",
+            "tips": [
+              "yo = I, tú = you, él = he, ella = she.",
+              "Nouns have gender: el hombre (the man), la mujer (the woman).",
+              "un amigo = a (male) friend, una amiga = a (female) friend."
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "palabras",
+      "name": "Palabras",
+      "subtitle": "Everyday words",
+      "skills": [
+        {
+          "id": "numbers",
+          "name": "Números",
+          "icon": "🔢",
+          "requires": ["people"],
+          "lesson": {
+            "intro": "Count from one to ten. Numbers show up everywhere — prices, ages, phone numbers.",
+            "tips": [
+              "uno, dos, tres, cuatro, cinco (1–5).",
+              "seis, siete, ocho, nueve, diez (6–10).",
+              "uno becomes un before a masculine noun: un gato."
+            ]
+          }
+        },
+        {
+          "id": "colors",
+          "name": "Colores",
+          "icon": "🎨",
+          "requires": ["people"],
+          "lesson": {
+            "intro": "Name the colors. Colors are adjectives, so they often change to match the noun.",
+            "tips": [
+              "rojo (red), azul (blue), verde (green), amarillo (yellow).",
+              "negro (black), blanco (white).",
+              "Adjectives usually come after the noun: la casa roja (the red house)."
+            ]
+          }
+        },
+        {
+          "id": "days",
+          "name": "Los días",
+          "icon": "📅",
+          "requires": ["numbers"],
+          "lesson": {
+            "intro": "Learn the days of the week and words like today and tomorrow.",
+            "tips": [
+              "lunes, martes, miércoles, jueves, viernes (Mon–Fri).",
+              "sábado, domingo (Sat, Sun). Days are not capitalized in Spanish.",
+              "hoy = today, mañana = tomorrow, ayer = yesterday."
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "la-vida",
+      "name": "La vida",
+      "subtitle": "Everyday life",
+      "skills": [
+        {
+          "id": "food",
+          "name": "La comida",
+          "icon": "🍎",
+          "requires": ["numbers"],
+          "lesson": {
+            "intro": "Order and name food and drink. Delicious vocabulary you'll use every day.",
+            "tips": [
+              "el pan (bread), el agua (water), la leche (milk), el café (coffee).",
+              "la manzana (apple), el arroz (rice), la carne (meat), el queso (cheese).",
+              "Quiero... = I want..., por favor to be polite."
+            ]
+          }
+        },
+        {
+          "id": "family",
+          "name": "La familia",
+          "icon": "👨‍👩‍👧",
+          "requires": ["people"],
+          "lesson": {
+            "intro": "Introduce your family — mother, father, brothers, sisters and children.",
+            "tips": [
+              "la madre (mother), el padre (father).",
+              "el hermano (brother), la hermana (sister).",
+              "el hijo (son), la hija (daughter), la familia (family)."
+            ]
+          }
+        },
+        {
+          "id": "animals",
+          "name": "Los animales",
+          "icon": "🐶",
+          "requires": ["colors"],
+          "lesson": {
+            "intro": "Meet the animals — pets and farm animals alike.",
+            "tips": [
+              "el perro (dog), el gato (cat), el pájaro (bird), el pez (fish).",
+              "el caballo (horse), la vaca (cow).",
+              "Plurals add -s or -es: los perros, los peces."
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "frases",
+      "name": "Frases",
+      "subtitle": "Making sentences",
+      "skills": [
+        {
+          "id": "ser-estar",
+          "name": "Ser y estar",
+          "icon": "🧩",
+          "requires": ["people", "food"],
+          "lesson": {
+            "intro": "Spanish has two verbs for 'to be'. Use ser for identity and estar for states and locations.",
+            "tips": [
+              "ser: soy (I am), eres (you are), es (he/she/it is) — for who or what something is.",
+              "estar: estoy, estás, está — for how or where something is.",
+              "Soy Ana. (I am Ana.) — Estoy bien. (I am well.)"
+            ]
+          }
+        },
+        {
+          "id": "tener",
+          "name": "Tener",
+          "icon": "🤲",
+          "requires": ["ser-estar", "numbers"],
+          "lesson": {
+            "intro": "The verb tener means 'to have' — and Spanish uses it for age and feelings too.",
+            "tips": [
+              "tengo (I have), tienes (you have), tiene (he/she has).",
+              "Tengo un perro. = I have a dog.",
+              "For age, use tener: Tengo diez años. = I am ten years old."
+            ]
+          }
+        },
+        {
+          "id": "verbs",
+          "name": "Verbos comunes",
+          "icon": "🗣️",
+          "requires": ["ser-estar"],
+          "lesson": {
+            "intro": "Put it together with everyday verbs: to eat, to drink, to speak, to want and to live.",
+            "tips": [
+              "comer (to eat), beber (to drink), hablar (to speak), vivir (to live), querer (to want).",
+              "Present tense -o for 'I': como, bebo, hablo, vivo, quiero.",
+              "Hablo español. = I speak Spanish."
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "el-reto",
+      "name": "El reto",
+      "subtitle": "Boss challenge",
+      "skills": [
+        {
+          "id": "review-boss",
+          "name": "Repaso general",
+          "icon": "🏆",
+          "requires": ["ser-estar", "tener", "verbs", "food", "family", "animals", "days", "colors"],
+          "lesson": {
+            "intro": "The boss round. A mix of everything you've learned — greetings, numbers, food, family and full sentences. ¡Buena suerte!",
+            "tips": [
+              "Take your time and read each prompt carefully.",
+              "Use the 🔊 button whenever you want to hear the Spanish.",
+              "Everything here has appeared in an earlier skill."
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

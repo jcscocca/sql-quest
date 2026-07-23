@@ -1,0 +1,99 @@
+{
+  "skillId": "verbs",
+  "exercises": [
+    {
+      "type": "match",
+      "id": "v1",
+      "xp": 12,
+      "pairs": [
+        { "es": "comer", "en": "to eat" },
+        { "es": "beber", "en": "to drink" },
+        { "es": "hablar", "en": "to speak" },
+        { "es": "vivir", "en": "to live" }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "v2",
+      "xp": 10,
+      "prompt": "Hablo español.",
+      "promptLang": "es",
+      "choices": ["I speak Spanish.", "You speak Spanish.", "I want Spanish.", "I live in Spain."],
+      "answer": "I speak Spanish.",
+      "explanation": "hablar → hablo (I speak). español = Spanish.",
+      "teach": [
+        { "es": "hablo", "en": "I speak", "pos": "verb" },
+        { "es": "español", "en": "Spanish", "pos": "noun" }
+      ]
+    },
+    {
+      "type": "type",
+      "id": "v3",
+      "xp": 12,
+      "prompt": "Type “I eat bread” in Spanish.",
+      "promptLang": "en",
+      "answerLang": "es",
+      "accept": ["como pan"],
+      "hints": ["comer → como (I eat)."],
+      "teach": [{ "es": "como", "en": "I eat", "pos": "verb" }]
+    },
+    {
+      "type": "choice",
+      "id": "v4",
+      "xp": 10,
+      "prompt": "Bebo agua.",
+      "promptLang": "es",
+      "choices": ["I drink water.", "I eat water.", "I want water.", "I have water."],
+      "answer": "I drink water.",
+      "teach": [{ "es": "bebo", "en": "I drink", "pos": "verb" }]
+    },
+    {
+      "type": "build",
+      "id": "v5",
+      "xp": 14,
+      "prompt": "I speak English.",
+      "answer": "Hablo inglés",
+      "tokens": ["Hablo", "inglés", "español", "como"],
+      "teach": [{ "es": "inglés", "en": "English", "pos": "noun" }]
+    },
+    {
+      "type": "listen",
+      "id": "v6",
+      "xp": 14,
+      "audio": "¿Hablas español?",
+      "accept": ["¿hablas español?", "hablas español", "hablas espanol"],
+      "translation": "Do you speak Spanish?",
+      "teach": [{ "es": "hablas", "en": "you speak", "pos": "verb" }]
+    },
+    {
+      "type": "choice",
+      "id": "v7",
+      "xp": 10,
+      "prompt": "Vivo en Madrid.",
+      "promptLang": "es",
+      "choices": ["I live in Madrid.", "I speak in Madrid.", "I want Madrid.", "I am Madrid."],
+      "answer": "I live in Madrid.",
+      "explanation": "vivir → vivo (I live). en = in.",
+      "teach": [{ "es": "vivo", "en": "I live", "pos": "verb" }]
+    },
+    {
+      "type": "type",
+      "id": "v8",
+      "xp": 12,
+      "prompt": "quiero",
+      "promptLang": "es",
+      "answerLang": "en",
+      "accept": ["i want", "want"],
+      "teach": [{ "es": "querer", "en": "to want", "pos": "verb" }]
+    },
+    {
+      "type": "build",
+      "id": "v9",
+      "xp": 12,
+      "prompt": "I drink coffee.",
+      "answer": "Bebo café",
+      "tokens": ["Bebo", "café", "agua", "como"],
+      "teach": [{ "es": "beber", "en": "to drink", "pos": "verb" }]
+    }
+  ]
+}

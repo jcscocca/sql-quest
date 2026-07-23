@@ -1,0 +1,93 @@
+{
+  "skillId": "animals",
+  "exercises": [
+    {
+      "type": "match",
+      "id": "an1",
+      "xp": 10,
+      "pairs": [
+        { "es": "perro", "en": "dog" },
+        { "es": "gato", "en": "cat" },
+        { "es": "pájaro", "en": "bird" },
+        { "es": "pez", "en": "fish" }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "an2",
+      "xp": 10,
+      "prompt": "caballo",
+      "promptLang": "es",
+      "choices": ["horse", "cow", "dog", "bird"],
+      "answer": "horse",
+      "teach": [{ "es": "el caballo", "en": "horse", "pos": "noun" }]
+    },
+    {
+      "type": "choice",
+      "id": "an3",
+      "xp": 10,
+      "prompt": "vaca",
+      "promptLang": "es",
+      "choices": ["cow", "horse", "cat", "fish"],
+      "answer": "cow",
+      "teach": [{ "es": "la vaca", "en": "cow", "pos": "noun" }]
+    },
+    {
+      "type": "type",
+      "id": "an4",
+      "xp": 12,
+      "prompt": "Type “dog” in Spanish.",
+      "promptLang": "en",
+      "answerLang": "es",
+      "accept": ["perro", "el perro"],
+      "teach": [{ "es": "el perro", "en": "dog", "pos": "noun" }]
+    },
+    {
+      "type": "type",
+      "id": "an5",
+      "xp": 12,
+      "prompt": "gato",
+      "promptLang": "es",
+      "answerLang": "en",
+      "accept": ["cat"],
+      "teach": [{ "es": "el gato", "en": "cat", "pos": "noun" }]
+    },
+    {
+      "type": "build",
+      "id": "an6",
+      "xp": 14,
+      "prompt": "the black cat",
+      "answer": "el gato negro",
+      "tokens": ["el", "gato", "negro", "perro"],
+      "explanation": "The color follows the noun: gato negro.",
+      "teach": [{ "es": "el pez", "en": "fish", "pos": "noun" }]
+    },
+    {
+      "type": "listen",
+      "id": "an7",
+      "xp": 14,
+      "audio": "el perro y el gato",
+      "accept": ["el perro y el gato"],
+      "translation": "the dog and the cat"
+    },
+    {
+      "type": "choice",
+      "id": "an8",
+      "xp": 10,
+      "prompt": "How do you say “bird”?",
+      "promptLang": "en",
+      "choices": ["pájaro", "pez", "vaca", "gato"],
+      "answer": "pájaro",
+      "teach": [{ "es": "el pájaro", "en": "bird", "pos": "noun" }]
+    },
+    {
+      "type": "build",
+      "id": "an9",
+      "xp": 12,
+      "prompt": "a white horse",
+      "answer": "un caballo blanco",
+      "tokens": ["un", "caballo", "blanco", "negro"],
+      "teach": [{ "es": "la vaca", "en": "cow", "pos": "noun" }]
+    }
+  ]
+}

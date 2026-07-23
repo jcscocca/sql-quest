@@ -1,0 +1,109 @@
+{
+  "skillId": "numbers",
+  "exercises": [
+    {
+      "type": "match",
+      "id": "n1",
+      "xp": 10,
+      "pairs": [
+        { "es": "uno", "en": "one" },
+        { "es": "dos", "en": "two" },
+        { "es": "tres", "en": "three" },
+        { "es": "cuatro", "en": "four" }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "n2",
+      "xp": 10,
+      "prompt": "cinco",
+      "promptLang": "es",
+      "choices": ["five", "four", "six", "nine"],
+      "answer": "five",
+      "teach": [{ "es": "cinco", "en": "five", "pos": "number" }]
+    },
+    {
+      "type": "choice",
+      "id": "n3",
+      "xp": 10,
+      "prompt": "seis",
+      "promptLang": "es",
+      "choices": ["six", "seven", "five", "eight"],
+      "answer": "six",
+      "teach": [{ "es": "seis", "en": "six", "pos": "number" }]
+    },
+    {
+      "type": "type",
+      "id": "n4",
+      "xp": 12,
+      "prompt": "Type “seven” in Spanish.",
+      "promptLang": "en",
+      "answerLang": "es",
+      "accept": ["siete"],
+      "teach": [{ "es": "siete", "en": "seven", "pos": "number" }]
+    },
+    {
+      "type": "type",
+      "id": "n5",
+      "xp": 12,
+      "prompt": "ocho",
+      "promptLang": "es",
+      "answerLang": "en",
+      "accept": ["eight"],
+      "teach": [{ "es": "ocho", "en": "eight", "pos": "number" }]
+    },
+    {
+      "type": "choice",
+      "id": "n6",
+      "xp": 10,
+      "prompt": "How do you say “nine”?",
+      "promptLang": "en",
+      "choices": ["nueve", "siete", "diez", "cuatro"],
+      "answer": "nueve",
+      "teach": [{ "es": "nueve", "en": "nine", "pos": "number" }]
+    },
+    {
+      "type": "type",
+      "id": "n7",
+      "xp": 12,
+      "prompt": "Type “ten” in Spanish.",
+      "promptLang": "en",
+      "answerLang": "es",
+      "accept": ["diez"],
+      "teach": [{ "es": "diez", "en": "ten", "pos": "number" }]
+    },
+    {
+      "type": "build",
+      "id": "n8",
+      "xp": 12,
+      "prompt": "two friends",
+      "answer": "dos amigos",
+      "tokens": ["dos", "amigos", "tres", "amigas"],
+      "explanation": "amigos = friends (masculine or mixed group).",
+      "teach": [{ "es": "dos", "en": "two", "pos": "number" }]
+    },
+    {
+      "type": "listen",
+      "id": "n9",
+      "xp": 14,
+      "audio": "siete, ocho, nueve",
+      "accept": ["siete ocho nueve", "siete, ocho, nueve"],
+      "translation": "seven, eight, nine"
+    },
+    {
+      "type": "choice",
+      "id": "n10",
+      "xp": 10,
+      "prompt": "uno, dos, tres, …",
+      "promptLang": "es",
+      "speak": "uno, dos, tres",
+      "choices": ["cuatro", "cinco", "seis", "diez"],
+      "answer": "cuatro",
+      "explanation": "The next number after tres (3) is cuatro (4).",
+      "teach": [
+        { "es": "uno", "en": "one", "pos": "number" },
+        { "es": "cuatro", "en": "four", "pos": "number" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,104 @@
+{
+  "skillId": "greetings",
+  "exercises": [
+    {
+      "type": "choice",
+      "id": "g1",
+      "xp": 10,
+      "prompt": "How do you say “hello”?",
+      "promptLang": "en",
+      "choices": ["Hola", "Adiós", "Gracias", "Bien"],
+      "answer": "Hola",
+      "explanation": "hola works at any time of day.",
+      "teach": [{ "es": "hola", "en": "hello", "pos": "greeting" }]
+    },
+    {
+      "type": "choice",
+      "id": "g2",
+      "xp": 10,
+      "prompt": "Buenos días",
+      "promptLang": "es",
+      "choices": ["Good morning", "Good night", "Goodbye", "Please"],
+      "answer": "Good morning",
+      "explanation": "buenos días = good morning (literally “good days”).",
+      "teach": [{ "es": "buenos días", "en": "good morning", "pos": "greeting" }]
+    },
+    {
+      "type": "match",
+      "id": "g3",
+      "xp": 10,
+      "pairs": [
+        { "es": "hola", "en": "hello" },
+        { "es": "adiós", "en": "goodbye" },
+        { "es": "buenos días", "en": "good morning" },
+        { "es": "buenas noches", "en": "good night" }
+      ]
+    },
+    {
+      "type": "type",
+      "id": "g4",
+      "xp": 12,
+      "prompt": "Type “good afternoon” in Spanish.",
+      "promptLang": "en",
+      "answerLang": "es",
+      "accept": ["buenas tardes"],
+      "hints": ["It starts with buenas… (the feminine form)."],
+      "teach": [{ "es": "buenas tardes", "en": "good afternoon", "pos": "greeting" }]
+    },
+    {
+      "type": "listen",
+      "id": "g5",
+      "xp": 14,
+      "audio": "Hola, ¿cómo estás?",
+      "accept": ["Hola, ¿cómo estás?", "hola cómo estás", "hola como estas"],
+      "translation": "Hello, how are you?",
+      "teach": [{ "es": "¿cómo estás?", "en": "how are you?", "pos": "phrase" }]
+    },
+    {
+      "type": "build",
+      "id": "g6",
+      "xp": 12,
+      "prompt": "Good morning!",
+      "answer": "Buenos días",
+      "tokens": ["Buenos", "días", "tardes", "noches"],
+      "explanation": "días = days, tardes = afternoons, noches = nights.",
+      "teach": [{ "es": "buenos días", "en": "good morning", "pos": "greeting" }]
+    },
+    {
+      "type": "choice",
+      "id": "g7",
+      "xp": 10,
+      "prompt": "You are leaving. What do you say?",
+      "promptLang": "en",
+      "choices": ["Adiós", "Hola", "Gracias", "Sí"],
+      "answer": "Adiós",
+      "explanation": "adiós = goodbye. hasta luego (see you later) also works.",
+      "teach": [
+        { "es": "adiós", "en": "goodbye", "pos": "greeting" },
+        { "es": "hasta luego", "en": "see you later", "pos": "phrase" }
+      ]
+    },
+    {
+      "type": "type",
+      "id": "g8",
+      "xp": 12,
+      "prompt": "buenas noches",
+      "promptLang": "es",
+      "answerLang": "en",
+      "accept": ["good night", "good evening", "goodnight"],
+      "teach": [{ "es": "buenas noches", "en": "good night", "pos": "greeting" }]
+    },
+    {
+      "type": "choice",
+      "id": "g9",
+      "xp": 10,
+      "prompt": "Someone asks “¿Cómo estás?”. A good reply is…",
+      "promptLang": "es",
+      "speak": "¿Cómo estás?",
+      "choices": ["Muy bien, gracias", "Buenos días", "Adiós", "Por favor"],
+      "answer": "Muy bien, gracias",
+      "explanation": "muy bien = very well. bien = well/fine.",
+      "teach": [{ "es": "bien", "en": "well / fine", "pos": "adverb" }]
+    }
+  ]
+}

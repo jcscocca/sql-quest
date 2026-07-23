@@ -1,0 +1,93 @@
+{
+  "skillId": "food",
+  "exercises": [
+    {
+      "type": "match",
+      "id": "f1",
+      "xp": 10,
+      "pairs": [
+        { "es": "pan", "en": "bread" },
+        { "es": "agua", "en": "water" },
+        { "es": "leche", "en": "milk" },
+        { "es": "café", "en": "coffee" }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "f2",
+      "xp": 10,
+      "prompt": "manzana",
+      "promptLang": "es",
+      "choices": ["apple", "orange", "bread", "meat"],
+      "answer": "apple",
+      "teach": [{ "es": "la manzana", "en": "apple", "pos": "noun" }]
+    },
+    {
+      "type": "choice",
+      "id": "f3",
+      "xp": 10,
+      "prompt": "queso",
+      "promptLang": "es",
+      "choices": ["cheese", "milk", "rice", "meat"],
+      "answer": "cheese",
+      "teach": [{ "es": "el queso", "en": "cheese", "pos": "noun" }]
+    },
+    {
+      "type": "type",
+      "id": "f4",
+      "xp": 12,
+      "prompt": "Type “meat” in Spanish.",
+      "promptLang": "en",
+      "answerLang": "es",
+      "accept": ["carne", "la carne"],
+      "teach": [{ "es": "la carne", "en": "meat", "pos": "noun" }]
+    },
+    {
+      "type": "type",
+      "id": "f5",
+      "xp": 12,
+      "prompt": "arroz",
+      "promptLang": "es",
+      "answerLang": "en",
+      "accept": ["rice"],
+      "teach": [{ "es": "el arroz", "en": "rice", "pos": "noun" }]
+    },
+    {
+      "type": "build",
+      "id": "f6",
+      "xp": 14,
+      "prompt": "I want water.",
+      "answer": "Quiero agua",
+      "tokens": ["Quiero", "agua", "leche", "pan"],
+      "explanation": "Quiero… = I want… Add por favor to be polite.",
+      "teach": [{ "es": "quiero", "en": "I want", "pos": "verb" }]
+    },
+    {
+      "type": "listen",
+      "id": "f7",
+      "xp": 14,
+      "audio": "un café, por favor",
+      "accept": ["un café por favor", "un café, por favor"],
+      "translation": "a coffee, please"
+    },
+    {
+      "type": "choice",
+      "id": "f8",
+      "xp": 10,
+      "prompt": "Quiero ___, por favor. (I want bread, please.)",
+      "promptLang": "es",
+      "choices": ["pan", "agua", "leche", "queso"],
+      "answer": "pan",
+      "teach": [{ "es": "el pan", "en": "bread", "pos": "noun" }]
+    },
+    {
+      "type": "build",
+      "id": "f9",
+      "xp": 12,
+      "prompt": "bread and cheese",
+      "answer": "pan y queso",
+      "tokens": ["pan", "y", "queso", "carne"],
+      "teach": [{ "es": "el agua", "en": "water", "pos": "noun" }]
+    }
+  ]
+}
