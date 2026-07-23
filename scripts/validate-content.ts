@@ -1,7 +1,8 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { DuckDBInstance } from '@duckdb/node-api'
 import { compareResults, type QueryResult } from '../src/lib/compare'
-import type { CaseBuildBank, Curriculum, DrillBank, ExerciseBank, WorldSchema } from '../src/lib/content'
+import { runTests } from '../src/lib/js-runtime'
+import type { CaseBuildBank, Curriculum, DrillBank, ExerciseBank, JsBank, WorldSchema } from '../src/lib/content'
 
 const failures: string[] = []
 
@@ -98,6 +99,46 @@ for (const skill of skills) {
       else if (!d.choices.some(c => c.id === d.answer)) failures.push(`${tag}: answer "${d.answer}" matches no choice id`)
       if (!d.explanation?.trim()) failures.push(`${tag}: missing explanation`)
       if (d.hints.length !== 3) failures.push(`${tag}: expected 3 hints, found ${d.hints.length}`)
+    }
+    continue
+  }
+
+  if (skill.trackId === 'javascript') {
+    let jsBank: JsBank
+    try {
+      jsBank = JSON.parse(readFileSync(`public/content/exercises/${skill.id}.json`, 'utf8')) as JsBank
+    } catch {
+      failures.push(`${skill.id}: missing or unreadable JS bank`)
+      continue
+    }
+    if (jsBank.skillId !== skill.id) failures.push(`${skill.id}: bank skillId is "${jsBank.skillId}"`)
+    if (!Array.isArray(jsBank.exercises) || jsBank.exercises.length === 0) {
+      failures.push(`${skill.id}: JS bank is empty`)
+      continue
+    }
+    if (new Set(jsBank.exercises.map(e => e.id)).size !== jsBank.exercises.length)
+      failures.push(`${skill.id}: duplicate exercise ids in bank`)
+    for (const ex of jsBank.exercises) {
+      checked++
+      const tag = `${skill.id}/${ex.id}`
+      if (!ex.functionName?.trim()) failures.push(`${tag}: missing functionName`)
+      if (!ex.starter?.trim()) failures.push(`${tag}: missing starter`)
+      if (!ex.solution?.trim()) failures.push(`${tag}: missing solution`)
+      if (!Array.isArray(ex.tests) || ex.tests.length < 1) failures.push(`${tag}: needs at least 1 test`)
+      if (ex.hints.length !== 3) failures.push(`${tag}: expected 3 hints, found ${ex.hints.length}`)
+      if (ex.functionName?.trim() && ex.solution?.trim() && Array.isArray(ex.tests) && ex.tests.length > 0) {
+        try {
+          const fn = new Function(`${ex.solution}\n; return ${ex.functionName}`)() as Function
+          runTests(fn, ex.tests).forEach((r, i) => {
+            if (!r.pass)
+              failures.push(
+                `${tag}: solution fails test ${i + 1} — expected ${JSON.stringify(r.expected)}, got ${r.error ? `error ${r.error}` : JSON.stringify(r.actual)}`,
+              )
+          })
+        } catch (e) {
+          failures.push(`${tag}: solution did not evaluate — ${e}`)
+        }
+      }
     }
     continue
   }

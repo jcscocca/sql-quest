@@ -161,6 +161,23 @@ button:disabled { opacity: 0.45; cursor: default; }
   margin: 8px 0 0;
 }
 
+.tests { display: flex; flex-direction: column; gap: 6px; }
+.test {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  align-items: baseline;
+  border: 1px solid var(--border);
+  border-left-width: 4px;
+  border-radius: 6px;
+  padding: 8px 12px;
+  background: var(--panel);
+  font-size: 14px;
+}
+.test.pass { border-left-color: var(--green); }
+.test.fail { border-left-color: var(--red); }
+.test .test-detail { font-family: ui-monospace, monospace; font-size: 12px; color: var(--muted); }
+
 .result-grid {
   border: 1px solid var(--border);
   border-radius: 8px;

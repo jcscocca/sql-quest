@@ -16,6 +16,7 @@
     "validate": "tsx scripts/validate-content.ts"
   },
   "dependencies": {
+    "@codemirror/lang-javascript": "^6.2.5",
     "@codemirror/lang-sql": "^6.10.0",
     "@duckdb/duckdb-wasm": "^1.33.1-dev57.0",
     "@uiw/react-codemirror": "^4.25.11",

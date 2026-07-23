@@ -1,0 +1,68 @@
+{
+  "skillId": "js-basics",
+  "exercises": [
+    {
+      "id": "js-add",
+      "prompt": "Implement add(a, b) so it returns the sum of the two numbers a and b.",
+      "functionName": "add",
+      "starter": "function add(a, b) {\n  // return the sum of a and b\n}",
+      "solution": "function add(a, b) {\n  return a + b\n}",
+      "tests": [
+        { "input": [1, 2], "expected": 3 },
+        { "input": [0, 0], "expected": 0 },
+        { "input": [-5, 5], "expected": 0 },
+        { "input": [-3, -4], "expected": -7 },
+        { "input": [2.5, 0.5], "expected": 3 },
+        { "input": [100, 250], "expected": 350 }
+      ],
+      "hints": [
+        "A function only hands a value back when you use the return keyword — without it, add gives back undefined and every test fails.",
+        "The + operator adds two numbers together: a + b.",
+        "The whole body is one line: return a + b."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-max",
+      "prompt": "Implement max(a, b) so it returns the larger of the two numbers. If they are equal, return that shared value.",
+      "functionName": "max",
+      "starter": "function max(a, b) {\n  // return the larger of a and b\n}",
+      "solution": "function max(a, b) {\n  return a > b ? a : b\n}",
+      "tests": [
+        { "input": [1, 2], "expected": 2 },
+        { "input": [5, 3], "expected": 5 },
+        { "input": [-1, -2], "expected": -1 },
+        { "input": [0, 0], "expected": 0 },
+        { "input": [7, 7], "expected": 7 },
+        { "input": [-10, 10], "expected": 10 }
+      ],
+      "hints": [
+        "Compare the two values with the greater-than operator: a > b.",
+        "The ternary a > b ? a : b returns a when a is bigger and b otherwise — the same as an if/else.",
+        "When a and b are equal, a > b is false, so returning b (or a) gives the right shared value."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-fizzbuzz",
+      "prompt": "Implement fizzbuzz(n). Return 'Fizz' if n is divisible by 3, 'Buzz' if divisible by 5, 'FizzBuzz' if divisible by both, and otherwise the number itself as a string — fizzbuzz(7) returns '7'.",
+      "functionName": "fizzbuzz",
+      "starter": "function fizzbuzz(n) {\n  // return 'Fizz', 'Buzz', 'FizzBuzz', or String(n)\n}",
+      "solution": "function fizzbuzz(n) {\n  if (n % 15 === 0) return 'FizzBuzz'\n  if (n % 3 === 0) return 'Fizz'\n  if (n % 5 === 0) return 'Buzz'\n  return String(n)\n}",
+      "tests": [
+        { "input": [1], "expected": "1" },
+        { "input": [3], "expected": "Fizz" },
+        { "input": [5], "expected": "Buzz" },
+        { "input": [9], "expected": "Fizz" },
+        { "input": [15], "expected": "FizzBuzz" },
+        { "input": [7], "expected": "7" }
+      ],
+      "hints": [
+        "The remainder operator % tells you divisibility: n % 3 === 0 is true exactly when n is a multiple of 3.",
+        "Check the both-divisible case first — n % 15 === 0 — otherwise 15 would match 'Fizz' and stop before reaching 'FizzBuzz'.",
+        "For the fall-through case, convert the number to text with String(n) so you return '7', not the number 7."
+      ],
+      "xp": 15
+    }
+  ]
+}

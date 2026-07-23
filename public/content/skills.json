@@ -337,6 +337,34 @@
           }
         }
       ]
+    },
+    {
+      "id": "javascript",
+      "name": "JavaScript",
+      "skills": [
+        {
+          "id": "js-basics",
+          "name": "JS Basics",
+          "trackId": "javascript",
+          "requires": [],
+          "lesson": {
+            "intro": "Every region so far judged a query by the rows it returned. This track judges a function by what it returns — you implement a named function, and a set of hidden test cases calls it with real arguments and checks each answer. A JavaScript function declares parameters and hands back a value with return: function add(a, b) { return a + b }. A function with no return (or a bare return) yields undefined, which is why an untouched starter stub fails every test. return also stops the function immediately, so an early return inside an if is how you branch. Values come in types — numbers (including negatives and decimals), strings in quotes, and booleans — and JavaScript is happy to mix them: the + operator adds two numbers but joins two strings, so String(n) turns a number into its text form when a test expects '7' rather than 7. Press ▶ Run as often as you like to see which tests pass before you Submit.",
+            "exampleSql": "",
+            "wrapUp": "You now own the shape of every exercise here: read the prompt, fill in the function body, return the right value for every input the tests throw at it — including the edge cases (zero, negatives, ties) that a naive version forgets. return both produces the answer and ends the function, and String(n) bridges numbers to the text a prompt sometimes asks for. Next you'll turn from single values to whole collections: arrays, and the iteration that walks them."
+          }
+        },
+        {
+          "id": "js-arrays",
+          "name": "Arrays & Iteration",
+          "trackId": "javascript",
+          "requires": ["js-basics"],
+          "lesson": {
+            "intro": "An array is an ordered list of values — [1, 2, 3], [], or a string's characters — and most real work is walking one to build a result. You have two families of tools. A for loop gives you full control: for (let i = 0; i < arr.length; i++) visits each index, and you accumulate into a variable you declared before the loop (let sum = 0; ... sum += arr[i]). The array methods are terser for common shapes: map returns a new array with each element transformed (arr.map(x => x * 2)), filter returns a new array of the elements that pass a test (arr.filter(x => x % 2 === 0)), and reduce folds a whole array down to one value. The modulo operator % gives a division remainder, so x % 2 === 0 tests evenness — and note it keeps the sign of the left operand, so -4 % 2 is still 0 but negatives need care. Strings iterate too: str.length counts characters and str[i] or a for...of loop reaches each one, which is all you need to tally letters. Watch the empty case — an empty array or string should return the empty-but-valid answer ([] , 0, ''), not crash.",
+            "exampleSql": "",
+            "wrapUp": "You can now consume a collection and produce one: a for loop with an accumulator when you need control, or map / filter / reduce when the shape is standard. The modulo operator classifies numbers, string indexing walks characters, and the empty input is always the test that separates a robust function from a fragile one — handle it first and the rest follows. That completes the JavaScript track: you've implemented and tested functions over both single values and whole arrays."
+          }
+        }
+      ]
     }
   ]
 }
