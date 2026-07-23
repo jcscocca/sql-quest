@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { DuckDBInstance } from '@duckdb/node-api'
 import { compareResults, type QueryResult } from '../src/lib/compare'
 import { runTests } from '../src/lib/js-runtime'
-import type { CaseBuildBank, Curriculum, DrillBank, ExerciseBank, JsBank, WorldSchema } from '../src/lib/content'
+import type { CaseBuildBank, Curriculum, DrillBank, ExerciseBank, JsBank, PyBank, WorldSchema } from '../src/lib/content'
 
 const failures: string[] = []
 
@@ -139,6 +139,34 @@ for (const skill of skills) {
           failures.push(`${tag}: solution did not evaluate — ${e}`)
         }
       }
+    }
+    continue
+  }
+
+  // Python: structural checks only — running Pyodide in Node is too heavy for validation.
+  if (skill.trackId === 'python') {
+    let pyBank: PyBank
+    try {
+      pyBank = JSON.parse(readFileSync(`public/content/exercises/${skill.id}.json`, 'utf8')) as PyBank
+    } catch {
+      failures.push(`${skill.id}: missing or unreadable Python bank`)
+      continue
+    }
+    if (pyBank.skillId !== skill.id) failures.push(`${skill.id}: bank skillId is "${pyBank.skillId}"`)
+    if (!Array.isArray(pyBank.exercises) || pyBank.exercises.length === 0) {
+      failures.push(`${skill.id}: Python bank is empty`)
+      continue
+    }
+    if (new Set(pyBank.exercises.map(e => e.id)).size !== pyBank.exercises.length)
+      failures.push(`${skill.id}: duplicate exercise ids in bank`)
+    for (const ex of pyBank.exercises) {
+      checked++
+      const tag = `${skill.id}/${ex.id}`
+      if (!ex.functionName?.trim()) failures.push(`${tag}: missing functionName`)
+      if (!ex.starter?.trim()) failures.push(`${tag}: missing starter`)
+      if (!ex.solution?.trim()) failures.push(`${tag}: missing solution`)
+      if (!Array.isArray(ex.tests) || ex.tests.length < 1) failures.push(`${tag}: needs at least 1 test`)
+      if (ex.hints.length !== 3) failures.push(`${tag}: expected 3 hints, found ${ex.hints.length}`)
     }
     continue
   }

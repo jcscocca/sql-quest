@@ -365,6 +365,34 @@
           }
         }
       ]
+    },
+    {
+      "id": "python",
+      "name": "Python",
+      "skills": [
+        {
+          "id": "py-basics",
+          "name": "Python Basics",
+          "trackId": "python",
+          "requires": [],
+          "lesson": {
+            "intro": "This track judges a function by what it returns — you implement a named function, and hidden test cases call it with real arguments and check each answer, just like the JavaScript track. Python spells a function with def: def add(a, b): then an indented body, and return hands a value back. Indentation is not decoration — it is how Python knows which lines belong to the function, so every body line is indented the same amount (four spaces here). A starter stub whose body is just pass runs and returns None, which is why an untouched stub fails every test — replace pass with a real return. Values have types: int and float numbers (including negatives and decimals), str text in quotes, and bool True/False. The remainder operator % gives divisibility (n % 3 == 0 is True when n is a multiple of 3), and str(n) turns a number into its text form when a test expects '7' rather than 7. Python also has a one-line conditional expression, a if cond else b, for returning one of two values. Press ▶ Run as often as you like to see which tests pass before you Submit.",
+            "exampleSql": "",
+            "wrapUp": "You now own the shape of every exercise here: read the prompt, indent a body under def, and return the right value for every input — including the edge cases (zero, negatives, ties) a naive version forgets. return both produces the answer and ends the function, % classifies numbers by divisibility, and str(n) bridges a number to the text a prompt sometimes asks for. Next you'll turn from single values to whole collections: lists, and the comprehensions that transform them."
+          }
+        },
+        {
+          "id": "py-collections",
+          "name": "Lists & Comprehensions",
+          "trackId": "python",
+          "requires": ["py-basics"],
+          "lesson": {
+            "intro": "A list is an ordered collection — [1, 2, 3], [], or the characters you iterate out of a string — and most real work is walking one to build a result. Python's signature tool is the comprehension: [x * 2 for x in xs] builds a brand-new list by evaluating an expression for each element, and adding an if filters which elements take part ([x for x in xs if x % 2 == 0]). Drop the brackets and you have a generator, which sum() folds straight into one number: sum(x for x in xs if x % 2 == 0). The remainder operator % classifies numbers — x % 2 == 0 tests evenness and stays correct for negatives and zero (-4 % 2 and 0 % 2 are both 0). Strings iterate too: for ch in s visits each character, s.lower() normalizes case, and ch in 'aeiou' is a compact membership test. Watch the empty case — an empty list or string should return the empty-but-valid answer ([], 0, ''), and comprehensions and sum() handle it for free: an empty input yields [] or 0 with no special code.",
+            "exampleSql": "",
+            "wrapUp": "You can now consume a collection and produce one: a comprehension when you transform or filter into a new list, a generator fed to sum() when you fold down to a single number. The modulo operator classifies numbers, iterating a string walks its characters, and the empty input is always the test that separates a robust function from a fragile one — and Python's comprehensions handle it without a special case. That completes the Python track: you've implemented and tested functions over both single values and whole lists, all running on real CPython in your browser."
+          }
+        }
+      ]
     }
   ]
 }

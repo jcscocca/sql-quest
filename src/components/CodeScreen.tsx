@@ -1,23 +1,32 @@
 import { useRef, useState } from 'react'
+import { type Extension } from '@uiw/react-codemirror'
 import { CodeEditor } from './CodeEditor'
 import { createJavascriptTrack } from '../lib/tracks/javascript'
 import { type TestResult } from '../lib/js-runtime'
 import { useProgress } from '../lib/progress'
-import type { JsBank, Region, Skill } from '../lib/content'
+import type { JsBank, JsTest, PyBank, Region, Skill } from '../lib/content'
+
+type RunResult = { results: TestResult[]; error?: string }
+interface CodeTrack {
+  run: (code: string, ex: { functionName: string; tests: JsTest[] }) => Promise<RunResult>
+  check: (r: RunResult) => { correct: boolean; reason?: string }
+}
 
 type Feedback =
   | { kind: 'success'; gained: number; finished: boolean }
   | { kind: 'wrong'; passed: number; total: number }
 
-export function CodeScreen({ skill, bank, region, onBack }: {
+export function CodeScreen({ skill, bank, region, onBack, createTrack = createJavascriptTrack, lang }: {
   skill: Skill
-  bank: JsBank
+  bank: JsBank | PyBank
   region: Region
   onBack: () => void
+  createTrack?: () => CodeTrack
+  lang?: () => Extension
 }) {
   const progress = useProgress()
-  const trackRef = useRef<ReturnType<typeof createJavascriptTrack> | null>(null)
-  if (!trackRef.current) trackRef.current = createJavascriptTrack()
+  const trackRef = useRef<CodeTrack | null>(null)
+  if (!trackRef.current) trackRef.current = createTrack()
   const track = trackRef.current
   const solved = progress.skills[skill.id]?.solved ?? []
   const firstUnsolved = bank.exercises.findIndex(e => !solved.includes(e.id))
@@ -140,7 +149,7 @@ export function CodeScreen({ skill, bank, region, onBack }: {
           </div>
         </aside>
         <main className="right-panel">
-          <CodeEditor key={ex.id} value={code} onChange={setCode} />
+          <CodeEditor key={ex.id} value={code} onChange={setCode} lang={lang} />
           <div className="actions">
             <button onClick={() => void handleRun()} disabled={busy}>
               ▶ Run

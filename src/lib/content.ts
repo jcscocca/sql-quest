@@ -26,7 +26,7 @@ export interface Skill {
   id: string
   name: string
   world?: string
-  trackId?: 'sql' | 'systems-design' | 'javascript'
+  trackId?: 'sql' | 'systems-design' | 'javascript' | 'python'
   format?: 'drills' | 'case'
   requires: string[]
   lesson: { intro: string; exampleSql: string; wrapUp?: string }
@@ -106,6 +106,23 @@ export interface JsExercise {
 export interface JsBank {
   skillId: string
   exercises: JsExercise[]
+}
+
+export interface PyExercise {
+  id: string
+  prompt: string
+  functionName: string
+  starter: string
+  /** Reference implementation, used only by validate — never shown in the UI. */
+  solution: string
+  tests: JsTest[]
+  hints: string[]
+  xp: number
+}
+
+export interface PyBank {
+  skillId: string
+  exercises: PyExercise[]
 }
 
 export async function loadJson<T>(url: string): Promise<T> {

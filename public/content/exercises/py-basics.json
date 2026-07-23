@@ -1,0 +1,68 @@
+{
+  "skillId": "py-basics",
+  "exercises": [
+    {
+      "id": "py-add",
+      "prompt": "Implement add(a, b) so it returns the sum of the two numbers a and b.",
+      "functionName": "add",
+      "starter": "def add(a, b):\n    # return the sum of a and b\n    pass",
+      "solution": "def add(a, b):\n    return a + b",
+      "tests": [
+        { "input": [1, 2], "expected": 3 },
+        { "input": [0, 0], "expected": 0 },
+        { "input": [-5, 5], "expected": 0 },
+        { "input": [-3, -4], "expected": -7 },
+        { "input": [2.5, 0.5], "expected": 3 },
+        { "input": [100, 250], "expected": 350 }
+      ],
+      "hints": [
+        "A Python function hands a value back only with the return keyword — an untouched stub runs pass and returns None, so every test fails.",
+        "The + operator adds two numbers: a + b.",
+        "The whole body is one line: return a + b (delete the pass)."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-biggest",
+      "prompt": "Implement biggest(a, b) so it returns the larger of the two numbers. If they are equal, return that shared value.",
+      "functionName": "biggest",
+      "starter": "def biggest(a, b):\n    # return the larger of a and b\n    pass",
+      "solution": "def biggest(a, b):\n    return a if a > b else b",
+      "tests": [
+        { "input": [1, 2], "expected": 2 },
+        { "input": [5, 3], "expected": 5 },
+        { "input": [-1, -2], "expected": -1 },
+        { "input": [0, 0], "expected": 0 },
+        { "input": [7, 7], "expected": 7 },
+        { "input": [-10, 10], "expected": 10 }
+      ],
+      "hints": [
+        "Compare the two values with the greater-than operator: a > b.",
+        "Python's conditional expression a if a > b else b evaluates to a when a is bigger and b otherwise — a one-line if/else.",
+        "When a and b are equal, a > b is False, so the expression returns b (which equals a) — the right shared value."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-fizzbuzz",
+      "prompt": "Implement fizzbuzz(n). Return 'Fizz' if n is divisible by 3, 'Buzz' if divisible by 5, 'FizzBuzz' if divisible by both, and otherwise the number itself as a string — fizzbuzz(7) returns '7'.",
+      "functionName": "fizzbuzz",
+      "starter": "def fizzbuzz(n):\n    # return 'Fizz', 'Buzz', 'FizzBuzz', or str(n)\n    pass",
+      "solution": "def fizzbuzz(n):\n    if n % 15 == 0:\n        return 'FizzBuzz'\n    if n % 3 == 0:\n        return 'Fizz'\n    if n % 5 == 0:\n        return 'Buzz'\n    return str(n)",
+      "tests": [
+        { "input": [1], "expected": "1" },
+        { "input": [3], "expected": "Fizz" },
+        { "input": [5], "expected": "Buzz" },
+        { "input": [9], "expected": "Fizz" },
+        { "input": [15], "expected": "FizzBuzz" },
+        { "input": [7], "expected": "7" }
+      ],
+      "hints": [
+        "The remainder operator % tells you divisibility: n % 3 == 0 is True exactly when n is a multiple of 3.",
+        "Check the both-divisible case first — n % 15 == 0 — otherwise 15 matches 'Fizz' and returns before reaching 'FizzBuzz'.",
+        "For the fall-through case, convert the number to text with str(n) so you return '7', not the integer 7."
+      ],
+      "xp": 15
+    }
+  ]
+}

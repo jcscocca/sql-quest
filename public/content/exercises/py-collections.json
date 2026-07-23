@@ -1,0 +1,68 @@
+{
+  "skillId": "py-collections",
+  "exercises": [
+    {
+      "id": "py-double-all",
+      "prompt": "Implement double_all(xs) so it returns a new list in which every number from xs has been multiplied by 2. An empty list returns an empty list.",
+      "functionName": "double_all",
+      "starter": "def double_all(xs):\n    # return a new list with each number doubled\n    pass",
+      "solution": "def double_all(xs):\n    return [x * 2 for x in xs]",
+      "tests": [
+        { "input": [[1, 2, 3]], "expected": [2, 4, 6] },
+        { "input": [[]], "expected": [] },
+        { "input": [[0]], "expected": [0] },
+        { "input": [[-1, -2]], "expected": [-2, -4] },
+        { "input": [[5]], "expected": [10] },
+        { "input": [[1, 2, 100]], "expected": [2, 4, 200] }
+      ],
+      "hints": [
+        "A list comprehension [expr for x in xs] builds a brand-new list by evaluating expr for each element — the 'transform every item' shape.",
+        "The transform is a doubling: x * 2.",
+        "Put it together: [x * 2 for x in xs] — an empty xs already yields [], so no special case is needed."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-sum-even",
+      "prompt": "Implement sum_even(xs) so it returns the sum of only the even numbers in xs. An empty list, or one with no even numbers, returns 0.",
+      "functionName": "sum_even",
+      "starter": "def sum_even(xs):\n    # add up only the even numbers\n    pass",
+      "solution": "def sum_even(xs):\n    return sum(x for x in xs if x % 2 == 0)",
+      "tests": [
+        { "input": [[1, 2, 3, 4]], "expected": 6 },
+        { "input": [[]], "expected": 0 },
+        { "input": [[1, 3, 5]], "expected": 0 },
+        { "input": [[2, 4, 6]], "expected": 12 },
+        { "input": [[-2, -4, 1]], "expected": -6 },
+        { "input": [[0, 1, 2]], "expected": 2 }
+      ],
+      "hints": [
+        "x % 2 == 0 tests evenness, and it holds for negatives and zero too (-4 and 0 are both even).",
+        "sum(...) over a generator that filters — sum(x for x in xs if x % 2 == 0) — adds only the values that pass.",
+        "sum of an empty sequence is 0, which is also the answer when nothing is even — no special case required."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-count-vowels",
+      "prompt": "Implement count_vowels(s) so it returns how many vowels (a, e, i, o, u) the string contains, counting both uppercase and lowercase. An empty string returns 0.",
+      "functionName": "count_vowels",
+      "starter": "def count_vowels(s):\n    # count the vowels, case-insensitive\n    pass",
+      "solution": "def count_vowels(s):\n    return sum(1 for ch in s.lower() if ch in 'aeiou')",
+      "tests": [
+        { "input": ["hello"], "expected": 2 },
+        { "input": [""], "expected": 0 },
+        { "input": ["xyz"], "expected": 0 },
+        { "input": ["AEIOU"], "expected": 5 },
+        { "input": ["Programming"], "expected": 3 },
+        { "input": ["Why"], "expected": 0 }
+      ],
+      "hints": [
+        "Lowercase the whole string first with s.lower() so 'A' and 'a' count the same.",
+        "The membership test ch in 'aeiou' is True exactly when ch is a vowel.",
+        "sum(1 for ch in s.lower() if ch in 'aeiou') counts one for each vowel — and an empty string sums to 0."
+      ],
+      "xp": 15
+    }
+  ]
+}

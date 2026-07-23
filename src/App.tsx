@@ -6,7 +6,9 @@ import { CaseBuildScreen } from './components/CaseBuildScreen'
 import { CodeScreen } from './components/CodeScreen'
 import { CollectionScreen } from './components/CollectionScreen'
 import { ReviewScreen } from './components/ReviewScreen'
-import { loadJson, type CaseBuildBank, type Curriculum, type DrillBank, type ExerciseBank, type JsBank, type Region, type WorldSchema } from './lib/content'
+import { createPythonTrack } from './lib/tracks/python'
+import { python } from '@codemirror/lang-python'
+import { loadJson, type CaseBuildBank, type Curriculum, type DrillBank, type ExerciseBank, type JsBank, type PyBank, type Region, type WorldSchema } from './lib/content'
 import { useProgress, type SkillProgress } from './lib/progress'
 import { assembleReview, displayedMastery, type ReviewItem } from './lib/review'
 import { todayString } from './lib/xp'
@@ -17,6 +19,7 @@ interface Content {
   drillBanks: Record<string, DrillBank>
   caseBuilds: Record<string, CaseBuildBank>
   jsBanks: Record<string, JsBank>
+  pyBanks: Record<string, PyBank>
   schemas: Record<string, WorldSchema>
 }
 
@@ -111,6 +114,18 @@ export default function App() {
           onBack={() => setView({ screen: 'home' })}
         />
       )
+    if (skill.trackId === 'python')
+      return (
+        <CodeScreen
+          key={skill.id}
+          skill={skill}
+          bank={content.pyBanks[skill.id]}
+          region={region}
+          onBack={() => setView({ screen: 'home' })}
+          createTrack={createPythonTrack}
+          lang={python}
+        />
+      )
     return (
       <ExerciseScreen
         key={skill.id}
@@ -176,6 +191,7 @@ async function loadContent(): Promise<Content> {
   const drillBanks: Record<string, DrillBank> = {}
   const caseBuilds: Record<string, CaseBuildBank> = {}
   const jsBanks: Record<string, JsBank> = {}
+  const pyBanks: Record<string, PyBank> = {}
   const schemas: Record<string, WorldSchema> = {}
   await Promise.all(
     skills.map(async s => {
@@ -185,6 +201,8 @@ async function loadContent(): Promise<Content> {
         drillBanks[s.id] = await loadJson<DrillBank>(`${base}content/exercises/${s.id}.json`)
       else if (s.trackId === 'javascript')
         jsBanks[s.id] = await loadJson<JsBank>(`${base}content/exercises/${s.id}.json`)
+      else if (s.trackId === 'python')
+        pyBanks[s.id] = await loadJson<PyBank>(`${base}content/exercises/${s.id}.json`)
       else banks[s.id] = await loadJson<ExerciseBank>(`${base}content/exercises/${s.id}.json`)
     }),
   )
@@ -194,5 +212,5 @@ async function loadContent(): Promise<Content> {
       schemas[w] = await loadJson<WorldSchema>(`${base}worlds/${w}/schema.json`)
     }),
   )
-  return { curriculum, banks, drillBanks, caseBuilds, jsBanks, schemas }
+  return { curriculum, banks, drillBanks, caseBuilds, jsBanks, pyBanks, schemas }
 }
