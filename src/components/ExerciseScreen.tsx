@@ -2,10 +2,11 @@ import { useEffect, useRef, useState } from 'react'
 import { Editor } from './Editor'
 import { ResultGrid } from './ResultGrid'
 import { SchemaBrowser } from './SchemaBrowser'
-import { compareResults, type QueryResult } from '../lib/compare'
+import { type QueryResult } from '../lib/compare'
 import { loadWorld, runQuery } from '../lib/duckdb'
 import { translateError, TrainerError } from '../lib/errors'
-import { pickCatches } from '../lib/catches'
+import { getTrack } from '../lib/tracks/registry'
+import type { Track } from '../lib/tracks/types'
 import { useProgress } from '../lib/progress'
 import { loadManifest, spriteUrl, type SpriteManifest } from '../lib/sprites'
 import type { ExerciseBank, Region, Skill, WorldSchema } from '../lib/content'
@@ -23,6 +24,9 @@ export function ExerciseScreen({ skill, bank, schema, region, onBack }: {
   onBack: () => void
 }) {
   const progress = useProgress()
+  const trackRef = useRef<Track | null>(null)
+  if (!trackRef.current) trackRef.current = getTrack(skill, { runQuery, loadWorld })
+  const track = trackRef.current
   const solved = progress.skills[skill.id]?.solved ?? []
   const firstUnsolved = bank.exercises.findIndex(e => !solved.includes(e.id))
   const [idx, setIdx] = useState(firstUnsolved === -1 ? 0 : firstUnsolved)
@@ -34,8 +38,6 @@ export function ExerciseScreen({ skill, bank, schema, region, onBack }: {
   const [result, setResult] = useState<QueryResult | null>(null)
   const [feedback, setFeedback] = useState<Feedback | null>(null)
   const [hintsShown, setHintsShown] = useState(0)
-  const refCache = useRef(new Map<string, QueryResult>())
-  const [worldNames, setWorldNames] = useState<Set<string> | null>(null)
   const [sessionCatches, setSessionCatches] = useState<string[]>([])
   const [completion, setCompletion] = useState<{ catches: string[] } | null>(null)
   const [spriteManifest, setSpriteManifest] = useState<SpriteManifest | null>(null)
@@ -53,14 +55,8 @@ export function ExerciseScreen({ skill, bank, schema, region, onBack }: {
   const exSolved = solved.includes(ex.id)
 
   useEffect(() => {
-    loadWorld(schema.world, schema.tables.map(t => t.name))
-      .then(async () => {
-        setEngineReady(true)
-        if (schema.entity) {
-          const r = await runQuery(`SELECT DISTINCT ${schema.entity.column} FROM ${schema.entity.table}`)
-          setWorldNames(new Set(r.rows.map(row => String(row[0]))))
-        }
-      })
+    track.prepare(skill, schema)
+      .then(() => setEngineReady(true))
       .catch(e => setEngineError(String(e)))
   }, [schema])
 
@@ -74,7 +70,7 @@ export function ExerciseScreen({ skill, bank, schema, region, onBack }: {
     setBusy(true)
     setFeedback(null)
     try {
-      setResult(await runQuery(text))
+      setResult(await track.run(text))
     } catch (e) {
       showError(e)
     } finally {
@@ -86,45 +82,25 @@ export function ExerciseScreen({ skill, bank, schema, region, onBack }: {
     setBusy(true)
     setFeedback(null)
     try {
-      const user = await runQuery(sqlText)
+      const user = await track.run(sqlText)
       setResult(user)
-      let ref = refCache.current.get(ex.id)
-      if (!ref) {
-        ref = await runQuery(ex.referenceSql)
-        refCache.current.set(ex.id, ref)
-      }
-      const outcome = compareResults(user, ref, { orderMatters: ex.orderMatters })
-      if (outcome.equal) {
+      const outcome = await track.check(user, ex)
+      if (outcome.correct) {
         const res = useProgress
           .getState()
           .recordSolve(skill.id, ex.id, ex.xp, hintsShown, bank.exercises.length)
         let caught: string[] = []
-        if (res.gained > 0 && schema.entity) {
+        if (res.gained > 0) {
           try {
-            let nameSet = worldNames
-            if (!nameSet) {
-              const r = await runQuery(
-                `SELECT DISTINCT ${schema.entity.column} FROM ${schema.entity.table}`,
-              )
-              nameSet = new Set(r.rows.map(row => String(row[0])))
-              setWorldNames(nameSet)
-            }
             const owned = new Set(
               useProgress.getState().collection.filter(c => c.world === skill.world).map(c => c.name),
             )
-            const names = pickCatches(user, nameSet, owned, ex.collectibles ?? [])
-            let entries = names.map(n => ({ name: n, label: '' }))
-            if (names.length > 0 && schema.entity.labelColumn) {
-              const list = names.map(n => `'${n.replace(/'/g, "''")}'`).join(', ')
-              const lr = await runQuery(
-                `SELECT ${schema.entity.column}, ${schema.entity.labelColumn} FROM ${schema.entity.table} WHERE ${schema.entity.column} IN (${list})`,
-              )
-              const labels = new Map(lr.rows.map(r => [String(r[0]), String(r[1] ?? '')]))
-              entries = names.map(n => ({ name: n, label: labels.get(n) ?? '' }))
+            const entries = await track.reward(user, ex, { owned })
+            if (entries.length > 0) {
+              const tagged = useProgress.getState().addCatches(skill.world, entries)
+              caught = tagged.map(t => t.name)
+              if (caught.length > 0) setSessionCatches(prev => [...prev, ...caught])
             }
-            const tagged = useProgress.getState().addCatches(skill.world, entries)
-            caught = tagged.map(t => t.name)
-            if (caught.length > 0) setSessionCatches(prev => [...prev, ...caught])
           } catch (err) {
             console.error('Catch check failed', err)
           }
@@ -172,7 +148,7 @@ export function ExerciseScreen({ skill, bank, schema, region, onBack }: {
         <div className="lesson-actions">
           <button
             onClick={() => {
-              setSqlText(skill.lesson.exampleSql)
+              setSqlText(track.example(skill))
               setShowLesson(false)
             }}
           >
