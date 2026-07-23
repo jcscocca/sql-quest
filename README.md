@@ -1,16 +1,27 @@
 # ⚡ SQL Quest
 
-A single-player SQL trainer: Duolingo-style skill tree over a real SQL engine
-(DuckDB-WASM, fully in-browser) querying datasets worth caring about. The
-142-exercise curriculum spans five regions — Foundations, Shaping, Combining,
-Analyst Power, and Boss Arenas — across four worlds (Pokémon, Yu-Gi-Oh!,
-Digimon, Seattle 311), from SELECT basics through joins, subqueries, and
-window functions to multi-step Boss Arena challenges. Daily Review resurfaces
-rusty skills on an expanding schedule, and correct queries catch the entities
-they return into a collection you build across every world — with real
-sprites and card art on the tiles. See
-`docs/superpowers/specs/2026-07-18-sql-learning-app-design.md` for the full
-design.
+A single-player coding trainer: a Duolingo-style skill tree with multiple
+learning **tracks** that share one XP / streak / badge / spaced-review
+backbone, all in-browser with no accounts.
+
+- **SQL** (the original) — a real SQL engine (DuckDB-WASM) over datasets worth
+  caring about: 142 exercises across five regions (Foundations, Shaping,
+  Combining, Analyst Power, Boss Arenas) and four worlds (Pokémon, Yu-Gi-Oh!,
+  Digimon, Seattle 311). Correct queries catch the entities they return into a
+  collection with real sprite/card art; Daily Review resurfaces rusty SQL
+  skills on an expanding schedule.
+- **Systems Design** — decision drills and guided case-builds grounded in
+  public-sector / police data engineering (CAD ingestion, ALPR retention,
+  CJIS, NIBRS). Multiple-choice answer-check; no code execution.
+- **JavaScript** & **Python** — implement a named function; it runs in-browser
+  (a Web Worker for JS, Pyodide for Python) against test cases. Python fetches
+  Pyodide from a CDN on first run (the app's only online dependency).
+
+Every subject plugs into the same backbone through a `Track` interface
+(`src/lib/tracks/`). See
+`docs/superpowers/specs/2026-07-22-multi-track-platform-design.md` for the
+multi-track design and `2026-07-18-sql-learning-app-design.md` for the
+original SQL trainer.
 
 ## Run it
 

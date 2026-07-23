@@ -81,6 +81,16 @@ remote runner is a future drop-in that touches neither Core nor content.
 Each phase is its own spec → plan → ship cycle. Systems Design is front-loaded
 because it is the user's priority and it proves the new answer-check port.
 
+**Status (2026-07-22): Phases 0–4 all shipped.** Phase 0 landed the `Track`
+interface with SQL as Track #0 (behavior-preserving; the `exampleSql`/`referenceSql`
+field renames were deferred as a scope boundary — the SQL track reads the existing
+fields). Phases 1–4 added the Systems Design track (decision drills + guided
+case-builds, grounded in police data-engineering), the JavaScript track (Web
+Worker + test cases), and the Python track (Pyodide + test cases). **Known gap:**
+only SQL skills enter Daily Review so far — non-SQL skills complete and earn
+badges but are not yet in the spaced-review rotation (a drill/code-aware review
+screen is future work).
+
 0. **Extract the Core, define the Track interface.** SQL becomes Track #0 —
    zero behavior change, `npm run validate` stays green. Generalize content
    types (rename `exampleSql`/`referenceSql`, make `WorldSchema` an optional
