@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react'
 import { HomeScreen } from './components/HomeScreen'
 import { ExerciseScreen } from './components/ExerciseScreen'
 import { DrillScreen } from './components/DrillScreen'
+import { CaseBuildScreen } from './components/CaseBuildScreen'
 import { CollectionScreen } from './components/CollectionScreen'
 import { ReviewScreen } from './components/ReviewScreen'
-import { loadJson, type Curriculum, type DrillBank, type ExerciseBank, type Region, type WorldSchema } from './lib/content'
+import { loadJson, type CaseBuildBank, type Curriculum, type DrillBank, type ExerciseBank, type Region, type WorldSchema } from './lib/content'
 import { useProgress, type SkillProgress } from './lib/progress'
 import { assembleReview, displayedMastery, type ReviewItem } from './lib/review'
 import { todayString } from './lib/xp'
@@ -13,6 +14,7 @@ interface Content {
   curriculum: Curriculum
   banks: Record<string, ExerciseBank>
   drillBanks: Record<string, DrillBank>
+  caseBuilds: Record<string, CaseBuildBank>
   schemas: Record<string, WorldSchema>
 }
 
@@ -77,6 +79,16 @@ export default function App() {
     const skill = content.curriculum.regions.flatMap(r => r.skills).find(s => s.id === view.skillId)
     if (!skill) return <div className="load-error">Unknown skill: {view.skillId}</div>
     const region = content.curriculum.regions.find(r => r.skills.some(s => s.id === view.skillId))!
+    if (skill.trackId === 'systems-design' && skill.format === 'case')
+      return (
+        <CaseBuildScreen
+          key={skill.id}
+          skill={skill}
+          bank={content.caseBuilds[skill.id]}
+          region={region}
+          onBack={() => setView({ screen: 'home' })}
+        />
+      )
     if (skill.trackId === 'systems-design')
       return (
         <DrillScreen
@@ -150,10 +162,13 @@ async function loadContent(): Promise<Content> {
   const skills = curriculum.regions.flatMap(r => r.skills)
   const banks: Record<string, ExerciseBank> = {}
   const drillBanks: Record<string, DrillBank> = {}
+  const caseBuilds: Record<string, CaseBuildBank> = {}
   const schemas: Record<string, WorldSchema> = {}
   await Promise.all(
     skills.map(async s => {
-      if (s.trackId === 'systems-design')
+      if (s.trackId === 'systems-design' && s.format === 'case')
+        caseBuilds[s.id] = await loadJson<CaseBuildBank>(`${base}content/exercises/${s.id}.json`)
+      else if (s.trackId === 'systems-design')
         drillBanks[s.id] = await loadJson<DrillBank>(`${base}content/exercises/${s.id}.json`)
       else banks[s.id] = await loadJson<ExerciseBank>(`${base}content/exercises/${s.id}.json`)
     }),
@@ -164,5 +179,5 @@ async function loadContent(): Promise<Content> {
       schemas[w] = await loadJson<WorldSchema>(`${base}worlds/${w}/schema.json`)
     }),
   )
-  return { curriculum, banks, drillBanks, schemas }
+  return { curriculum, banks, drillBanks, caseBuilds, schemas }
 }

@@ -1,0 +1,121 @@
+{
+  "skillId": "sd-case-cad",
+  "title": "Design: Real-Time CAD Ingestion",
+  "scenario": "A city's 911 Computer-Aided-Dispatch (CAD) system emits a continuous stream of call-for-service events — new calls, unit assignments, and status changes — that must feed a live command dashboard with under-2-second freshness and never drop an event. Steady-state volume is roughly 40 events per second, but a major incident can burst the stream to about 300 events per second for minutes at a time. You are designing the ingestion and serving layer end to end.",
+  "steps": [
+    {
+      "id": "cad-1",
+      "label": "Requirements",
+      "prompt": "Before choosing any technology, which pair of non-functional requirements most constrains this design?",
+      "choices": [
+        { "id": "a", "text": "High throughput and schema flexibility above all — optimize for raw ingest speed and let the event shape evolve freely." },
+        { "id": "b", "text": "Durability (never drop an event) and low end-to-end latency (<2s freshness) — the design must guarantee both at once, even through a burst." },
+        { "id": "c", "text": "Strong consistency and exactly-once analytics — every downstream report must reconcile to the cent." },
+        { "id": "d", "text": "Cost efficiency and minimal operational footprint — keep the component count as low as possible." }
+      ],
+      "answer": "b",
+      "explanation": "The brief names two hard guarantees: no event may be dropped (durability) and the dashboard must be under two seconds stale (latency). Holding both at once through a 7x burst is what forces a durable buffer plus a streaming path, and every later decision serves those two constraints. Throughput here is modest; cost and simplicity are real but secondary to a public-safety correctness bar.",
+      "hints": [
+        "Reread the two promises the system makes to dispatchers and treat them as inviolable.",
+        "One requirement is about never losing data; the other is about how fresh the dashboard is.",
+        "Throughput is modest (tens to low hundreds per second); the binding constraints are correctness and freshness."
+      ],
+      "xp": 20
+    },
+    {
+      "id": "cad-2",
+      "label": "Capacity",
+      "prompt": "You need a back-of-the-envelope capacity target for the buffer at the front door. Assume ~2 KB per event and a requirement to absorb a 10-minute major-incident burst without backpressuring producers. Which sizing is defensible?",
+      "choices": [
+        { "id": "a", "text": "Provision for the 40 events/s average (~80 KB/s); bursts are rare and can be smoothed out later." },
+        { "id": "b", "text": "Provision for the ~300 events/s peak with headroom (~0.6 MB/s, ~360 MB buffered across a 10-minute burst) and partition the log to sustain that rate." },
+        { "id": "c", "text": "Provision for a hypothetical 10,000 events/s so capacity never has to be thought about again." },
+        { "id": "d", "text": "Skip sizing entirely — autoscaling will react to load as it arrives." }
+      ],
+      "answer": "b",
+      "explanation": "A never-drop system is sized to its peak with headroom, not its comfortable average. The honest estimate multiplies peak rate by payload (300/s x 2 KB ≈ 0.6 MB/s) and then by burst duration (~360 MB over ten minutes), which fits easily in a partitioned durable log. Sizing to the average drops events exactly during the incident that creates the burst; over-provisioning 30x wastes money on a load two orders of magnitude off; and 'autoscaling will handle it' ignores that scaling lag is precisely when events get dropped.",
+      "hints": [
+        "A never-drop system is sized to its peak, not its comfortable average.",
+        "Multiply peak events/s by bytes/event for throughput, then by burst seconds for buffered volume.",
+        "300/s x 2 KB is under 1 MB/s — the numbers are modest; provision for peak plus headroom."
+      ],
+      "xp": 20
+    },
+    {
+      "id": "cad-3",
+      "label": "Ingest path",
+      "prompt": "How should events travel from the CAD producers to the dashboard so nothing is lost during a burst?",
+      "choices": [
+        { "id": "a", "text": "Have CAD producers write directly to the dashboard's serving database over synchronous HTTP." },
+        { "id": "b", "text": "Publish events to a durable, partitioned, replayable log (e.g. Kafka/Kinesis); a stream processor consumes it and updates the read model." },
+        { "id": "c", "text": "Batch events into files and load them into the analytical warehouse every five minutes." },
+        { "id": "d", "text": "Push events into an in-memory queue on the dashboard server." }
+      ],
+      "answer": "b",
+      "explanation": "A durable partitioned log decouples bursty producers from steady consumers, absorbs the 7x surge as buffered backlog instead of backpressure or loss, and — crucially — its replayability is what lets a crashed consumer recover without dropping events. A stream processor reading from it keeps the read model fresh within the latency budget. Writing producers straight to the serving DB couples them to its availability and offers no buffer; five-minute batch files blow the <2s freshness budget; an in-memory queue loses everything on restart.",
+      "hints": [
+        "Producers are bursty and consumers are steady — you need something between them that can hold a backlog.",
+        "'Never drop an event' and 'recover after a crash' both point to durability and replay.",
+        "In-memory or direct-to-DB paths have no buffer and no replay; a log has both."
+      ],
+      "xp": 20
+    },
+    {
+      "id": "cad-4",
+      "label": "Storage & serving",
+      "prompt": "The dashboard must show the current state of every active call in under two seconds. What serving design fits?",
+      "choices": [
+        { "id": "a", "text": "Run the dashboard's queries directly against the raw event log, folding events into state on every page load." },
+        { "id": "b", "text": "Maintain a materialized read model (current state per call) updated by the stream processor, and separately land the raw events for analytics." },
+        { "id": "c", "text": "Point the dashboard at the analytical warehouse that the events eventually land in." },
+        { "id": "d", "text": "Cache the last N events in the browser and reconstruct call state client-side." }
+      ],
+      "answer": "b",
+      "explanation": "The dashboard asks 'what is the state of each active call right now,' which is a materialized-view question: the stream processor folds the event stream into a current-state read model the dashboard reads in one fast lookup, while the raw events are also landed durably for the heavier analytical path. That is the operational/analytical split from the ingestion track. Re-folding the raw log per request won't meet <2s under load, the warehouse is built for batch analytics not live serving, and browser-side reconstruction can't be the source of truth.",
+      "hints": [
+        "The dashboard wants current state, not history — that's a job for a maintained view, not a re-scan.",
+        "Recall the split between the low-latency operational path and the heavy analytical one.",
+        "Keep serving reads cheap by updating a read model as events arrive, and land raw events separately."
+      ],
+      "xp": 20
+    },
+    {
+      "id": "cad-5",
+      "label": "Failure modes",
+      "prompt": "After a consumer restart, the log replays events it had already processed, and some events arrive twice. How do you stay correct?",
+      "choices": [
+        { "id": "a", "text": "Trust that the log delivers each event exactly once and do nothing special." },
+        { "id": "b", "text": "Make processing idempotent with a stable event key — upsert current state, dedupe on event id — so replays and redeliveries can't double-count or corrupt state." },
+        { "id": "c", "text": "Add a downstream job that periodically scans for and deletes duplicate rows." },
+        { "id": "d", "text": "Switch the log to at-most-once delivery so duplicates never occur." }
+      ],
+      "answer": "b",
+      "explanation": "Distributed logs deliver at-least-once, so redelivery is a certainty, not an edge case — the durable fix is idempotency: key each event stably and upsert, so applying the same event twice yields the same state. That makes replay-after-crash safe and is what lets you use the log's replay for recovery at all. Assuming exactly-once is wishful; periodic dedupe scans race the live dashboard and leave windows of wrong state; at-most-once 'solves' duplicates by dropping events, violating the never-drop rule.",
+      "hints": [
+        "Real logs deliver at-least-once, so the same event arriving twice is guaranteed, not hypothetical.",
+        "The goal is that applying an event a second time changes nothing.",
+        "A stable event id plus upsert/dedupe beats both wishful 'exactly-once' and lossy 'at-most-once.'"
+      ],
+      "xp": 20
+    },
+    {
+      "id": "cad-6",
+      "label": "Retention/CJIS",
+      "prompt": "CAD records are Criminal Justice Information under a mandated retention schedule. How do you store the landed events for the long term?",
+      "choices": [
+        { "id": "a", "text": "Keep every event in the hot serving store forever; storage is cheap enough." },
+        { "id": "b", "text": "Land raw events partitioned by time, tier older partitions to cheaper storage and drop them when the retention clock expires, with CJIS-compliant encryption at rest and immutable access-audit logs." },
+        { "id": "c", "text": "Purge events the moment a call is closed to minimize how much sensitive data is held." },
+        { "id": "d", "text": "Store the events unencrypted but restrict physical access to the building." }
+      ],
+      "answer": "b",
+      "explanation": "This is the storage-track playbook applied to CJI: partition by time so the mandated retention cap becomes a partition drop instead of a mass delete, tier cold data down to control cost, and wrap it in CJIS controls — FIPS-validated encryption at rest, least-privilege access, and tamper-evident audit trails of every access. Hoarding everything hot ignores both cost and the retention schedule, purging on call-close destroys records you're legally required to retain, and physical security without encryption fails CJIS for data at rest.",
+      "hints": [
+        "Partition by time so an expiry rule is a partition drop, not a billion-row delete.",
+        "CJI at rest means encryption, least-privilege access, and immutable audit logs — not physical security alone.",
+        "Retention is a mandated schedule: neither keep-forever nor purge-on-close satisfies it."
+      ],
+      "xp": 20
+    }
+  ]
+}

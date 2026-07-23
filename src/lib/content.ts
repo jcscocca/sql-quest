@@ -27,6 +27,7 @@ export interface Skill {
   name: string
   world?: string
   trackId?: 'sql' | 'systems-design'
+  format?: 'drills' | 'case'
   requires: string[]
   lesson: { intro: string; exampleSql: string; wrapUp?: string }
 }
@@ -65,6 +66,24 @@ export interface DrillExercise {
 export interface DrillBank {
   skillId: string
   exercises: DrillExercise[]
+}
+
+export interface CaseStep {
+  id: string
+  label: string
+  prompt: string
+  choices: DrillChoice[]
+  answer: string
+  explanation: string
+  hints: string[]
+  xp: number
+}
+
+export interface CaseBuildBank {
+  skillId: string
+  title: string
+  scenario: string
+  steps: CaseStep[]
 }
 
 export async function loadJson<T>(url: string): Promise<T> {

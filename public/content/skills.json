@@ -323,6 +323,18 @@
             "exampleSql": "",
             "wrapUp": "Match physical design to the rule, not just the benchmark: partition by time so a retention cap becomes a partition drop instead of a billion-row delete; index and cluster for the geo-plus-time way records are actually queried; tier cold video to cheap archive while a legal-hold class protects evidence from early expiry; encrypt CJI at rest behind least-privilege access and immutable audit trails; and model crime statistics as a star schema at the reportable grain so incident-based data aggregates cleanly. You've now reasoned about the whole path — how data arrives and where it rests — the way a systems designer does."
           }
+        },
+        {
+          "id": "sd-case-cad",
+          "name": "Design: Real-Time CAD Ingestion",
+          "trackId": "systems-design",
+          "format": "case",
+          "requires": ["sd-storage"],
+          "lesson": {
+            "intro": "The drills asked you to make one decision at a time. A case build asks you to design a whole system — one coherent set of choices that has to hold together end to end. You are the data engineer standing up the ingestion and serving layer for a city's 911 Computer-Aided Dispatch platform, where the live command dashboard drives real dispatch decisions: a dropped event is a dropped emergency, and a stale screen is a wrong picture of the city. Work the checkpoints in order — pin down the requirements, size the load, choose the ingest path, design storage and serving, harden the failure modes, then satisfy retention and CJIS. Each step constrains the next, exactly as it would in a real design review. Pick the option a working data engineer would defend when the stakes are this high.",
+            "exampleSql": "",
+            "wrapUp": "Case closed. You designed the full path — durability and freshness fixed as the binding requirements, a peak-sized durable log at the front door, a stream processor folding events into a materialized read model for sub-two-second serving, idempotent processing so replays stay correct, and time-partitioned, CJIS-audited retention at the back. That is the whole shape of a real-time public-safety pipeline: not five isolated answers, but one system whose parts each defend the same two promises — never drop an event, never show a stale screen. This is the difference between answering design questions and designing."
+          }
         }
       ]
     }

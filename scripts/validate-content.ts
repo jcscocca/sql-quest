@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { DuckDBInstance } from '@duckdb/node-api'
 import { compareResults, type QueryResult } from '../src/lib/compare'
-import type { Curriculum, DrillBank, ExerciseBank, WorldSchema } from '../src/lib/content'
+import type { CaseBuildBank, Curriculum, DrillBank, ExerciseBank, WorldSchema } from '../src/lib/content'
 
 const failures: string[] = []
 
@@ -46,6 +46,35 @@ let checked = 0
 const idBanks = new Map<string, string[]>()
 for (const skill of skills) {
   if (!skill.lesson?.wrapUp?.trim()) failures.push(`${skill.id}: missing lesson.wrapUp`)
+
+  if (skill.trackId === 'systems-design' && skill.format === 'case') {
+    let cb: CaseBuildBank
+    try {
+      cb = JSON.parse(readFileSync(`public/content/exercises/${skill.id}.json`, 'utf8')) as CaseBuildBank
+    } catch {
+      failures.push(`${skill.id}: missing or unreadable case-build bank`)
+      continue
+    }
+    if (cb.skillId !== skill.id) failures.push(`${skill.id}: bank skillId is "${cb.skillId}"`)
+    if (!cb.title?.trim()) failures.push(`${skill.id}: missing case-build title`)
+    if (!cb.scenario?.trim()) failures.push(`${skill.id}: missing case-build scenario`)
+    if (!Array.isArray(cb.steps) || cb.steps.length < 2) {
+      failures.push(`${skill.id}: case-build needs at least 2 steps`)
+      continue
+    }
+    if (new Set(cb.steps.map(s => s.id)).size !== cb.steps.length)
+      failures.push(`${skill.id}: duplicate step ids in bank`)
+    for (const st of cb.steps) {
+      checked++
+      const tag = `${skill.id}/${st.id}`
+      if (!st.label?.trim()) failures.push(`${tag}: missing label`)
+      if (!Array.isArray(st.choices) || st.choices.length < 2) failures.push(`${tag}: needs at least 2 choices`)
+      else if (!st.choices.some(c => c.id === st.answer)) failures.push(`${tag}: answer "${st.answer}" matches no choice id`)
+      if (!st.explanation?.trim()) failures.push(`${tag}: missing explanation`)
+      if (st.hints.length !== 3) failures.push(`${tag}: expected 3 hints, found ${st.hints.length}`)
+    }
+    continue
+  }
 
   if (skill.trackId === 'systems-design') {
     let drills: DrillBank

@@ -107,6 +107,25 @@ button:disabled { opacity: 0.45; cursor: default; }
 .hints { display: flex; flex-direction: column; gap: 8px; }
 .hint { font-size: 14px; line-height: 1.5; }
 
+.case-brief h3 { margin: 6px 0; }
+.case-brief { margin: 18px 24px 0; }
+.stepper { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+  font-size: 14px;
+  color: var(--muted);
+}
+.step .step-mark { font-size: 13px; width: 16px; text-align: center; }
+.step.done { border-color: var(--green); color: var(--text); }
+.step.current { border-color: var(--accent); color: var(--text); }
+.step.upcoming { border-style: dashed; }
+
 .schema-browser h4 { margin: 0 0 8px; }
 .schema-browser summary { cursor: pointer; }
 .schema-browser ul { margin: 8px 0 0; padding-left: 18px; }
