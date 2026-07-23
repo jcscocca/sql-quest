@@ -1,0 +1,100 @@
+{
+  "skillId": "sd-ingestion",
+  "exercises": [
+    {
+      "id": "ing-1",
+      "prompt": "What is the most robust way to keep the pipeline from dropping events during these surges?",
+      "scenario": "Your county's Computer-Aided Dispatch (CAD) system emits an event for every 911 call and unit-status change. During a major storm, call volume spikes 10x and your analytics warehouse can't ingest writes fast enough — ingestion lag climbs and memory on the collector fills up.",
+      "choices": [
+        { "id": "a", "text": "Have CAD write each event directly and synchronously into the warehouse so nothing is buffered." },
+        { "id": "b", "text": "Place a durable, partitioned log (such as Kafka) between CAD and the warehouse so events are buffered and replayed while consumers scale independently." },
+        { "id": "c", "text": "Sample the stream during spikes, keeping one in ten events until lag recovers." },
+        { "id": "d", "text": "Increase the warehouse write batch size and retry failed writes until they succeed." }
+      ],
+      "answer": "b",
+      "explanation": "A durable log decouples the fast producer from the slower consumer, absorbing bursts on disk and letting you replay or add consumers without back-pressuring the 911 system itself. Synchronous writes couple dispatch to warehouse health, and sampling throws away records you're expected to keep.",
+      "hints": [
+        "Dropping or thinning public-safety events isn't acceptable, so any answer that loses data is out.",
+        "The core problem is a fast producer and a slow consumer — you want something between them that can hold a backlog durably.",
+        "Think of a partitioned, replayable log that lets consumers read at their own pace."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "ing-2",
+      "prompt": "How should you serve both the live map and the historical reports?",
+      "scenario": "Dispatchers need a live map of active incidents updated within seconds, while crime analysts run heavy historical trend reports over months of the same incident data.",
+      "choices": [
+        { "id": "a", "text": "Point both the live map and the analysts' reports at the operational CAD database directly." },
+        { "id": "b", "text": "Run one nightly batch that refreshes a single table both the map and the reports read from." },
+        { "id": "c", "text": "Feed the event stream to a low-latency operational store for the live map, and land the same events in an analytical warehouse for historical reporting." },
+        { "id": "d", "text": "Give analysts a read replica of the CAD database and let them run their monthly aggregations there." }
+      ],
+      "answer": "c",
+      "explanation": "Operational and analytical workloads have opposite profiles — tiny fresh lookups versus large scans — so you split them: a streaming path powers the live map while the same events land in a warehouse built for heavy history. Even a read replica is still a row-oriented OLTP schema unsuited to month-spanning aggregation, and a nightly batch is far too stale for a live map.",
+      "hints": [
+        "Fresh, tiny lookups and huge historical scans are opposite workloads — one system rarely serves both well.",
+        "Whatever the analysts do, it must not put analytical load on the system dispatchers rely on in real time.",
+        "Stream to an operational store for 'now', and land the same events in a warehouse for 'history'."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "ing-3",
+      "prompt": "What is the right fix so redelivered events don't inflate the data?",
+      "scenario": "Your stream consumer is restarted after a crash. Because the message broker guarantees at-least-once delivery, several minutes of 911 incident events are redelivered, and your incident counts for that window jump.",
+      "choices": [
+        { "id": "a", "text": "Switch the consumer to trust the broker's ordering and assume exactly-once delivery." },
+        { "id": "b", "text": "Give each event a stable idempotency key (e.g. incident id + revision) and upsert on it, so a redelivered event overwrites rather than duplicates." },
+        { "id": "c", "text": "Run a nightly job that finds and deletes duplicate incident rows." },
+        { "id": "d", "text": "Accept the duplicates as noise since redeliveries are infrequent." }
+      ],
+      "answer": "b",
+      "explanation": "At-least-once delivery is the norm, so correctness has to come from the consumer: a stable key plus an upsert makes reprocessing the same event harmless and idempotent. Assuming exactly-once is wishful, and after-the-fact dedup jobs are racy and leave windows of wrong counts.",
+      "hints": [
+        "Most brokers only promise at-least-once — you can't assume a message arrives exactly once.",
+        "The consumer needs a way to recognize 'I've already seen this exact event.'",
+        "A stable per-event key plus an upsert makes reprocessing a no-op."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "ing-4",
+      "prompt": "How should you design ingestion to survive the vendor's schema changes?",
+      "scenario": "The CAD vendor periodically adds new fields to the event JSON without warning. Twice now a new field has broken your rigid ingestion job, and you lost data during the outage.",
+      "choices": [
+        { "id": "a", "text": "Land the full raw payload immutably in a landing zone, then parse the fields you need downstream, so unknown fields are preserved for later modeling." },
+        { "id": "b", "text": "Maintain a fixed column list and reject any event containing a field you don't recognize." },
+        { "id": "c", "text": "Automatically ALTER the production incident table to add a column each time a new field appears." },
+        { "id": "d", "text": "Ask the vendor to freeze the schema and refuse to accept updates." }
+      ],
+      "answer": "a",
+      "explanation": "Landing the raw payload first (schema-on-read) means new or unexpected fields are captured rather than fatal, and can be modeled whenever you're ready. Rejecting unknown fields drops data, auto-altering production tables on a vendor's whim is operationally dangerous, and you don't control the vendor's release schedule.",
+      "hints": [
+        "You can't stop the vendor from changing the payload, so ingestion has to tolerate it.",
+        "Losing data because of one unexpected field is the outcome to design away.",
+        "Capture the raw event as-is first; decide how to parse and model it afterward."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "ing-5",
+      "prompt": "How should the streaming job bucket these out-of-order events correctly?",
+      "scenario": "Patrol units in coverage dead-zones buffer their status updates and send them minutes later, so events arrive out of order. Your streaming job counts active units per minute, and these late updates are landing in the wrong minute or getting dropped.",
+      "choices": [
+        { "id": "a", "text": "Bucket each event by the wall-clock time it is processed, and finalize each minute the moment it ends." },
+        { "id": "b", "text": "Window events by their own event timestamp using a watermark with bounded allowed-lateness, so late arrivals still fall into the minute they actually occurred." },
+        { "id": "c", "text": "Hold every event in memory and never finalize a minute until all units have reported." },
+        { "id": "d", "text": "Sort the whole day's events at midnight and compute the per-minute counts in one nightly pass." }
+      ],
+      "answer": "b",
+      "explanation": "Counting 'when it happened' means windowing on event time with a watermark that tolerates a defined lateness, so a delayed update is still credited to its real minute without waiting forever. Processing-time buckets misplace late data, unbounded buffering never emits, and a nightly batch abandons the real-time requirement.",
+      "hints": [
+        "There's a difference between when an event happened and when your job saw it — which should define the bucket?",
+        "You need to tolerate some lateness without waiting indefinitely for stragglers.",
+        "Event-time windows plus a watermark / allowed-lateness is the streaming pattern for this."
+      ],
+      "xp": 15
+    }
+  ]
+}

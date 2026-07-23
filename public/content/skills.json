@@ -297,6 +297,34 @@
           }
         }
       ]
+    },
+    {
+      "id": "systems-design",
+      "name": "Systems Design",
+      "skills": [
+        {
+          "id": "sd-ingestion",
+          "name": "Ingestion & Streaming",
+          "trackId": "systems-design",
+          "requires": [],
+          "lesson": {
+            "intro": "You've spent every region writing queries against data that was already sitting in a table. This track flips the question: how does the data get there, and who decides the shape of the pipe? Public-safety systems make that vivid. A Computer-Aided Dispatch (CAD) platform emits an unbounded stream of 911 calls and unit-status changes — faster than any warehouse wants to be written to, sometimes out of order, sometimes the very same event twice after a restart. These drills are decision drills: no SQL to run, just the judgment calls an ingestion engineer makes at the front door. How do you absorb a 10x storm surge without dropping a single record? How do you keep a live dispatch map fresh while still landing everything for next quarter's analysis? How do you stay correct when a message is redelivered or a field appears that nobody warned you about? Pick the option a working data engineer would defend in review.",
+            "exampleSql": "",
+            "wrapUp": "The front-door playbook, in five moves: buffer bursts behind a durable, replayable log instead of coupling producers to consumers; split the low-latency operational path from the heavy analytical one so reporting never threatens the live system; make ingestion idempotent with a stable key so redeliveries can't inflate your counts; land the raw payload first so a new vendor field is captured, never a cause of data loss; and window on event time with a watermark so late arrivals land in the moment they actually happened. Next you'll decide where all this data lives and for how long."
+          }
+        },
+        {
+          "id": "sd-storage",
+          "name": "Storage & Retention",
+          "trackId": "systems-design",
+          "requires": ["sd-ingestion"],
+          "lesson": {
+            "intro": "Once the stream is safely landed, two questions decide your architecture: where does the data physically live, and for how long is it allowed to? In the public sector the second question has teeth that commercial data rarely does. Automated License Plate Reader (ALPR) reads must be purged on a legal clock. Body-worn-camera footage runs to petabytes with tiered retention rules. Criminal Justice Information (CJI) is governed by the FBI's CJIS Security Policy. Crime statistics have to roll up into the national NIBRS standard. Each of these is really a physical-design decision — partitioning, indexing, storage tiers, encryption, dimensional modeling — chosen to fit a legal or access reality rather than raw performance alone. These drills ask you to match the design to the constraint: the layout that makes a 90-day purge a one-line operation, the index that serves the way investigators actually search, the storage class that survives an audit. Choose the answer that a data engineer would still defend when the lawyer is in the room.",
+            "exampleSql": "",
+            "wrapUp": "Match physical design to the rule, not just the benchmark: partition by time so a retention cap becomes a partition drop instead of a billion-row delete; index and cluster for the geo-plus-time way records are actually queried; tier cold video to cheap archive while a legal-hold class protects evidence from early expiry; encrypt CJI at rest behind least-privilege access and immutable audit trails; and model crime statistics as a star schema at the reportable grain so incident-based data aggregates cleanly. You've now reasoned about the whole path — how data arrives and where it rests — the way a systems designer does."
+          }
+        }
+      ]
     }
   ]
 }

@@ -9,7 +9,7 @@ import { getTrack } from '../lib/tracks/registry'
 import type { Track } from '../lib/tracks/types'
 import { useProgress } from '../lib/progress'
 import { loadManifest, spriteUrl, type SpriteManifest } from '../lib/sprites'
-import type { ExerciseBank, Region, Skill, WorldSchema } from '../lib/content'
+import type { Exercise, ExerciseBank, Region, Skill, WorldSchema } from '../lib/content'
 
 type Feedback =
   | { kind: 'success'; gained: number; caught: string[]; finished: boolean }
@@ -24,7 +24,8 @@ export function ExerciseScreen({ skill, bank, schema, region, onBack }: {
   onBack: () => void
 }) {
   const progress = useProgress()
-  const trackRef = useRef<Track | null>(null)
+  const world = schema.world
+  const trackRef = useRef<Track<QueryResult, Exercise> | null>(null)
   if (!trackRef.current) trackRef.current = getTrack(skill, { runQuery, loadWorld })
   const track = trackRef.current
   const solved = progress.skills[skill.id]?.solved ?? []
@@ -43,13 +44,13 @@ export function ExerciseScreen({ skill, bank, schema, region, onBack }: {
   const [spriteManifest, setSpriteManifest] = useState<SpriteManifest | null>(null)
   useEffect(() => {
     let live = true
-    void loadManifest(skill.world).then(m => {
+    void loadManifest(world).then(m => {
       if (live) setSpriteManifest(m)
     })
     return () => {
       live = false
     }
-  }, [skill.world])
+  }, [world])
 
   const ex = bank.exercises[idx]
   const exSolved = solved.includes(ex.id)
@@ -93,11 +94,11 @@ export function ExerciseScreen({ skill, bank, schema, region, onBack }: {
         if (res.gained > 0) {
           try {
             const owned = new Set(
-              useProgress.getState().collection.filter(c => c.world === skill.world).map(c => c.name),
+              useProgress.getState().collection.filter(c => c.world === world).map(c => c.name),
             )
             const entries = await track.reward(user, ex, { owned })
             if (entries.length > 0) {
-              const tagged = useProgress.getState().addCatches(skill.world, entries)
+              const tagged = useProgress.getState().addCatches(world, entries)
               caught = tagged.map(t => t.name)
               if (caught.length > 0) setSessionCatches(prev => [...prev, ...caught])
             }
@@ -223,7 +224,7 @@ export function ExerciseScreen({ skill, bank, schema, region, onBack }: {
                 <span className="catch-chip">
                   Caught:{' '}
                   {feedback.caught.map((n, i) => {
-                    const url = spriteUrl(skill.world, spriteManifest, n)
+                    const url = spriteUrl(world, spriteManifest, n)
                     return (
                       <span key={n}>
                         {i > 0 && ', '}

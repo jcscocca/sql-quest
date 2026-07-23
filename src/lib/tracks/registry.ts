@@ -1,8 +1,9 @@
-import type { Skill } from '../content'
+import type { QueryResult } from '../compare'
+import type { Exercise, Skill } from '../content'
 import { createSqlTrack, type SqlDeps } from './sql'
 import type { Track } from './types'
 
-// Phase 0: every skill is a SQL skill. A later phase dispatches on a skill track id.
-export function getTrack(_skill: Skill, deps: SqlDeps): Track {
+// SQL skills route here; systems-design skills use their own track via DrillScreen.
+export function getTrack(_skill: Skill, deps: SqlDeps): Track<QueryResult, Exercise> {
   return createSqlTrack(deps)
 }

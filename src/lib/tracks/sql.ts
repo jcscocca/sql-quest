@@ -8,7 +8,7 @@ export interface SqlDeps {
   loadWorld: (world: string, tables: string[]) => Promise<void>
 }
 
-export function createSqlTrack(deps: SqlDeps): Track {
+export function createSqlTrack(deps: SqlDeps): Track<QueryResult, Exercise> {
   let schema: WorldSchema | undefined
   let worldNames: Set<string> | null = null
   const refCache = new Map<string, QueryResult>()

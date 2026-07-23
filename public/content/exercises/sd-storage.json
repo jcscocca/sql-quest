@@ -1,0 +1,100 @@
+{
+  "skillId": "sd-storage",
+  "exercises": [
+    {
+      "id": "sto-1",
+      "prompt": "What physical design makes the legally-required purge efficient and reliable?",
+      "scenario": "State law requires that Automated License Plate Reader (ALPR) reads not tied to an active investigation be purged after 90 days. Your reads table holds billions of rows, and a nightly DELETE ... WHERE read_time < now() - 90 days has become slow and is bloating the table.",
+      "choices": [
+        { "id": "a", "text": "Keep every read and simply filter to the last 90 days in each query." },
+        { "id": "b", "text": "Partition the table by day and drop whole partitions older than 90 days, with a hold flag exempting investigation-linked reads." },
+        { "id": "c", "text": "Add an index on read_time so the nightly row-by-row DELETE runs faster." },
+        { "id": "d", "text": "Move rows older than 90 days into a separate 'archive' table each night." }
+      ],
+      "answer": "b",
+      "explanation": "Dropping a time partition is a near-instant metadata operation that reclaims space cleanly, so aligning partitions to the retention window turns the legal cap into a partition drop instead of a billion-row delete. Filtering in queries or archiving to another table keeps data you're required to purge.",
+      "hints": [
+        "The law says purge, so any option that merely hides or relocates the data still fails the requirement.",
+        "Deleting billions of individual rows is the expensive path you're trying to avoid.",
+        "If the table were split by day, expiring old data could be a single drop operation."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "sto-2",
+      "prompt": "Which physical design best serves this access pattern?",
+      "scenario": "Investigators query the ALPR reads by asking 'which plates were captured within 500 meters of this intersection between 2pm and 4pm on these three dates.' Queries filter by location and time window, almost never by plate number alone.",
+      "choices": [
+        { "id": "a", "text": "A single B-tree index on plate_number." },
+        { "id": "b", "text": "No index at all; rely on a full table scan for each investigator query." },
+        { "id": "c", "text": "Partition by time and cluster or index on a spatial key (such as a geohash) so location-and-time ranges prune to a small slice." },
+        { "id": "d", "text": "Index every column individually so any possible filter is covered." }
+      ],
+      "answer": "c",
+      "explanation": "Design to the query: since reads are retrieved by area and time window, partitioning on time and clustering on a spatial key lets the engine skip almost everything and scan only the relevant slice. A plate-only index doesn't serve geo/time filters, and indexing every column bloats writes without matching the access pattern.",
+      "hints": [
+        "Index for how the data is actually read, not for every column just in case.",
+        "The filters are location and time — that's what the physical layout should make cheap.",
+        "Time partitioning plus a spatial key (like a geohash) targets exactly these range queries."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "sto-3",
+      "prompt": "What storage design controls cost while still meeting retention?",
+      "scenario": "Body-worn-camera footage totals petabytes. Most clips are non-evidentiary and rarely opened after 60 days, yet policy requires retaining them for 18 months; evidentiary clips must be kept far longer and never expired early.",
+      "choices": [
+        { "id": "a", "text": "Keep all footage on hot, SSD-backed storage for the full retention period." },
+        { "id": "b", "text": "Store the video as BLOBs inside the relational warehouse alongside the incident metadata." },
+        { "id": "c", "text": "Store footage in object storage with lifecycle rules that keep recent clips hot and auto-tier older ones to cold/archive, flagging evidentiary clips to a longer, hold-protected class." },
+        { "id": "d", "text": "Delete non-evidentiary footage after 30 days to keep the volume down." }
+      ],
+      "answer": "c",
+      "explanation": "Object storage with lifecycle tiering matches spend to access — hot for the clips people actually open, cheap archive for the long tail — while a legal-hold class keeps evidentiary footage safe from expiry. Keeping petabytes hot is wasteful, deleting early violates the retention policy, and a relational store is the wrong home for large binaries.",
+      "hints": [
+        "Access drops off after about 60 days, but the retention clock runs much longer — cost and policy pull in different directions.",
+        "Deleting early to save space collides with the retention requirement.",
+        "Object storage lifecycle tiers (hot to cold to archive) plus a hold class for evidence fits this."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "sto-4",
+      "prompt": "Which control set is required for Criminal Justice Information at rest?",
+      "scenario": "The platform stores Criminal Justice Information (CJI) and must comply with the FBI's CJIS Security Policy. You are specifying the controls for the data-at-rest layer.",
+      "choices": [
+        { "id": "a", "text": "Rely on the data center's physical access controls; encrypting the stored data is optional if the building is secure." },
+        { "id": "b", "text": "Encrypt only the network transport with TLS and store the data itself in plaintext." },
+        { "id": "c", "text": "Encrypt CJI at rest with FIPS 140-2 validated cryptography, enforce role-based least-privilege access, and retain immutable audit logs of every access." },
+        { "id": "d", "text": "Hash the sensitive columns so they can't be read, and grant all analysts read access for convenience." }
+      ],
+      "answer": "c",
+      "explanation": "CJIS expects defense in depth for CJI at rest: FIPS-validated encryption, least-privilege role-based access, and tamper-evident audit trails of who touched what. Transport-only encryption leaves stored data exposed, physical security alone isn't sufficient, and hashing destroys data you need to read while broad access violates least privilege.",
+      "hints": [
+        "Encrypting data in transit (TLS) does nothing for the copy sitting on disk.",
+        "Compliance regimes for criminal-justice data expect encryption, tight access control, and auditing together.",
+        "Think FIPS-validated encryption at rest, role-based least privilege, and immutable audit logs."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "sto-5",
+      "prompt": "What data model best supports this NIBRS reporting?",
+      "scenario": "You're building a reporting warehouse to produce NIBRS/UCR crime statistics. Incidents are inherently multi-part — one incident can carry several offenses, victims, and offenders — and analysts slice offenses by date, geography, offense code, and clearance status.",
+      "choices": [
+        { "id": "a", "text": "One wide, denormalized table with fixed columns offense1, offense2, and offense3 per incident." },
+        { "id": "b", "text": "A star schema with a fact table grained to the reportable offense (per incident) and conformed dimensions for date, geography, offense code, and clearance." },
+        { "id": "c", "text": "Keep the source records-management system's normalized (3NF) schema and have analysts join across it for every report." },
+        { "id": "d", "text": "A single flat CSV export per month that analysts open in a spreadsheet." }
+      ],
+      "answer": "b",
+      "explanation": "NIBRS is incident-based with many offenses per incident, so a fact grained to the offense with conformed dimensions models the real cardinality and makes the slice-and-dice aggregations fast and consistent. Fixed offenseN columns can't represent variable offenses, a normalized OLTP schema is join-heavy and slow for aggregation, and monthly CSVs don't scale or conform.",
+      "hints": [
+        "An incident can carry several offenses and victims — a fixed set of columns can't capture that cleanly.",
+        "Analysts want to aggregate and slice by date, place, and offense type — that favors a model built for aggregation.",
+        "Think Kimball: a fact at the right grain plus conformed dimensions — a star schema."
+      ],
+      "xp": 15
+    }
+  ]
+}

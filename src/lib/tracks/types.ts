@@ -15,16 +15,16 @@ export interface RewardContext {
   owned: Set<string>
 }
 
-export interface Track {
+export interface Track<R = QueryResult, E = Exercise> {
   id: string
   /** Load any engine state the exercises in this skill need. SQL: load the world's tables. */
   prepare(skill: Skill | undefined, schema: WorldSchema | undefined): Promise<void>
-  /** Run the learner's submission and return the result the UI grid renders. */
-  run(submission: string): Promise<QueryResult>
+  /** Run the learner's submission and return the result the UI renders. */
+  run(submission: string): Promise<R>
   /** Judge a run result against the exercise. SQL: run the reference query and diff. */
-  check(result: QueryResult, exercise: Exercise): Promise<CheckOutcome>
+  check(result: R, exercise: E): Promise<CheckOutcome>
   /** Collectibles earned from a correct solve. SQL: entities in the result cells. Others: []. */
-  reward(result: QueryResult, exercise: Exercise, ctx: RewardContext): Promise<Catch[]>
+  reward(result: R, exercise: E, ctx: RewardContext): Promise<Catch[]>
   /** Starter text to prefill the editor. */
   example(skill: Skill): string
 }

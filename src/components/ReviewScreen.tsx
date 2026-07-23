@@ -8,7 +8,7 @@ import { getTrack } from '../lib/tracks/registry'
 import type { Track } from '../lib/tracks/types'
 import { useProgress } from '../lib/progress'
 import type { ReviewItem } from '../lib/review'
-import type { Curriculum, WorldSchema } from '../lib/content'
+import type { Curriculum, Exercise, WorldSchema } from '../lib/content'
 
 type Feedback =
   | { kind: 'success'; gained: number }
@@ -41,7 +41,7 @@ export function ReviewScreen({ items, schemas, curriculum, onDone }: {
   const allSkills = useMemo(() => curriculum.regions.flatMap(r => r.skills), [curriculum])
   const world = allSkills.find(s => s.id === item?.skillId)?.world ?? 'pokemon'
   const schema = schemas[world]
-  const trackRef = useRef<Track | null>(null)
+  const trackRef = useRef<Track<QueryResult, Exercise> | null>(null)
   if (!trackRef.current) {
     const sk = allSkills.find(s => s.id === item?.skillId)
     if (sk) trackRef.current = getTrack(sk, { runQuery, loadWorld })

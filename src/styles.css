@@ -114,6 +114,11 @@ button:disabled { opacity: 0.45; cursor: default; }
 .coltype { color: var(--muted); font-size: 11px; }
 
 .right-panel { display: flex; flex-direction: column; gap: 12px; }
+.choices { display: flex; flex-direction: column; gap: 10px; }
+.choice { text-align: left; padding: 12px 14px; line-height: 1.45; }
+.choice.selected { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, var(--panel)); }
+.prompt .scenario { color: var(--muted); }
+.explanation { margin: 6px 0 0; line-height: 1.5; }
 .actions { display: flex; gap: 10px; align-items: center; }
 .actions .submit { border-color: var(--green); }
 .engine-status { color: var(--muted); font-size: 13px; }

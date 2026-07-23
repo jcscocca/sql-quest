@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { DuckDBInstance } from '@duckdb/node-api'
 import { compareResults, type QueryResult } from '../src/lib/compare'
-import type { Curriculum, ExerciseBank, WorldSchema } from '../src/lib/content'
+import type { Curriculum, DrillBank, ExerciseBank, WorldSchema } from '../src/lib/content'
 
 const failures: string[] = []
 
@@ -15,7 +15,7 @@ for (const s of skills)
 const db = await DuckDBInstance.create()
 const conn = await db.connect()
 
-const worlds = new Set(skills.map(s => s.world))
+const worlds = new Set(skills.map(s => s.world).filter((w): w is string => !!w))
 const worldSchemas: Record<string, WorldSchema> = {}
 const entityNames: Record<string, Set<string>> = {}
 // mirrors pickCatches (src/lib/catches.ts) and build-sprites.ts catchable() — keep matching semantics in lockstep
@@ -46,6 +46,34 @@ let checked = 0
 const idBanks = new Map<string, string[]>()
 for (const skill of skills) {
   if (!skill.lesson?.wrapUp?.trim()) failures.push(`${skill.id}: missing lesson.wrapUp`)
+
+  if (skill.trackId === 'systems-design') {
+    let drills: DrillBank
+    try {
+      drills = JSON.parse(readFileSync(`public/content/exercises/${skill.id}.json`, 'utf8')) as DrillBank
+    } catch {
+      failures.push(`${skill.id}: missing or unreadable drill bank`)
+      continue
+    }
+    if (drills.skillId !== skill.id) failures.push(`${skill.id}: bank skillId is "${drills.skillId}"`)
+    if (!Array.isArray(drills.exercises) || drills.exercises.length === 0) {
+      failures.push(`${skill.id}: drill bank is empty`)
+      continue
+    }
+    if (new Set(drills.exercises.map(d => d.id)).size !== drills.exercises.length)
+      failures.push(`${skill.id}: duplicate drill ids in bank`)
+    for (const d of drills.exercises) {
+      checked++
+      const tag = `${skill.id}/${d.id}`
+      if (!Array.isArray(d.choices) || d.choices.length < 2) failures.push(`${tag}: needs at least 2 choices`)
+      else if (!d.choices.some(c => c.id === d.answer)) failures.push(`${tag}: answer "${d.answer}" matches no choice id`)
+      if (!d.explanation?.trim()) failures.push(`${tag}: missing explanation`)
+      if (d.hints.length !== 3) failures.push(`${tag}: expected 3 hints, found ${d.hints.length}`)
+    }
+    continue
+  }
+
+  const world = skill.world!
   let bank: ExerciseBank
   try {
     bank = JSON.parse(readFileSync(`public/content/exercises/${skill.id}.json`, 'utf8')) as ExerciseBank
@@ -72,10 +100,10 @@ for (const skill of skills) {
         failures.push(`${tag}: reference query returns no rows`)
         continue
       }
-      const names = entityNames[skill.world]
+      const names = entityNames[world]
       if (names)
         for (const row of a.rows)
-          for (const cell of row) if (typeof cell === 'string' && names.has(cell)) catchableByWorld[skill.world].add(cell)
+          for (const cell of row) if (typeof cell === 'string' && names.has(cell)) catchableByWorld[world].add(cell)
       const b = await run(ex.referenceSql)
       if (!compareResults(a, b, { orderMatters: ex.orderMatters }).equal)
         failures.push(`${tag}: reference query is nondeterministic — add a tiebreaker to ORDER BY`)
@@ -87,14 +115,14 @@ for (const skill of skills) {
           )
       }
       if ((ex.collectibles ?? []).length > 0) {
-        const entity = worldSchemas[skill.world]?.entity
+        const entity = worldSchemas[world]?.entity
         if (!entity) {
           failures.push(`${tag}: world has no entity, collectibles not allowed`)
         } else {
           for (const c of ex.collectibles ?? []) {
             const hit = await run(`SELECT 1 FROM ${entity.table} WHERE ${entity.column} = '${c.replace(/'/g, "''")}'`)
             if (hit.rows.length === 0) failures.push(`${tag}: collectible "${c}" not found in world`)
-            else (catchableByWorld[skill.world] ??= new Set()).add(c)
+            else (catchableByWorld[world] ??= new Set()).add(c)
           }
         }
       }

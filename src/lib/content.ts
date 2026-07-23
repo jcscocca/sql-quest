@@ -25,7 +25,8 @@ export interface Region {
 export interface Skill {
   id: string
   name: string
-  world: string
+  world?: string
+  trackId?: 'sql' | 'systems-design'
   requires: string[]
   lesson: { intro: string; exampleSql: string; wrapUp?: string }
 }
@@ -43,6 +44,27 @@ export interface Exercise {
 export interface ExerciseBank {
   skillId: string
   exercises: Exercise[]
+}
+
+export interface DrillChoice {
+  id: string
+  text: string
+}
+
+export interface DrillExercise {
+  id: string
+  prompt: string
+  scenario?: string
+  choices: DrillChoice[]
+  answer: string
+  explanation: string
+  hints: string[]
+  xp: number
+}
+
+export interface DrillBank {
+  skillId: string
+  exercises: DrillExercise[]
 }
 
 export async function loadJson<T>(url: string): Promise<T> {
