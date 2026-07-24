@@ -543,6 +543,45 @@
       ]
     },
     {
+      "id": "js-applied",
+      "name": "JavaScript · Applied Data",
+      "skills": [
+        {
+          "id": "js-applied-pokemon",
+          "name": "Pokémon Analytics",
+          "trackId": "javascript",
+          "requires": ["js-classes"],
+          "lesson": {
+            "intro": "You have spent the JavaScript track building a toolkit — filter and map to select and project fields, reduce to aggregate, sort with a comparator to rank, and plain objects to group and tally. This region is where you point all of it at real analytical questions, the way the SQL Boss Arenas did: no new syntax, just the case. Each exercise hands you roster, an array of Pokémon records shaped { name, type, attack, defense } — a table of rows in JavaScript form, shown in the data panel beside the editor — and asks a question a data analyst would actually field: how many of each type, the strongest per type, the average attack per type, the top N by attack, the types whose defense clears a bar. The craft is decomposition — name the shape you want, then compose the tools that reach it: group with an object keyed by type, fold each group with reduce, sort a copy with a comparator, dedupe with a Set. And the details are the whole grade, exactly as they are on the job: ties resolved deterministically (keep the earlier record, or break alphabetically), averages rounded the way the prompt says with Math.round, strict > versus >= at a threshold, and the empty roster returning an empty-but-valid answer rather than crashing. Read each brief, picture the rows, and build the query in JavaScript.",
+            "exampleSql": "",
+            "wrapUp": "You turned a flat roster into per-type leaders, averages, rankings, and thresholds — composing filter, map, reduce, sort, and object-grouping into answers, never reaching for new syntax. That is the analyst's real skill: not knowing more operators, but choosing which intermediate results to build and pinning the edges — ties, rounding, the empty input — so the numbers can be trusted. Next you take the same instincts to a Yu-Gi-Oh! card database."
+          }
+        },
+        {
+          "id": "js-applied-yugioh",
+          "name": "Yu-Gi-Oh! Analytics",
+          "trackId": "javascript",
+          "requires": ["js-applied-pokemon"],
+          "lesson": {
+            "intro": "Second case, a new table. Here each exercise hands you cards, an array of Yu-Gi-Oh! card records shaped { name, archetype, atk, def, level }, and the questions shift from Pokémon types to card archetypes: how many cards per archetype, the strongest card overall and the strongest within each archetype, the average atk per archetype, every card at or above an atk threshold, the archetype with the most cards. The moves are the ones you just drilled — tally into an object keyed by archetype, fold each group to its leader with a running max, round a group average with Math.round — but the data leans on you to be precise. Archetype names carry spaces and hyphens, so 'Blue-Eyes' is an object key you must quote; a threshold test is >= not >; and ties are everywhere because so many cards share an atk of 3000. Decide each tie the way the prompt states — the first card in the array, or the alphabetically earliest archetype — and the plausible-but-sloppy solution that ignores the rule will fail the very test that checks it. Read the brief, stage your working set, and answer.",
+            "exampleSql": "",
+            "wrapUp": "You read a card database the way an analyst reads any table: grouping by archetype, ranking within and across groups, averaging and thresholding — all from the same handful of array tools. The recurring lesson was precision at the edges: quote the keys the data actually has, respect >= versus >, and settle every tie deterministically. One case remains, and it trades game data for a city's operations."
+          }
+        },
+        {
+          "id": "js-applied-seattle",
+          "name": "Seattle 311 Analytics",
+          "trackId": "javascript",
+          "requires": ["js-applied-yugioh"],
+          "lesson": {
+            "intro": "The final JavaScript case is an operational one. Each exercise hands you requests, an array of Seattle 311 service-request records shaped { type, neighborhood, daysOpen, status }, where status is 'open' or 'closed' and daysOpen is how long the request has stood open — and you are the analyst in the dispatch center. The questions are the daily bread of civic operations: how many requests per neighborhood, how many are still open, which neighborhoods reported a given type, the average days-open per request type, and the two that reward care — the slowest neighborhood by average days-open, and the busiest request type. Those last two hide the classic trap: the slowest neighborhood is decided by the average days-open, not the total, so a busy neighborhood with many quick requests must lose to a quiet one with a couple of stale ones — divide, don't sum. As always, settle ties the way the brief says (alphabetically here) and return null for the empty log rather than guessing. Compose the group-and-aggregate you now know cold, and read the operation off the data.",
+            "exampleSql": "",
+            "wrapUp": "You closed the case load: counts per neighborhood, open-versus-closed tallies, average resolution time per type, and the slowest and busiest cuts an operations lead actually asks for — each one a grouping folded to an aggregate and then ranked or thresholded. The trap you learned to avoid, choosing an average over a raw total, is the difference between a report that guides dispatch and one that quietly misleads it. That completes the JavaScript Applied Data region and the track's analytical arc: you can take an open, real-world question, decompose it into staged array operations, and pin every edge so the answer holds."
+          }
+        }
+      ]
+    },
+    {
       "id": "py-foundations",
       "name": "Python · Foundations",
       "skills": [

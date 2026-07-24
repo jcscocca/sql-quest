@@ -1,0 +1,153 @@
+{
+  "skillId": "js-applied-seattle",
+  "exercises": [
+    {
+      "id": "js-app-count-by-neighborhood",
+      "prompt": "You are given requests, an array of Seattle 311 service-request records, each an object { type, neighborhood, daysOpen, status } — for example { type: 'Pothole', neighborhood: 'Ballard', daysOpen: 6, status: 'open' } (status is always 'open' or 'closed'). Implement countByNeighborhood(requests) so it returns an object mapping each neighborhood to how many requests it has — { neighborhood: count }. countByNeighborhood(requests) is {'Ballard': 3, 'Fremont': 4, 'Downtown': 3, 'Capitol Hill': 2, 'Georgetown': 3}. An empty array returns an empty object {}.",
+      "functionName": "countByNeighborhood",
+      "fixture": "const requests = [\n  { type: 'Pothole', neighborhood: 'Ballard', daysOpen: 6, status: 'open' },\n  { type: 'Pothole', neighborhood: 'Fremont', daysOpen: 8, status: 'closed' },\n  { type: 'Pothole', neighborhood: 'Downtown', daysOpen: 50, status: 'open' },\n  { type: 'Graffiti', neighborhood: 'Capitol Hill', daysOpen: 40, status: 'closed' },\n  { type: 'Graffiti', neighborhood: 'Ballard', daysOpen: 18, status: 'open' },\n  { type: 'Graffiti', neighborhood: 'Downtown', daysOpen: 30, status: 'closed' },\n  { type: 'Streetlight', neighborhood: 'Fremont', daysOpen: 12, status: 'open' },\n  { type: 'Streetlight', neighborhood: 'Georgetown', daysOpen: 20, status: 'open' },\n  { type: 'Illegal Dumping', neighborhood: 'Georgetown', daysOpen: 25, status: 'open' },\n  { type: 'Illegal Dumping', neighborhood: 'Ballard', daysOpen: 9, status: 'closed' },\n  { type: 'Abandoned Vehicle', neighborhood: 'Capitol Hill', daysOpen: 44, status: 'closed' },\n  { type: 'Abandoned Vehicle', neighborhood: 'Downtown', daysOpen: 10, status: 'open' },\n  { type: 'Abandoned Vehicle', neighborhood: 'Fremont', daysOpen: 4, status: 'closed' },\n  { type: 'Pothole', neighborhood: 'Georgetown', daysOpen: 15, status: 'open' },\n  { type: 'Graffiti', neighborhood: 'Fremont', daysOpen: 16, status: 'closed' }\n]",
+      "starter": "function countByNeighborhood(requests) {\n  // tally requests into a {neighborhood: count} object\n}",
+      "solution": "function countByNeighborhood(requests) {\n  const counts = {}\n  for (const r of requests) {\n    counts[r.neighborhood] = (counts[r.neighborhood] || 0) + 1\n  }\n  return counts\n}",
+      "tests": [
+        { "expr": "countByNeighborhood(requests)", "expect": "{'Ballard': 3, 'Fremont': 4, 'Downtown': 3, 'Capitol Hill': 2, 'Georgetown': 3}" },
+        { "expr": "countByNeighborhood([])", "expect": "{}" },
+        { "expr": "countByNeighborhood([{ type: 'Pothole', neighborhood: 'SoDo', daysOpen: 1, status: 'open' }])", "expect": "{'SoDo': 1}" },
+        { "expr": "countByNeighborhood([{ type: 'a', neighborhood: 'Fremont', daysOpen: 1, status: 'open' }, { type: 'b', neighborhood: 'Fremont', daysOpen: 2, status: 'closed' }])", "expect": "{'Fremont': 2}" },
+        { "setup": "const c = countByNeighborhood(requests)", "expr": "c['Fremont']", "expect": "4" }
+      ],
+      "hints": [
+        "This is a frequency tally keyed by each request's neighborhood field.",
+        "Walk the requests bumping counts[r.neighborhood] = (counts[r.neighborhood] || 0) + 1.",
+        "Loop the requests updating counts[r.neighborhood] = (counts[r.neighborhood] || 0) + 1, then return counts — an empty array never enters the loop and returns {}."
+      ],
+      "xp": 20
+    },
+    {
+      "id": "js-app-closed-count",
+      "prompt": "You are given requests, an array of service-request records of shape { type, neighborhood, daysOpen, status }, where status is 'open' or 'closed'. Implement closedCount(requests) so it returns the number of requests whose status is 'closed'. closedCount(requests) is 7. An empty array returns 0.",
+      "functionName": "closedCount",
+      "fixture": "const requests = [\n  { type: 'Pothole', neighborhood: 'Ballard', daysOpen: 6, status: 'open' },\n  { type: 'Pothole', neighborhood: 'Fremont', daysOpen: 8, status: 'closed' },\n  { type: 'Pothole', neighborhood: 'Downtown', daysOpen: 50, status: 'open' },\n  { type: 'Graffiti', neighborhood: 'Capitol Hill', daysOpen: 40, status: 'closed' },\n  { type: 'Graffiti', neighborhood: 'Ballard', daysOpen: 18, status: 'open' },\n  { type: 'Graffiti', neighborhood: 'Downtown', daysOpen: 30, status: 'closed' },\n  { type: 'Streetlight', neighborhood: 'Fremont', daysOpen: 12, status: 'open' },\n  { type: 'Streetlight', neighborhood: 'Georgetown', daysOpen: 20, status: 'open' },\n  { type: 'Illegal Dumping', neighborhood: 'Georgetown', daysOpen: 25, status: 'open' },\n  { type: 'Illegal Dumping', neighborhood: 'Ballard', daysOpen: 9, status: 'closed' },\n  { type: 'Abandoned Vehicle', neighborhood: 'Capitol Hill', daysOpen: 44, status: 'closed' },\n  { type: 'Abandoned Vehicle', neighborhood: 'Downtown', daysOpen: 10, status: 'open' },\n  { type: 'Abandoned Vehicle', neighborhood: 'Fremont', daysOpen: 4, status: 'closed' },\n  { type: 'Pothole', neighborhood: 'Georgetown', daysOpen: 15, status: 'open' },\n  { type: 'Graffiti', neighborhood: 'Fremont', daysOpen: 16, status: 'closed' }\n]",
+      "starter": "function closedCount(requests) {\n  // count the requests whose status is 'closed'\n}",
+      "solution": "function closedCount(requests) {\n  return requests.filter(r => r.status === 'closed').length\n}",
+      "tests": [
+        { "expr": "closedCount(requests)", "expect": "7" },
+        { "expr": "closedCount([])", "expect": "0" },
+        { "expr": "closedCount([{ type: 'a', neighborhood: 'x', daysOpen: 1, status: 'closed' }, { type: 'b', neighborhood: 'y', daysOpen: 2, status: 'closed' }])", "expect": "2" },
+        { "expr": "closedCount([{ type: 'a', neighborhood: 'x', daysOpen: 1, status: 'open' }, { type: 'b', neighborhood: 'y', daysOpen: 2, status: 'open' }])", "expect": "0" },
+        { "expr": "closedCount([{ type: 'a', neighborhood: 'x', daysOpen: 1, status: 'open' }, { type: 'b', neighborhood: 'y', daysOpen: 2, status: 'closed' }])", "expect": "1" }
+      ],
+      "hints": [
+        "Keep only the closed requests, then ask how many there are.",
+        "filter(r => r.status === 'closed') selects the closed ones, and .length counts them.",
+        "return requests.filter(r => r.status === 'closed').length — the empty array filters to an empty array whose length is 0."
+      ],
+      "xp": 20
+    },
+    {
+      "id": "js-app-requests-of-type",
+      "prompt": "You are given requests, an array of service-request records of shape { type, neighborhood, daysOpen, status }. Implement requestsOfType(requests, type) so it returns an array of the neighborhoods of every request whose type equals the given type, in the array's original order (repeats are kept — one entry per matching request). requestsOfType(requests, 'Pothole') is ['Ballard', 'Fremont', 'Downtown', 'Georgetown']. A type with no requests, or an empty array, returns an empty array.",
+      "functionName": "requestsOfType",
+      "fixture": "const requests = [\n  { type: 'Pothole', neighborhood: 'Ballard', daysOpen: 6, status: 'open' },\n  { type: 'Pothole', neighborhood: 'Fremont', daysOpen: 8, status: 'closed' },\n  { type: 'Pothole', neighborhood: 'Downtown', daysOpen: 50, status: 'open' },\n  { type: 'Graffiti', neighborhood: 'Capitol Hill', daysOpen: 40, status: 'closed' },\n  { type: 'Graffiti', neighborhood: 'Ballard', daysOpen: 18, status: 'open' },\n  { type: 'Graffiti', neighborhood: 'Downtown', daysOpen: 30, status: 'closed' },\n  { type: 'Streetlight', neighborhood: 'Fremont', daysOpen: 12, status: 'open' },\n  { type: 'Streetlight', neighborhood: 'Georgetown', daysOpen: 20, status: 'open' },\n  { type: 'Illegal Dumping', neighborhood: 'Georgetown', daysOpen: 25, status: 'open' },\n  { type: 'Illegal Dumping', neighborhood: 'Ballard', daysOpen: 9, status: 'closed' },\n  { type: 'Abandoned Vehicle', neighborhood: 'Capitol Hill', daysOpen: 44, status: 'closed' },\n  { type: 'Abandoned Vehicle', neighborhood: 'Downtown', daysOpen: 10, status: 'open' },\n  { type: 'Abandoned Vehicle', neighborhood: 'Fremont', daysOpen: 4, status: 'closed' },\n  { type: 'Pothole', neighborhood: 'Georgetown', daysOpen: 15, status: 'open' },\n  { type: 'Graffiti', neighborhood: 'Fremont', daysOpen: 16, status: 'closed' }\n]",
+      "starter": "function requestsOfType(requests, type) {\n  // return the neighborhoods of matching requests, in order\n}",
+      "solution": "function requestsOfType(requests, type) {\n  return requests.filter(r => r.type === type).map(r => r.neighborhood)\n}",
+      "tests": [
+        { "expr": "requestsOfType(requests, 'Pothole')", "expect": "['Ballard', 'Fremont', 'Downtown', 'Georgetown']" },
+        { "expr": "requestsOfType(requests, 'Graffiti')", "expect": "['Capitol Hill', 'Ballard', 'Downtown', 'Fremont']" },
+        { "expr": "requestsOfType(requests, 'Streetlight')", "expect": "['Fremont', 'Georgetown']" },
+        { "expr": "requestsOfType(requests, 'Earthquake')", "expect": "[]" },
+        { "expr": "requestsOfType([], 'Pothole')", "expect": "[]" },
+        { "expr": "requestsOfType(requests, 'Abandoned Vehicle')", "expect": "['Capitol Hill', 'Downtown', 'Fremont']" }
+      ],
+      "hints": [
+        "Keep the requests of the requested type, then project each to its neighborhood.",
+        "filter(r => r.type === type) narrows the requests; map(r => r.neighborhood) turns each into its neighborhood.",
+        "return requests.filter(r => r.type === type).map(r => r.neighborhood) — filtering before mapping keeps the neighborhoods in original order, duplicates and all."
+      ],
+      "xp": 20
+    },
+    {
+      "id": "js-app-open-requests",
+      "prompt": "You are given requests, an array of service-request records of shape { type, neighborhood, daysOpen, status }, where status is 'open' or 'closed'. Implement openRequests(requests) so it returns an array of the types of every request whose status is 'open', in the array's original order (one entry per open request, repeats kept). openRequests(requests) is ['Pothole', 'Pothole', 'Graffiti', 'Streetlight', 'Streetlight', 'Illegal Dumping', 'Abandoned Vehicle', 'Pothole']. If no request is open, or the array is empty, return an empty array.",
+      "functionName": "openRequests",
+      "fixture": "const requests = [\n  { type: 'Pothole', neighborhood: 'Ballard', daysOpen: 6, status: 'open' },\n  { type: 'Pothole', neighborhood: 'Fremont', daysOpen: 8, status: 'closed' },\n  { type: 'Pothole', neighborhood: 'Downtown', daysOpen: 50, status: 'open' },\n  { type: 'Graffiti', neighborhood: 'Capitol Hill', daysOpen: 40, status: 'closed' },\n  { type: 'Graffiti', neighborhood: 'Ballard', daysOpen: 18, status: 'open' },\n  { type: 'Graffiti', neighborhood: 'Downtown', daysOpen: 30, status: 'closed' },\n  { type: 'Streetlight', neighborhood: 'Fremont', daysOpen: 12, status: 'open' },\n  { type: 'Streetlight', neighborhood: 'Georgetown', daysOpen: 20, status: 'open' },\n  { type: 'Illegal Dumping', neighborhood: 'Georgetown', daysOpen: 25, status: 'open' },\n  { type: 'Illegal Dumping', neighborhood: 'Ballard', daysOpen: 9, status: 'closed' },\n  { type: 'Abandoned Vehicle', neighborhood: 'Capitol Hill', daysOpen: 44, status: 'closed' },\n  { type: 'Abandoned Vehicle', neighborhood: 'Downtown', daysOpen: 10, status: 'open' },\n  { type: 'Abandoned Vehicle', neighborhood: 'Fremont', daysOpen: 4, status: 'closed' },\n  { type: 'Pothole', neighborhood: 'Georgetown', daysOpen: 15, status: 'open' },\n  { type: 'Graffiti', neighborhood: 'Fremont', daysOpen: 16, status: 'closed' }\n]",
+      "starter": "function openRequests(requests) {\n  // return the types of the open requests, in order\n}",
+      "solution": "function openRequests(requests) {\n  return requests.filter(r => r.status === 'open').map(r => r.type)\n}",
+      "tests": [
+        { "expr": "openRequests(requests)", "expect": "['Pothole', 'Pothole', 'Graffiti', 'Streetlight', 'Streetlight', 'Illegal Dumping', 'Abandoned Vehicle', 'Pothole']" },
+        { "expr": "openRequests([])", "expect": "[]" },
+        { "expr": "openRequests([{ type: 'a', neighborhood: 'x', daysOpen: 1, status: 'closed' }, { type: 'b', neighborhood: 'y', daysOpen: 2, status: 'closed' }])", "expect": "[]" },
+        { "expr": "openRequests([{ type: 'a', neighborhood: 'x', daysOpen: 1, status: 'open' }, { type: 'b', neighborhood: 'y', daysOpen: 2, status: 'closed' }])", "expect": "['a']" },
+        { "expr": "openRequests([{ type: 'a', neighborhood: 'x', daysOpen: 1, status: 'open' }, { type: 'b', neighborhood: 'y', daysOpen: 2, status: 'open' }])", "expect": "['a', 'b']" }
+      ],
+      "hints": [
+        "Keep the requests whose status is 'open', then project each to its type.",
+        "filter(r => r.status === 'open') selects the open ones; map(r => r.type) turns each into its type.",
+        "return requests.filter(r => r.status === 'open').map(r => r.type) — an all-closed array filters to nothing and returns []."
+      ],
+      "xp": 20
+    },
+    {
+      "id": "js-app-avg-days-open-by-type",
+      "prompt": "You are given requests, an array of service-request records of shape { type, neighborhood, daysOpen, status }. Implement avgDaysOpenByType(requests) so it returns an object mapping each type to the average daysOpen of its requests, rounded to the nearest integer with Math.round (a .5 rounds up) — { type: avg }. avgDaysOpenByType(requests) is {'Pothole': 20, 'Graffiti': 26, 'Streetlight': 16, 'Illegal Dumping': 17, 'Abandoned Vehicle': 19}. An empty array returns an empty object {}.",
+      "functionName": "avgDaysOpenByType",
+      "fixture": "const requests = [\n  { type: 'Pothole', neighborhood: 'Ballard', daysOpen: 6, status: 'open' },\n  { type: 'Pothole', neighborhood: 'Fremont', daysOpen: 8, status: 'closed' },\n  { type: 'Pothole', neighborhood: 'Downtown', daysOpen: 50, status: 'open' },\n  { type: 'Graffiti', neighborhood: 'Capitol Hill', daysOpen: 40, status: 'closed' },\n  { type: 'Graffiti', neighborhood: 'Ballard', daysOpen: 18, status: 'open' },\n  { type: 'Graffiti', neighborhood: 'Downtown', daysOpen: 30, status: 'closed' },\n  { type: 'Streetlight', neighborhood: 'Fremont', daysOpen: 12, status: 'open' },\n  { type: 'Streetlight', neighborhood: 'Georgetown', daysOpen: 20, status: 'open' },\n  { type: 'Illegal Dumping', neighborhood: 'Georgetown', daysOpen: 25, status: 'open' },\n  { type: 'Illegal Dumping', neighborhood: 'Ballard', daysOpen: 9, status: 'closed' },\n  { type: 'Abandoned Vehicle', neighborhood: 'Capitol Hill', daysOpen: 44, status: 'closed' },\n  { type: 'Abandoned Vehicle', neighborhood: 'Downtown', daysOpen: 10, status: 'open' },\n  { type: 'Abandoned Vehicle', neighborhood: 'Fremont', daysOpen: 4, status: 'closed' },\n  { type: 'Pothole', neighborhood: 'Georgetown', daysOpen: 15, status: 'open' },\n  { type: 'Graffiti', neighborhood: 'Fremont', daysOpen: 16, status: 'closed' }\n]",
+      "starter": "function avgDaysOpenByType(requests) {\n  // map each type to its rounded average daysOpen\n}",
+      "solution": "function avgDaysOpenByType(requests) {\n  const sums = {}\n  const counts = {}\n  for (const r of requests) {\n    sums[r.type] = (sums[r.type] || 0) + r.daysOpen\n    counts[r.type] = (counts[r.type] || 0) + 1\n  }\n  const result = {}\n  for (const t of Object.keys(sums)) {\n    result[t] = Math.round(sums[t] / counts[t])\n  }\n  return result\n}",
+      "tests": [
+        { "expr": "avgDaysOpenByType(requests)", "expect": "{'Pothole': 20, 'Graffiti': 26, 'Streetlight': 16, 'Illegal Dumping': 17, 'Abandoned Vehicle': 19}" },
+        { "expr": "avgDaysOpenByType([])", "expect": "{}" },
+        { "expr": "avgDaysOpenByType([{ type: 'Pothole', neighborhood: 'x', daysOpen: 10, status: 'open' }, { type: 'Pothole', neighborhood: 'y', daysOpen: 21, status: 'closed' }])", "expect": "{'Pothole': 16}" },
+        { "expr": "avgDaysOpenByType([{ type: 'Graffiti', neighborhood: 'x', daysOpen: 7, status: 'open' }])", "expect": "{'Graffiti': 7}" },
+        { "setup": "const a = avgDaysOpenByType(requests)", "expr": "a['Pothole']", "expect": "20" }
+      ],
+      "hints": [
+        "Accumulate a running sum of daysOpen and a running count of requests per type as you walk the array.",
+        "In a second pass, divide each type's sum by its count and Math.round the result.",
+        "The Pothole average is (6 + 8 + 50 + 15) / 4 = 19.75, which Math.round lifts to 20 — flooring or truncating would wrongly give 19, so round rather than cut."
+      ],
+      "xp": 20
+    },
+    {
+      "id": "js-app-slowest-neighborhood",
+      "prompt": "You are given requests, an array of service-request records of shape { type, neighborhood, daysOpen, status }. Implement slowestNeighborhood(requests) so it returns the neighborhood with the greatest average daysOpen across its requests. Compare on the true average, not the total. slowestNeighborhood(requests) is 'Capitol Hill' (its two requests average 42 days, beating every busier neighborhood's average). If several neighborhoods tie for the highest average, return the alphabetically smallest. An empty array returns null.",
+      "functionName": "slowestNeighborhood",
+      "fixture": "const requests = [\n  { type: 'Pothole', neighborhood: 'Ballard', daysOpen: 6, status: 'open' },\n  { type: 'Pothole', neighborhood: 'Fremont', daysOpen: 8, status: 'closed' },\n  { type: 'Pothole', neighborhood: 'Downtown', daysOpen: 50, status: 'open' },\n  { type: 'Graffiti', neighborhood: 'Capitol Hill', daysOpen: 40, status: 'closed' },\n  { type: 'Graffiti', neighborhood: 'Ballard', daysOpen: 18, status: 'open' },\n  { type: 'Graffiti', neighborhood: 'Downtown', daysOpen: 30, status: 'closed' },\n  { type: 'Streetlight', neighborhood: 'Fremont', daysOpen: 12, status: 'open' },\n  { type: 'Streetlight', neighborhood: 'Georgetown', daysOpen: 20, status: 'open' },\n  { type: 'Illegal Dumping', neighborhood: 'Georgetown', daysOpen: 25, status: 'open' },\n  { type: 'Illegal Dumping', neighborhood: 'Ballard', daysOpen: 9, status: 'closed' },\n  { type: 'Abandoned Vehicle', neighborhood: 'Capitol Hill', daysOpen: 44, status: 'closed' },\n  { type: 'Abandoned Vehicle', neighborhood: 'Downtown', daysOpen: 10, status: 'open' },\n  { type: 'Abandoned Vehicle', neighborhood: 'Fremont', daysOpen: 4, status: 'closed' },\n  { type: 'Pothole', neighborhood: 'Georgetown', daysOpen: 15, status: 'open' },\n  { type: 'Graffiti', neighborhood: 'Fremont', daysOpen: 16, status: 'closed' }\n]",
+      "starter": "function slowestNeighborhood(requests) {\n  // return the neighborhood with the greatest average daysOpen\n}",
+      "solution": "function slowestNeighborhood(requests) {\n  const sums = {}\n  const counts = {}\n  for (const r of requests) {\n    sums[r.neighborhood] = (sums[r.neighborhood] || 0) + r.daysOpen\n    counts[r.neighborhood] = (counts[r.neighborhood] || 0) + 1\n  }\n  let best = null\n  let bestAvg = -Infinity\n  for (const nb of Object.keys(sums).sort()) {\n    const avg = sums[nb] / counts[nb]\n    if (avg > bestAvg) {\n      bestAvg = avg\n      best = nb\n    }\n  }\n  return best\n}",
+      "tests": [
+        { "expr": "slowestNeighborhood(requests)", "expect": "'Capitol Hill'" },
+        { "expr": "slowestNeighborhood([])", "expect": "null" },
+        { "expr": "slowestNeighborhood([{ type: 't', neighborhood: 'Ravenna', daysOpen: 12, status: 'open' }])", "expect": "'Ravenna'" },
+        { "expr": "slowestNeighborhood([{ type: 't', neighborhood: 'Zed', daysOpen: 5, status: 'open' }, { type: 't', neighborhood: 'Ann', daysOpen: 5, status: 'open' }])", "expect": "'Ann'" },
+        { "expr": "slowestNeighborhood([{ type: 't', neighborhood: 'High', daysOpen: 100, status: 'open' }, { type: 't', neighborhood: 'Low', daysOpen: 30, status: 'open' }, { type: 't', neighborhood: 'Low', daysOpen: 30, status: 'open' }, { type: 't', neighborhood: 'Low', daysOpen: 30, status: 'open' }, { type: 't', neighborhood: 'Low', daysOpen: 30, status: 'open' }])", "expect": "'High'" }
+      ],
+      "hints": [
+        "Build per-neighborhood sum and count tallies of daysOpen, then scan for the largest sum / count — the average, not the raw total.",
+        "The last test proves why: 'Low' has the bigger total (120 over 4 requests) but 'High' has the bigger average (100 over 1), and the average must win.",
+        "After tallying, iterate Object.keys(sums).sort() tracking the max average with a strict >, so ties resolve alphabetically and an empty array leaves best as null."
+      ],
+      "xp": 20
+    },
+    {
+      "id": "js-app-busiest-type",
+      "prompt": "You are given requests, an array of service-request records of shape { type, neighborhood, daysOpen, status }. Implement busiestType(requests) so it returns the request type that appears most often. busiestType(requests) is 'Graffiti' — it ties Pothole at 4 requests each, and Graffiti wins the tie alphabetically. If several types tie for the most requests, return the alphabetically smallest. An empty array returns null.",
+      "functionName": "busiestType",
+      "fixture": "const requests = [\n  { type: 'Pothole', neighborhood: 'Ballard', daysOpen: 6, status: 'open' },\n  { type: 'Pothole', neighborhood: 'Fremont', daysOpen: 8, status: 'closed' },\n  { type: 'Pothole', neighborhood: 'Downtown', daysOpen: 50, status: 'open' },\n  { type: 'Graffiti', neighborhood: 'Capitol Hill', daysOpen: 40, status: 'closed' },\n  { type: 'Graffiti', neighborhood: 'Ballard', daysOpen: 18, status: 'open' },\n  { type: 'Graffiti', neighborhood: 'Downtown', daysOpen: 30, status: 'closed' },\n  { type: 'Streetlight', neighborhood: 'Fremont', daysOpen: 12, status: 'open' },\n  { type: 'Streetlight', neighborhood: 'Georgetown', daysOpen: 20, status: 'open' },\n  { type: 'Illegal Dumping', neighborhood: 'Georgetown', daysOpen: 25, status: 'open' },\n  { type: 'Illegal Dumping', neighborhood: 'Ballard', daysOpen: 9, status: 'closed' },\n  { type: 'Abandoned Vehicle', neighborhood: 'Capitol Hill', daysOpen: 44, status: 'closed' },\n  { type: 'Abandoned Vehicle', neighborhood: 'Downtown', daysOpen: 10, status: 'open' },\n  { type: 'Abandoned Vehicle', neighborhood: 'Fremont', daysOpen: 4, status: 'closed' },\n  { type: 'Pothole', neighborhood: 'Georgetown', daysOpen: 15, status: 'open' },\n  { type: 'Graffiti', neighborhood: 'Fremont', daysOpen: 16, status: 'closed' }\n]",
+      "starter": "function busiestType(requests) {\n  // return the most common request type\n}",
+      "solution": "function busiestType(requests) {\n  const counts = {}\n  for (const r of requests) {\n    counts[r.type] = (counts[r.type] || 0) + 1\n  }\n  let best = null\n  let bestCount = 0\n  for (const t of Object.keys(counts).sort()) {\n    if (counts[t] > bestCount) {\n      bestCount = counts[t]\n      best = t\n    }\n  }\n  return best\n}",
+      "tests": [
+        { "expr": "busiestType(requests)", "expect": "'Graffiti'" },
+        { "expr": "busiestType([])", "expect": "null" },
+        { "expr": "busiestType([{ type: 'Pothole', neighborhood: 'x', daysOpen: 1, status: 'open' }])", "expect": "'Pothole'" },
+        { "expr": "busiestType([{ type: 'Zed', neighborhood: 'x', daysOpen: 1, status: 'open' }, { type: 'Ann', neighborhood: 'y', daysOpen: 2, status: 'open' }])", "expect": "'Ann'" },
+        { "expr": "busiestType([{ type: 'Rare', neighborhood: 'x', daysOpen: 1, status: 'open' }, { type: 'Common', neighborhood: 'y', daysOpen: 2, status: 'open' }, { type: 'Common', neighborhood: 'z', daysOpen: 3, status: 'closed' }])", "expect": "'Common'" }
+      ],
+      "hints": [
+        "First tally the requests per type, then scan the tally for the type with the largest count.",
+        "Iterating the keys in sorted order with a strict > comparison makes a tie resolve to the alphabetically earlier type.",
+        "Build counts, then loop Object.keys(counts).sort() tracking the max — Pothole and Graffiti both reach 4, but scanning alphabetically with a strict > keeps 'Graffiti'."
+      ],
+      "xp": 20
+    }
+  ]
+}

@@ -1,0 +1,155 @@
+{
+  "skillId": "js-applied-pokemon",
+  "exercises": [
+    {
+      "id": "js-app-count-by-type",
+      "prompt": "You are given roster, an array of Pokémon records, each an object { name, type, attack, defense } — for example { name: 'charmander', type: 'fire', attack: 52, defense: 43 }. Implement countByType(roster) so it returns an object mapping each type to how many records have it — { type: count }. countByType(roster) is {fire: 4, water: 4, grass: 3, electric: 2, rock: 2}. An empty roster returns an empty object {}.",
+      "functionName": "countByType",
+      "fixture": "const roster = [\n  { name: 'charmander', type: 'fire', attack: 52, defense: 43 },\n  { name: 'charizard', type: 'fire', attack: 84, defense: 78 },\n  { name: 'vulpix', type: 'fire', attack: 41, defense: 40 },\n  { name: 'growlithe', type: 'fire', attack: 70, defense: 45 },\n  { name: 'squirtle', type: 'water', attack: 48, defense: 65 },\n  { name: 'blastoise', type: 'water', attack: 83, defense: 100 },\n  { name: 'psyduck', type: 'water', attack: 52, defense: 48 },\n  { name: 'staryu', type: 'water', attack: 45, defense: 55 },\n  { name: 'bulbasaur', type: 'grass', attack: 49, defense: 49 },\n  { name: 'oddish', type: 'grass', attack: 50, defense: 55 },\n  { name: 'bellsprout', type: 'grass', attack: 75, defense: 35 },\n  { name: 'pikachu', type: 'electric', attack: 55, defense: 40 },\n  { name: 'magnemite', type: 'electric', attack: 35, defense: 70 },\n  { name: 'geodude', type: 'rock', attack: 80, defense: 100 },\n  { name: 'onix', type: 'rock', attack: 45, defense: 160 }\n]",
+      "starter": "function countByType(roster) {\n  // tally records into a {type: count} object\n}",
+      "solution": "function countByType(roster) {\n  const counts = {}\n  for (const p of roster) {\n    counts[p.type] = (counts[p.type] || 0) + 1\n  }\n  return counts\n}",
+      "tests": [
+        { "expr": "countByType(roster)", "expect": "{fire: 4, water: 4, grass: 3, electric: 2, rock: 2}" },
+        { "expr": "countByType([])", "expect": "{}" },
+        { "expr": "countByType([{ name: 'a', type: 'fire', attack: 1, defense: 1 }])", "expect": "{fire: 1}" },
+        { "expr": "countByType([{ name: 'a', type: 'ghost', attack: 1, defense: 1 }, { name: 'b', type: 'ghost', attack: 2, defense: 2 }])", "expect": "{ghost: 2}" },
+        { "setup": "const c = countByType(roster)", "expr": "c.grass", "expect": "3" }
+      ],
+      "hints": [
+        "This is a frequency tally, but the value you count is each record's type field rather than the record itself.",
+        "Walk the records and bump the bucket for p.type: counts[p.type] = (counts[p.type] || 0) + 1.",
+        "Loop the roster updating counts[p.type] = (counts[p.type] || 0) + 1, then return counts — || 0 seeds the first record of each type, and an empty roster never enters the loop so you return {}."
+      ],
+      "xp": 20
+    },
+    {
+      "id": "js-app-total-attack-of-type",
+      "prompt": "You are given roster, an array of Pokémon records of shape { name, type, attack, defense }. Implement totalAttackOfType(roster, type) so it returns the sum of the attack fields across only the records whose type equals the given type. totalAttackOfType(roster, 'fire') is 247. A type no record has, or an empty roster, returns 0.",
+      "functionName": "totalAttackOfType",
+      "fixture": "const roster = [\n  { name: 'charmander', type: 'fire', attack: 52, defense: 43 },\n  { name: 'charizard', type: 'fire', attack: 84, defense: 78 },\n  { name: 'vulpix', type: 'fire', attack: 41, defense: 40 },\n  { name: 'growlithe', type: 'fire', attack: 70, defense: 45 },\n  { name: 'squirtle', type: 'water', attack: 48, defense: 65 },\n  { name: 'blastoise', type: 'water', attack: 83, defense: 100 },\n  { name: 'psyduck', type: 'water', attack: 52, defense: 48 },\n  { name: 'staryu', type: 'water', attack: 45, defense: 55 },\n  { name: 'bulbasaur', type: 'grass', attack: 49, defense: 49 },\n  { name: 'oddish', type: 'grass', attack: 50, defense: 55 },\n  { name: 'bellsprout', type: 'grass', attack: 75, defense: 35 },\n  { name: 'pikachu', type: 'electric', attack: 55, defense: 40 },\n  { name: 'magnemite', type: 'electric', attack: 35, defense: 70 },\n  { name: 'geodude', type: 'rock', attack: 80, defense: 100 },\n  { name: 'onix', type: 'rock', attack: 45, defense: 160 }\n]",
+      "starter": "function totalAttackOfType(roster, type) {\n  // sum attack across records of the given type\n}",
+      "solution": "function totalAttackOfType(roster, type) {\n  return roster\n    .filter(p => p.type === type)\n    .reduce((sum, p) => sum + p.attack, 0)\n}",
+      "tests": [
+        { "expr": "totalAttackOfType(roster, 'fire')", "expect": "247" },
+        { "expr": "totalAttackOfType(roster, 'water')", "expect": "228" },
+        { "expr": "totalAttackOfType(roster, 'electric')", "expect": "90" },
+        { "expr": "totalAttackOfType(roster, 'dragon')", "expect": "0" },
+        { "expr": "totalAttackOfType([], 'fire')", "expect": "0" },
+        { "expr": "totalAttackOfType(roster, 'rock')", "expect": "125" }
+      ],
+      "hints": [
+        "Two steps: narrow to the records of the requested type, then add up their attack values.",
+        "filter(p => p.type === type) keeps the matching records; reduce with a 0 seed sums a field: (sum, p) => sum + p.attack.",
+        "return roster.filter(p => p.type === type).reduce((sum, p) => sum + p.attack, 0) — the 0 seed is both the running total and the answer when no record matches."
+      ],
+      "xp": 20
+    },
+    {
+      "id": "js-app-strongest-by-type",
+      "prompt": "You are given roster, an array of Pokémon records of shape { name, type, attack, defense }. Implement strongestByType(roster) so it returns an object mapping each type to the name of its highest-attack record — { type: name }. strongestByType(roster) is {fire: 'charizard', water: 'blastoise', grass: 'bellsprout', electric: 'pikachu', rock: 'geodude'}. If two records of the same type tie for highest attack, keep the one that appears first in the roster. An empty roster returns an empty object {}.",
+      "functionName": "strongestByType",
+      "fixture": "const roster = [\n  { name: 'charmander', type: 'fire', attack: 52, defense: 43 },\n  { name: 'charizard', type: 'fire', attack: 84, defense: 78 },\n  { name: 'vulpix', type: 'fire', attack: 41, defense: 40 },\n  { name: 'growlithe', type: 'fire', attack: 70, defense: 45 },\n  { name: 'squirtle', type: 'water', attack: 48, defense: 65 },\n  { name: 'blastoise', type: 'water', attack: 83, defense: 100 },\n  { name: 'psyduck', type: 'water', attack: 52, defense: 48 },\n  { name: 'staryu', type: 'water', attack: 45, defense: 55 },\n  { name: 'bulbasaur', type: 'grass', attack: 49, defense: 49 },\n  { name: 'oddish', type: 'grass', attack: 50, defense: 55 },\n  { name: 'bellsprout', type: 'grass', attack: 75, defense: 35 },\n  { name: 'pikachu', type: 'electric', attack: 55, defense: 40 },\n  { name: 'magnemite', type: 'electric', attack: 35, defense: 70 },\n  { name: 'geodude', type: 'rock', attack: 80, defense: 100 },\n  { name: 'onix', type: 'rock', attack: 45, defense: 160 }\n]",
+      "starter": "function strongestByType(roster) {\n  // map each type to the name of its highest-attack record\n}",
+      "solution": "function strongestByType(roster) {\n  const best = {}\n  for (const p of roster) {\n    if (!(p.type in best) || p.attack > best[p.type].attack) best[p.type] = p\n  }\n  const result = {}\n  for (const type of Object.keys(best)) result[type] = best[type].name\n  return result\n}",
+      "tests": [
+        { "expr": "strongestByType(roster)", "expect": "{fire: 'charizard', water: 'blastoise', grass: 'bellsprout', electric: 'pikachu', rock: 'geodude'}" },
+        { "expr": "strongestByType([])", "expect": "{}" },
+        { "expr": "strongestByType([{ name: 'solo', type: 'ghost', attack: 10, defense: 5 }])", "expect": "{ghost: 'solo'}" },
+        { "expr": "strongestByType([{ name: 'first', type: 'x', attack: 50, defense: 1 }, { name: 'second', type: 'x', attack: 50, defense: 1 }])", "expect": "{x: 'first'}" },
+        { "expr": "strongestByType([{ name: 'a', type: 'fire', attack: 30, defense: 1 }, { name: 'b', type: 'water', attack: 20, defense: 1 }, { name: 'c', type: 'fire', attack: 90, defense: 1 }])", "expect": "{fire: 'c', water: 'b'}" }
+      ],
+      "hints": [
+        "Track the best record seen so far for each type as you walk the roster — one running leader per bucket.",
+        "For each record, replace the type's leader only when p.attack is strictly greater than the stored one, then read each leader's .name at the end.",
+        "Use if (!(p.type in best) || p.attack > best[p.type].attack) best[p.type] = p — strictly > keeps the earlier record on a tie, matching the fourth test where 'first' wins over 'second'."
+      ],
+      "xp": 20
+    },
+    {
+      "id": "js-app-average-attack-by-type",
+      "prompt": "You are given roster, an array of Pokémon records of shape { name, type, attack, defense }. Implement averageAttackByType(roster) so it returns an object mapping each type to the average attack of its records, rounded to the nearest integer with Math.round (a .5 rounds up) — { type: avg }. averageAttackByType(roster) is {fire: 62, water: 57, grass: 58, electric: 45, rock: 63}. An empty roster returns an empty object {}.",
+      "functionName": "averageAttackByType",
+      "fixture": "const roster = [\n  { name: 'charmander', type: 'fire', attack: 52, defense: 43 },\n  { name: 'charizard', type: 'fire', attack: 84, defense: 78 },\n  { name: 'vulpix', type: 'fire', attack: 41, defense: 40 },\n  { name: 'growlithe', type: 'fire', attack: 70, defense: 45 },\n  { name: 'squirtle', type: 'water', attack: 48, defense: 65 },\n  { name: 'blastoise', type: 'water', attack: 83, defense: 100 },\n  { name: 'psyduck', type: 'water', attack: 52, defense: 48 },\n  { name: 'staryu', type: 'water', attack: 45, defense: 55 },\n  { name: 'bulbasaur', type: 'grass', attack: 49, defense: 49 },\n  { name: 'oddish', type: 'grass', attack: 50, defense: 55 },\n  { name: 'bellsprout', type: 'grass', attack: 75, defense: 35 },\n  { name: 'pikachu', type: 'electric', attack: 55, defense: 40 },\n  { name: 'magnemite', type: 'electric', attack: 35, defense: 70 },\n  { name: 'geodude', type: 'rock', attack: 80, defense: 100 },\n  { name: 'onix', type: 'rock', attack: 45, defense: 160 }\n]",
+      "starter": "function averageAttackByType(roster) {\n  // map each type to its rounded average attack\n}",
+      "solution": "function averageAttackByType(roster) {\n  const sums = {}\n  const counts = {}\n  for (const p of roster) {\n    sums[p.type] = (sums[p.type] || 0) + p.attack\n    counts[p.type] = (counts[p.type] || 0) + 1\n  }\n  const result = {}\n  for (const type of Object.keys(sums)) {\n    result[type] = Math.round(sums[type] / counts[type])\n  }\n  return result\n}",
+      "tests": [
+        { "expr": "averageAttackByType(roster)", "expect": "{fire: 62, water: 57, grass: 58, electric: 45, rock: 63}" },
+        { "expr": "averageAttackByType([])", "expect": "{}" },
+        { "expr": "averageAttackByType([{ name: 'a', type: 'fire', attack: 10, defense: 1 }, { name: 'b', type: 'fire', attack: 21, defense: 1 }])", "expect": "{fire: 16}" },
+        { "expr": "averageAttackByType([{ name: 'solo', type: 'grass', attack: 40, defense: 1 }])", "expect": "{grass: 40}" },
+        { "setup": "const a = averageAttackByType(roster)", "expr": "a.rock", "expect": "63" }
+      ],
+      "hints": [
+        "You need two tallies per type as you walk the roster: a running sum of attack and a running count of records.",
+        "Accumulate sums[p.type] and counts[p.type] together, then in a second pass divide and round: Math.round(sums[type] / counts[type]).",
+        "The rock average is (80 + 45) / 2 = 62.5, which Math.round turns into 63 — flooring or truncating would wrongly give 62, so round rather than cut."
+      ],
+      "xp": 20
+    },
+    {
+      "id": "js-app-top-by-attack",
+      "prompt": "You are given roster, an array of Pokémon records of shape { name, type, attack, defense }. Implement topByAttack(roster, n) so it returns an array of the names of the n highest-attack records, ordered from highest attack to lowest. Records that tie on attack keep their original roster order relative to each other. topByAttack(roster, 3) is ['charizard', 'blastoise', 'geodude']. If n is 0 the result is empty; if n exceeds the roster length, return every name in sorted order. Do not modify the roster.",
+      "functionName": "topByAttack",
+      "fixture": "const roster = [\n  { name: 'charmander', type: 'fire', attack: 52, defense: 43 },\n  { name: 'charizard', type: 'fire', attack: 84, defense: 78 },\n  { name: 'vulpix', type: 'fire', attack: 41, defense: 40 },\n  { name: 'growlithe', type: 'fire', attack: 70, defense: 45 },\n  { name: 'squirtle', type: 'water', attack: 48, defense: 65 },\n  { name: 'blastoise', type: 'water', attack: 83, defense: 100 },\n  { name: 'psyduck', type: 'water', attack: 52, defense: 48 },\n  { name: 'staryu', type: 'water', attack: 45, defense: 55 },\n  { name: 'bulbasaur', type: 'grass', attack: 49, defense: 49 },\n  { name: 'oddish', type: 'grass', attack: 50, defense: 55 },\n  { name: 'bellsprout', type: 'grass', attack: 75, defense: 35 },\n  { name: 'pikachu', type: 'electric', attack: 55, defense: 40 },\n  { name: 'magnemite', type: 'electric', attack: 35, defense: 70 },\n  { name: 'geodude', type: 'rock', attack: 80, defense: 100 },\n  { name: 'onix', type: 'rock', attack: 45, defense: 160 }\n]",
+      "starter": "function topByAttack(roster, n) {\n  // return the n highest-attack names, strongest first\n}",
+      "solution": "function topByAttack(roster, n) {\n  return [...roster]\n    .sort((a, b) => b.attack - a.attack)\n    .slice(0, n)\n    .map(p => p.name)\n}",
+      "tests": [
+        { "expr": "topByAttack(roster, 3)", "expect": "['charizard', 'blastoise', 'geodude']" },
+        { "expr": "topByAttack(roster, 5)", "expect": "['charizard', 'blastoise', 'geodude', 'bellsprout', 'growlithe']" },
+        { "expr": "topByAttack(roster, 0)", "expect": "[]" },
+        { "expr": "topByAttack(roster, 8)", "expect": "['charizard', 'blastoise', 'geodude', 'bellsprout', 'growlithe', 'pikachu', 'charmander', 'psyduck']" },
+        { "expr": "topByAttack([{ name: 'only', type: 'x', attack: 5, defense: 1 }], 4)", "expect": "['only']" },
+        { "setup": "const original = [...roster]; topByAttack(roster, 3)", "expr": "roster.length", "expect": "15" }
+      ],
+      "hints": [
+        "Sort a copy of the roster by attack descending, then take the first n and pull each name out.",
+        "[...roster].sort((a, b) => b.attack - a.attack) orders strongest-first without touching the original; slice(0, n) is safe when n is 0 or larger than the array.",
+        "return [...roster].sort((a, b) => b.attack - a.attack).slice(0, n).map(p => p.name) — sort is stable, so charmander (attack 52) stays ahead of psyduck (also 52) as the eighth-place test checks."
+      ],
+      "xp": 20
+    },
+    {
+      "id": "js-app-types-with-defense-above",
+      "prompt": "You are given roster, an array of Pokémon records of shape { name, type, attack, defense }. Implement typesWithDefenseAbove(roster, d) so it returns an array of the distinct types that have at least one record whose defense is strictly greater than d, sorted alphabetically. typesWithDefenseAbove(roster, 70) is ['fire', 'rock', 'water']. If no type qualifies, or the roster is empty, return an empty array.",
+      "functionName": "typesWithDefenseAbove",
+      "fixture": "const roster = [\n  { name: 'charmander', type: 'fire', attack: 52, defense: 43 },\n  { name: 'charizard', type: 'fire', attack: 84, defense: 78 },\n  { name: 'vulpix', type: 'fire', attack: 41, defense: 40 },\n  { name: 'growlithe', type: 'fire', attack: 70, defense: 45 },\n  { name: 'squirtle', type: 'water', attack: 48, defense: 65 },\n  { name: 'blastoise', type: 'water', attack: 83, defense: 100 },\n  { name: 'psyduck', type: 'water', attack: 52, defense: 48 },\n  { name: 'staryu', type: 'water', attack: 45, defense: 55 },\n  { name: 'bulbasaur', type: 'grass', attack: 49, defense: 49 },\n  { name: 'oddish', type: 'grass', attack: 50, defense: 55 },\n  { name: 'bellsprout', type: 'grass', attack: 75, defense: 35 },\n  { name: 'pikachu', type: 'electric', attack: 55, defense: 40 },\n  { name: 'magnemite', type: 'electric', attack: 35, defense: 70 },\n  { name: 'geodude', type: 'rock', attack: 80, defense: 100 },\n  { name: 'onix', type: 'rock', attack: 45, defense: 160 }\n]",
+      "starter": "function typesWithDefenseAbove(roster, d) {\n  // return the distinct qualifying types, sorted\n}",
+      "solution": "function typesWithDefenseAbove(roster, d) {\n  return [...new Set(roster.filter(p => p.defense > d).map(p => p.type))].sort()\n}",
+      "tests": [
+        { "expr": "typesWithDefenseAbove(roster, 70)", "expect": "['fire', 'rock', 'water']" },
+        { "expr": "typesWithDefenseAbove(roster, 99)", "expect": "['rock', 'water']" },
+        { "expr": "typesWithDefenseAbove(roster, 200)", "expect": "[]" },
+        { "expr": "typesWithDefenseAbove(roster, 0)", "expect": "['electric', 'fire', 'grass', 'rock', 'water']" },
+        { "expr": "typesWithDefenseAbove([], 10)", "expect": "[]" },
+        { "expr": "typesWithDefenseAbove(roster, 100)", "expect": "['rock']" }
+      ],
+      "hints": [
+        "Keep the records whose defense clears the bar, collect their types, then drop duplicates and sort.",
+        "filter(p => p.defense > d) then map(p => p.type) gives a type list with repeats; wrap it in new Set(...) to dedupe.",
+        "return [...new Set(roster.filter(p => p.defense > d).map(p => p.type))].sort() — strictly > means magnemite (defense 70) does not put electric in the d = 70 result."
+      ],
+      "xp": 20
+    },
+    {
+      "id": "js-app-type-with-highest-average-attack",
+      "prompt": "You are given roster, an array of Pokémon records of shape { name, type, attack, defense }. Implement typeWithHighestAverageAttack(roster) so it returns the single type whose records have the greatest average attack. typeWithHighestAverageAttack(roster) is 'rock' (its average, 62.5, edges out fire's 61.75). Compare on the true average, not the total. If several types tie for the highest average, return the alphabetically smallest. An empty roster returns null.",
+      "functionName": "typeWithHighestAverageAttack",
+      "fixture": "const roster = [\n  { name: 'charmander', type: 'fire', attack: 52, defense: 43 },\n  { name: 'charizard', type: 'fire', attack: 84, defense: 78 },\n  { name: 'vulpix', type: 'fire', attack: 41, defense: 40 },\n  { name: 'growlithe', type: 'fire', attack: 70, defense: 45 },\n  { name: 'squirtle', type: 'water', attack: 48, defense: 65 },\n  { name: 'blastoise', type: 'water', attack: 83, defense: 100 },\n  { name: 'psyduck', type: 'water', attack: 52, defense: 48 },\n  { name: 'staryu', type: 'water', attack: 45, defense: 55 },\n  { name: 'bulbasaur', type: 'grass', attack: 49, defense: 49 },\n  { name: 'oddish', type: 'grass', attack: 50, defense: 55 },\n  { name: 'bellsprout', type: 'grass', attack: 75, defense: 35 },\n  { name: 'pikachu', type: 'electric', attack: 55, defense: 40 },\n  { name: 'magnemite', type: 'electric', attack: 35, defense: 70 },\n  { name: 'geodude', type: 'rock', attack: 80, defense: 100 },\n  { name: 'onix', type: 'rock', attack: 45, defense: 160 }\n]",
+      "starter": "function typeWithHighestAverageAttack(roster) {\n  // return the type with the greatest average attack\n}",
+      "solution": "function typeWithHighestAverageAttack(roster) {\n  const sums = {}\n  const counts = {}\n  for (const p of roster) {\n    sums[p.type] = (sums[p.type] || 0) + p.attack\n    counts[p.type] = (counts[p.type] || 0) + 1\n  }\n  let best = null\n  let bestAvg = -Infinity\n  for (const type of Object.keys(sums).sort()) {\n    const avg = sums[type] / counts[type]\n    if (avg > bestAvg) {\n      bestAvg = avg\n      best = type\n    }\n  }\n  return best\n}",
+      "tests": [
+        { "expr": "typeWithHighestAverageAttack(roster)", "expect": "'rock'" },
+        { "expr": "typeWithHighestAverageAttack([])", "expect": "null" },
+        { "expr": "typeWithHighestAverageAttack([{ name: 'x', type: 'ghost', attack: 5, defense: 1 }])", "expect": "'ghost'" },
+        { "expr": "typeWithHighestAverageAttack([{ name: 'a', type: 'zeta', attack: 10, defense: 1 }, { name: 'b', type: 'alpha', attack: 10, defense: 1 }])", "expect": "'alpha'" },
+        { "expr": "typeWithHighestAverageAttack([{ name: 'a', type: 'low', attack: 10, defense: 1 }, { name: 'b', type: 'low', attack: 10, defense: 1 }, { name: 'c', type: 'high', attack: 90, defense: 1 }])", "expect": "'high'" }
+      ],
+      "hints": [
+        "Build per-type sum and count tallies first, then scan the types comparing sums[type] / counts[type] — the average, not the raw sum.",
+        "Comparing totals would answer 'fire' (247 beats rock's 125); you must divide by the count so rock's 62.5 average wins.",
+        "Iterate Object.keys(sums).sort() tracking the largest average with a strict >, so on a tie the alphabetically earlier type is kept and an empty roster leaves best as null."
+      ],
+      "xp": 20
+    }
+  ]
+}
