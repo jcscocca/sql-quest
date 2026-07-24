@@ -1,10 +1,27 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { DuckDBInstance } from '@duckdb/node-api'
 import { compareResults, type QueryResult } from '../src/lib/compare'
-import { runTests } from '../src/lib/js-runtime'
-import type { Curriculum, ExerciseBank, JsBank, PyBank, WorldSchema } from '../src/lib/content'
+import { runCodeTests, withFixtureSetup } from '../src/lib/js-runtime'
+import { PY_RUNNER } from '../src/lib/py-runner-src'
+import { loadPyodide } from 'pyodide'
+import type { CodeTest, Curriculum, ExerciseBank, JsBank, PyBank, WorldSchema } from '../src/lib/content'
 
 const failures: string[] = []
+
+function checkCodeTests(tag: string, tests: unknown): tests is CodeTest[] {
+  if (!Array.isArray(tests) || tests.length < 1) {
+    failures.push(`${tag}: needs at least 1 test`)
+    return false
+  }
+  for (const [i, t] of tests.entries()) {
+    const where = `${tag}: test ${i + 1}`
+    if (!t.expr?.trim()) failures.push(`${where}: missing expr`)
+    const hasExpect = typeof t.expect === 'string' && t.expect.trim() !== ''
+    const hasRaises = typeof t.raises === 'string' && t.raises.trim() !== ''
+    if (hasExpect === hasRaises) failures.push(`${where}: needs exactly one of expect or raises`)
+  }
+  return true
+}
 
 const curriculum = JSON.parse(readFileSync('public/content/skills.json', 'utf8')) as Curriculum
 const skills = curriculum.regions.flatMap(r => r.skills)
@@ -15,6 +32,15 @@ for (const s of skills)
 
 const db = await DuckDBInstance.create()
 const conn = await db.connect()
+
+const py = await loadPyodide()
+py.runPython(PY_RUNNER)
+const pyRunExercise = py.globals.get('_run_exercise') as (code: string, testsJson: string) => string
+
+function runPyExercise(code: string, tests: CodeTest[], fixture?: string): [boolean, string, string, string | null][] {
+  const folded = tests.map(t => ({ ...t, setup: withFixtureSetup(fixture, t.setup) }))
+  return JSON.parse(pyRunExercise(code, JSON.stringify(folded)))
+}
 
 const worlds = new Set(skills.map(s => s.world).filter((w): w is string => !!w))
 const worldSchemas: Record<string, WorldSchema> = {}
@@ -69,26 +95,20 @@ for (const skill of skills) {
       if (!ex.functionName?.trim()) failures.push(`${tag}: missing functionName`)
       if (!ex.starter?.trim()) failures.push(`${tag}: missing starter`)
       if (!ex.solution?.trim()) failures.push(`${tag}: missing solution`)
-      if (!Array.isArray(ex.tests) || ex.tests.length < 1) failures.push(`${tag}: needs at least 1 test`)
       if (ex.hints.length !== 3) failures.push(`${tag}: expected 3 hints, found ${ex.hints.length}`)
-      if (ex.functionName?.trim() && ex.solution?.trim() && Array.isArray(ex.tests) && ex.tests.length > 0) {
-        try {
-          const fn = new Function(`${ex.solution}\n; return ${ex.functionName}`)() as Function
-          runTests(fn, ex.tests).forEach((r, i) => {
-            if (!r.pass)
-              failures.push(
-                `${tag}: solution fails test ${i + 1} — expected ${JSON.stringify(r.expected)}, got ${r.error ? `error ${r.error}` : JSON.stringify(r.actual)}`,
-              )
-          })
-        } catch (e) {
-          failures.push(`${tag}: solution did not evaluate — ${e}`)
+      if (!checkCodeTests(tag, ex.tests)) continue
+      if (ex.solution?.trim()) {
+        for (const [i, r] of runCodeTests(ex.solution, ex.tests, ex.fixture).entries()) {
+          if (!r.pass)
+            failures.push(
+              `${tag}: solution fails test ${i + 1} — expected ${r.expected}, got ${r.error ? `error ${r.error}` : r.actual}`,
+            )
         }
       }
     }
     continue
   }
 
-  // Python: structural checks only — running Pyodide in Node is too heavy for validation.
   if (skill.trackId === 'python') {
     let pyBank: PyBank
     try {
@@ -110,8 +130,21 @@ for (const skill of skills) {
       if (!ex.functionName?.trim()) failures.push(`${tag}: missing functionName`)
       if (!ex.starter?.trim()) failures.push(`${tag}: missing starter`)
       if (!ex.solution?.trim()) failures.push(`${tag}: missing solution`)
-      if (!Array.isArray(ex.tests) || ex.tests.length < 1) failures.push(`${tag}: needs at least 1 test`)
       if (ex.hints.length !== 3) failures.push(`${tag}: expected 3 hints, found ${ex.hints.length}`)
+      if (!checkCodeTests(tag, ex.tests)) continue
+      if (ex.solution?.trim()) {
+        try {
+          for (const [i, row] of runPyExercise(ex.solution, ex.tests, ex.fixture).entries()) {
+            const [ok, expected, actual, error] = row
+            if (!ok)
+              failures.push(
+                `${tag}: solution fails test ${i + 1} — expected ${expected}, got ${error ? `error ${error}` : actual}`,
+              )
+          }
+        } catch (e) {
+          failures.push(`${tag}: Python solution did not run — ${e}`)
+        }
+      }
     }
     continue
   }
