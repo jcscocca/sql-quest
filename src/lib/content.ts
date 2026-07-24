@@ -46,6 +46,13 @@ export interface ExerciseBank {
   exercises: Exercise[]
 }
 
+export interface CodeTest {
+  setup?: string   // statements run first, in the solution's scope
+  expr: string     // expression whose value is checked
+  expect?: string  // expression giving the expected value; omit iff `raises` is set
+  raises?: string  // instead of expect: the error-type name expr must throw
+}
+
 export interface JsTest {
   input: unknown[]
   expected: unknown
@@ -58,6 +65,7 @@ export interface JsExercise {
   starter: string
   /** Reference implementation, used only by validate — never shown in the UI. */
   solution: string
+  fixture?: string   // statements prepended to every test's setup in this exercise
   tests: JsTest[]
   hints: string[]
   xp: number
@@ -75,6 +83,7 @@ export interface PyExercise {
   starter: string
   /** Reference implementation, used only by validate — never shown in the UI. */
   solution: string
+  fixture?: string   // statements prepended to every test's setup in this exercise
   tests: JsTest[]
   hints: string[]
   xp: number
