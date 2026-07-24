@@ -24,22 +24,22 @@
     },
     {
       "id": "py-exc-safe-divide",
-      "prompt": "Implement safe_divide(a, b) so it returns a / b, but raises ZeroDivisionError when b is 0 rather than letting the division fail silently or return something misleading. safe_divide(10, 2) is 5.0 and safe_divide(7, 2) is 3.5, while safe_divide(1, 0) raises ZeroDivisionError. A zero numerator is fine: safe_divide(0, 5) is 0.0.",
+      "prompt": "Implement safe_divide(a, b) so it returns a / b, but raises ValueError when b is 0. Dividing by zero would trigger Python's built-in ZeroDivisionError; catch that case yourself with a guard and raise ValueError('cannot divide by zero') instead, so callers get one consistent, meaningful error. safe_divide(10, 2) is 5.0 and safe_divide(7, 2) is 3.5, while safe_divide(1, 0) raises ValueError. A zero numerator is fine: safe_divide(0, 5) is 0.0.",
       "functionName": "safe_divide",
-      "starter": "def safe_divide(a, b):\n    # raise ZeroDivisionError when b is 0; otherwise return a / b\n    pass",
-      "solution": "def safe_divide(a, b):\n    if b == 0:\n        raise ZeroDivisionError('cannot divide by zero')\n    return a / b",
+      "starter": "def safe_divide(a, b):\n    # raise ValueError when b is 0; otherwise return a / b\n    pass",
+      "solution": "def safe_divide(a, b):\n    if b == 0:\n        raise ValueError('cannot divide by zero')\n    return a / b",
       "tests": [
         { "expr": "safe_divide(10, 2)", "expect": "5.0" },
         { "expr": "safe_divide(9, 3)", "expect": "3.0" },
         { "expr": "safe_divide(7, 2)", "expect": "3.5" },
         { "expr": "safe_divide(0, 5)", "expect": "0.0" },
-        { "expr": "safe_divide(1, 0)", "raises": "ZeroDivisionError" },
+        { "expr": "safe_divide(1, 0)", "raises": "ValueError" },
         { "expr": "safe_divide(-6, 2)", "expect": "-3.0" }
       ],
       "hints": [
-        "The one input to reject is a divisor of 0 — guard it before you divide, since that is the only value of b with no valid result.",
-        "if b == 0: raise ZeroDivisionError('...'), then return a / b for every other divisor.",
-        "Use true division a / b (not //): it returns a float, so safe_divide(7, 2) is 3.5, and the guard means only b == 0 raises — a zero numerator like safe_divide(0, 5) is a perfectly fine 0.0."
+        "Only a divisor of 0 has no valid result — guard that case before you divide, and raise instead of computing.",
+        "A plain return a / b would raise Python's own ZeroDivisionError on b == 0, which is the wrong type here; write if b == 0: raise ValueError('...') yourself, then return a / b below.",
+        "if b == 0: raise ValueError('cannot divide by zero'), then return a / b — that is why safe_divide(1, 0) must raise ValueError (not the built-in ZeroDivisionError), while a zero numerator like safe_divide(0, 5) stays a fine 0.0."
       ],
       "xp": 15
     },

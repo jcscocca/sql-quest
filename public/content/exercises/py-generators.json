@@ -52,7 +52,8 @@
         { "expr": "list(evens_up_to(0))", "expect": "[]" },
         { "expr": "list(evens_up_to(1))", "expect": "[0]" },
         { "expr": "list(evens_up_to(2))", "expect": "[0]" },
-        { "expr": "list(evens_up_to(9))", "expect": "[0, 2, 4, 6, 8]" }
+        { "expr": "list(evens_up_to(9))", "expect": "[0, 2, 4, 6, 8]" },
+        { "setup": "g = evens_up_to(10)\nfirst = next(g)", "expr": "first", "expect": "0" }
       ],
       "hints": [
         "You want every second number starting at 0, stopping once you reach n — so the value n never appears.",
@@ -93,7 +94,8 @@
         { "expr": "list(repeat_each([]))", "expect": "[]" },
         { "expr": "list(repeat_each([5]))", "expect": "[5, 5]" },
         { "expr": "list(repeat_each(['a', 'b']))", "expect": "['a', 'a', 'b', 'b']" },
-        { "expr": "list(repeat_each([1, 2, 3]))", "expect": "[1, 1, 2, 2, 3, 3]" }
+        { "expr": "list(repeat_each([1, 2, 3]))", "expect": "[1, 1, 2, 2, 3, 3]" },
+        { "setup": "g = repeat_each([5])\nfirst = next(g)", "expr": "first", "expect": "5" }
       ],
       "hints": [
         "For each element you need two yields, one right after the other, before moving on to the next element.",
