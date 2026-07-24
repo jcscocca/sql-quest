@@ -8,12 +8,12 @@
       "starter": "function add(a, b) {\n  // return the sum of a and b\n}",
       "solution": "function add(a, b) {\n  return a + b\n}",
       "tests": [
-        { "input": [1, 2], "expected": 3 },
-        { "input": [0, 0], "expected": 0 },
-        { "input": [-5, 5], "expected": 0 },
-        { "input": [-3, -4], "expected": -7 },
-        { "input": [2.5, 0.5], "expected": 3 },
-        { "input": [100, 250], "expected": 350 }
+        { "expr": "add(1, 2)", "expect": "3" },
+        { "expr": "add(0, 0)", "expect": "0" },
+        { "expr": "add(-5, 5)", "expect": "0" },
+        { "expr": "add(-3, -4)", "expect": "-7" },
+        { "expr": "add(2.5, 0.5)", "expect": "3" },
+        { "expr": "add(100, 250)", "expect": "350" }
       ],
       "hints": [
         "A function only hands a value back when you use the return keyword — without it, add gives back undefined and every test fails.",
@@ -29,12 +29,12 @@
       "starter": "function max(a, b) {\n  // return the larger of a and b\n}",
       "solution": "function max(a, b) {\n  return a > b ? a : b\n}",
       "tests": [
-        { "input": [1, 2], "expected": 2 },
-        { "input": [5, 3], "expected": 5 },
-        { "input": [-1, -2], "expected": -1 },
-        { "input": [0, 0], "expected": 0 },
-        { "input": [7, 7], "expected": 7 },
-        { "input": [-10, 10], "expected": 10 }
+        { "expr": "max(1, 2)", "expect": "2" },
+        { "expr": "max(5, 3)", "expect": "5" },
+        { "expr": "max(-1, -2)", "expect": "-1" },
+        { "expr": "max(0, 0)", "expect": "0" },
+        { "expr": "max(7, 7)", "expect": "7" },
+        { "expr": "max(-10, 10)", "expect": "10" }
       ],
       "hints": [
         "Compare the two values with the greater-than operator: a > b.",
@@ -50,12 +50,12 @@
       "starter": "function fizzbuzz(n) {\n  // return 'Fizz', 'Buzz', 'FizzBuzz', or String(n)\n}",
       "solution": "function fizzbuzz(n) {\n  if (n % 15 === 0) return 'FizzBuzz'\n  if (n % 3 === 0) return 'Fizz'\n  if (n % 5 === 0) return 'Buzz'\n  return String(n)\n}",
       "tests": [
-        { "input": [1], "expected": "1" },
-        { "input": [3], "expected": "Fizz" },
-        { "input": [5], "expected": "Buzz" },
-        { "input": [9], "expected": "Fizz" },
-        { "input": [15], "expected": "FizzBuzz" },
-        { "input": [7], "expected": "7" }
+        { "expr": "fizzbuzz(1)", "expect": "'1'" },
+        { "expr": "fizzbuzz(3)", "expect": "'Fizz'" },
+        { "expr": "fizzbuzz(5)", "expect": "'Buzz'" },
+        { "expr": "fizzbuzz(9)", "expect": "'Fizz'" },
+        { "expr": "fizzbuzz(15)", "expect": "'FizzBuzz'" },
+        { "expr": "fizzbuzz(7)", "expect": "'7'" }
       ],
       "hints": [
         "The remainder operator % tells you divisibility: n % 3 === 0 is true exactly when n is a multiple of 3.",
