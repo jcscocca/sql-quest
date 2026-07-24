@@ -1,0 +1,111 @@
+{
+  "skillId": "py-records",
+  "exercises": [
+    {
+      "id": "py-names-of-type",
+      "prompt": "You are given roster, a list of Pokémon records, each a dict {'name', 'type', 'attack'} — for example {'name': 'charmander', 'type': 'fire', 'attack': 52}. Implement names_of_type(roster, kind) so it returns a list of the names of every record whose 'type' equals kind, in the roster's original order. names_of_type(roster, 'fire') is ['charmander', 'vulpix', 'growlithe']. A type no record has, or an empty roster, returns an empty list.",
+      "functionName": "names_of_type",
+      "fixture": "roster = [\n    {'name': 'charmander', 'type': 'fire', 'attack': 52},\n    {'name': 'squirtle', 'type': 'water', 'attack': 48},\n    {'name': 'bulbasaur', 'type': 'grass', 'attack': 49},\n    {'name': 'pikachu', 'type': 'electric', 'attack': 55},\n    {'name': 'vulpix', 'type': 'fire', 'attack': 41},\n    {'name': 'psyduck', 'type': 'water', 'attack': 52},\n    {'name': 'oddish', 'type': 'grass', 'attack': 50},\n    {'name': 'growlithe', 'type': 'fire', 'attack': 70}\n]",
+      "starter": "def names_of_type(roster, kind):\n    # return the names of records whose type is kind, in order\n    pass",
+      "solution": "def names_of_type(roster, kind):\n    return [p['name'] for p in roster if p['type'] == kind]",
+      "tests": [
+        { "expr": "names_of_type(roster, 'fire')", "expect": "['charmander', 'vulpix', 'growlithe']" },
+        { "expr": "names_of_type(roster, 'water')", "expect": "['squirtle', 'psyduck']" },
+        { "expr": "names_of_type(roster, 'electric')", "expect": "['pikachu']" },
+        { "expr": "names_of_type(roster, 'dragon')", "expect": "[]" },
+        { "expr": "names_of_type([], 'fire')", "expect": "[]" },
+        { "expr": "names_of_type(roster, 'grass')", "expect": "['bulbasaur', 'oddish']" }
+      ],
+      "hints": [
+        "Two jobs at once: keep only the records of the right type, and from each pull out the 'name'.",
+        "A list comprehension with a trailing if does both: filter with p['type'] == kind and emit p['name'].",
+        "return [p['name'] for p in roster if p['type'] == kind] — filtering as you go keeps the names in the roster's order."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-strongest",
+      "prompt": "You are given roster, a list of Pokémon records of shape {'name', 'type', 'attack'}. Implement strongest(roster) so it returns the name of the record with the highest 'attack'. strongest(roster) is 'growlithe'. Assume the roster has at least one record and a single clear winner.",
+      "functionName": "strongest",
+      "fixture": "roster = [\n    {'name': 'charmander', 'type': 'fire', 'attack': 52},\n    {'name': 'squirtle', 'type': 'water', 'attack': 48},\n    {'name': 'bulbasaur', 'type': 'grass', 'attack': 49},\n    {'name': 'pikachu', 'type': 'electric', 'attack': 55},\n    {'name': 'vulpix', 'type': 'fire', 'attack': 41},\n    {'name': 'psyduck', 'type': 'water', 'attack': 52},\n    {'name': 'oddish', 'type': 'grass', 'attack': 50},\n    {'name': 'growlithe', 'type': 'fire', 'attack': 70}\n]",
+      "starter": "def strongest(roster):\n    # return the name of the highest-attack record\n    pass",
+      "solution": "def strongest(roster):\n    return max(roster, key=lambda p: p['attack'])['name']",
+      "tests": [
+        { "expr": "strongest(roster)", "expect": "'growlithe'" },
+        { "expr": "strongest([{'name': 'solo', 'type': 'x', 'attack': 10}])", "expect": "'solo'" },
+        { "expr": "strongest([{'name': 'a', 'type': 'x', 'attack': 5}, {'name': 'b', 'type': 'y', 'attack': 8}])", "expect": "'b'" },
+        { "expr": "strongest([{'name': 'a', 'type': 'x', 'attack': 8}, {'name': 'b', 'type': 'y', 'attack': 5}])", "expect": "'a'" },
+        { "expr": "strongest([{'name': 'lo', 'type': 'x', 'attack': 1}, {'name': 'hi', 'type': 'y', 'attack': 100}, {'name': 'mid', 'type': 'z', 'attack': 50}])", "expect": "'hi'" }
+      ],
+      "hints": [
+        "You want the record whose 'attack' is largest, then that record's 'name' — find the record first, read the name second.",
+        "max with a key= picks the record scoring highest on that key: max(roster, key=lambda p: p['attack']).",
+        "return max(roster, key=lambda p: p['attack'])['name'] — max hands back the whole record, so index ['name'] on the end."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-count-by-type",
+      "prompt": "You are given roster, a list of Pokémon records of shape {'name', 'type', 'attack'}. Implement count_by_type(roster) so it returns a dict mapping each 'type' to how many records have it — {type: count}. count_by_type(roster) is {'fire': 3, 'water': 2, 'grass': 2, 'electric': 1}. An empty roster returns an empty dict.",
+      "functionName": "count_by_type",
+      "fixture": "roster = [\n    {'name': 'charmander', 'type': 'fire', 'attack': 52},\n    {'name': 'squirtle', 'type': 'water', 'attack': 48},\n    {'name': 'bulbasaur', 'type': 'grass', 'attack': 49},\n    {'name': 'pikachu', 'type': 'electric', 'attack': 55},\n    {'name': 'vulpix', 'type': 'fire', 'attack': 41},\n    {'name': 'psyduck', 'type': 'water', 'attack': 52},\n    {'name': 'oddish', 'type': 'grass', 'attack': 50},\n    {'name': 'growlithe', 'type': 'fire', 'attack': 70}\n]",
+      "starter": "def count_by_type(roster):\n    # tally the records into a {type: count} dict\n    pass",
+      "solution": "def count_by_type(roster):\n    counts = {}\n    for p in roster:\n        counts[p['type']] = counts.get(p['type'], 0) + 1\n    return counts",
+      "tests": [
+        { "expr": "count_by_type(roster)", "expect": "{'fire': 3, 'water': 2, 'grass': 2, 'electric': 1}" },
+        { "expr": "count_by_type([])", "expect": "{}" },
+        { "expr": "count_by_type([{'name': 'a', 'type': 'fire', 'attack': 1}])", "expect": "{'fire': 1}" },
+        { "expr": "count_by_type([{'name': 'a', 'type': 'fire', 'attack': 1}, {'name': 'b', 'type': 'fire', 'attack': 2}])", "expect": "{'fire': 2}" },
+        { "setup": "c = count_by_type(roster)", "expr": "c['water']", "expect": "2" }
+      ],
+      "hints": [
+        "This is a frequency tally, but the value you count is each record's 'type' field, not the record itself.",
+        "Walk the records and bump the bucket for p['type']: counts.get(p['type'], 0) + 1 starts a new type at 0.",
+        "Loop the roster updating counts[p['type']] = counts.get(p['type'], 0) + 1, then return counts."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-total-attack",
+      "prompt": "You are given roster, a list of Pokémon records of shape {'name', 'type', 'attack'}. Implement total_attack(roster) so it returns the sum of the 'attack' fields across all records. total_attack(roster) is 417. An empty roster returns 0.",
+      "functionName": "total_attack",
+      "fixture": "roster = [\n    {'name': 'charmander', 'type': 'fire', 'attack': 52},\n    {'name': 'squirtle', 'type': 'water', 'attack': 48},\n    {'name': 'bulbasaur', 'type': 'grass', 'attack': 49},\n    {'name': 'pikachu', 'type': 'electric', 'attack': 55},\n    {'name': 'vulpix', 'type': 'fire', 'attack': 41},\n    {'name': 'psyduck', 'type': 'water', 'attack': 52},\n    {'name': 'oddish', 'type': 'grass', 'attack': 50},\n    {'name': 'growlithe', 'type': 'fire', 'attack': 70}\n]",
+      "starter": "def total_attack(roster):\n    # add up every record's attack\n    pass",
+      "solution": "def total_attack(roster):\n    return sum(p['attack'] for p in roster)",
+      "tests": [
+        { "expr": "total_attack(roster)", "expect": "417" },
+        { "expr": "total_attack([])", "expect": "0" },
+        { "expr": "total_attack([{'name': 'a', 'type': 'x', 'attack': 10}])", "expect": "10" },
+        { "expr": "total_attack([{'name': 'a', 'type': 'x', 'attack': 5}, {'name': 'b', 'type': 'y', 'attack': 7}])", "expect": "12" },
+        { "expr": "total_attack([{'name': 'a', 'type': 'x', 'attack': 0}])", "expect": "0" }
+      ],
+      "hints": [
+        "You only need one field from each record — its 'attack' — added together.",
+        "A generator pulls that field out per record and sum folds it: sum(p['attack'] for p in roster).",
+        "return sum(p['attack'] for p in roster) — summing no values gives 0, so the empty roster is already correct."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-strongest-of-type",
+      "prompt": "You are given roster, a list of Pokémon records of shape {'name', 'type', 'attack'}. Implement strongest_of_type(roster, kind) so it returns the name of the highest-attack record among those whose 'type' equals kind — ignoring records of any other type. strongest_of_type(roster, 'water') is 'psyduck'. Assume at least one record has the requested type.",
+      "functionName": "strongest_of_type",
+      "fixture": "roster = [\n    {'name': 'charmander', 'type': 'fire', 'attack': 52},\n    {'name': 'squirtle', 'type': 'water', 'attack': 48},\n    {'name': 'bulbasaur', 'type': 'grass', 'attack': 49},\n    {'name': 'pikachu', 'type': 'electric', 'attack': 55},\n    {'name': 'vulpix', 'type': 'fire', 'attack': 41},\n    {'name': 'psyduck', 'type': 'water', 'attack': 52},\n    {'name': 'oddish', 'type': 'grass', 'attack': 50},\n    {'name': 'growlithe', 'type': 'fire', 'attack': 70}\n]",
+      "starter": "def strongest_of_type(roster, kind):\n    # return the name of the strongest record of the given type\n    pass",
+      "solution": "def strongest_of_type(roster, kind):\n    matches = [p for p in roster if p['type'] == kind]\n    return max(matches, key=lambda p: p['attack'])['name']",
+      "tests": [
+        { "expr": "strongest_of_type(roster, 'fire')", "expect": "'growlithe'" },
+        { "expr": "strongest_of_type(roster, 'water')", "expect": "'psyduck'" },
+        { "expr": "strongest_of_type(roster, 'grass')", "expect": "'oddish'" },
+        { "expr": "strongest_of_type(roster, 'electric')", "expect": "'pikachu'" },
+        { "expr": "strongest_of_type([{'name': 'a', 'type': 'fire', 'attack': 3}, {'name': 'b', 'type': 'water', 'attack': 9}, {'name': 'c', 'type': 'fire', 'attack': 7}], 'fire')", "expect": "'c'" }
+      ],
+      "hints": [
+        "Narrow to just the records of the requested type first, so a stronger record of another type can't win.",
+        "Filter with a comprehension, then take the max of the survivors by 'attack' and read its 'name'.",
+        "matches = [p for p in roster if p['type'] == kind]; return max(matches, key=lambda p: p['attack'])['name'] — the last test proves a stronger record of another type is ignored."
+      ],
+      "xp": 15
+    }
+  ]
+}

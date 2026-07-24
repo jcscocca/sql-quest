@@ -1,0 +1,109 @@
+{
+  "skillId": "py-dicts",
+  "exercises": [
+    {
+      "id": "py-get-or-default",
+      "prompt": "Implement get_or_default(d, key, default) so it returns d[key] when key is actually present in the dict d, and default when it is not. The stored value might be falsy — 0, '', or False — and those still count as present, so a key mapping to 0 returns 0, not default. Reach for the dict's own .get(key, default) rather than testing truthiness.",
+      "functionName": "get_or_default",
+      "starter": "def get_or_default(d, key, default):\n    # return the stored value if the key exists, else default\n    pass",
+      "solution": "def get_or_default(d, key, default):\n    return d.get(key, default)",
+      "tests": [
+        { "expr": "get_or_default({'a': 1}, 'a', 0)", "expect": "1" },
+        { "expr": "get_or_default({'a': 1}, 'b', 0)", "expect": "0" },
+        { "expr": "get_or_default({'a': 0}, 'a', 99)", "expect": "0" },
+        { "expr": "get_or_default({'flag': False}, 'flag', True)", "expect": "False" },
+        { "expr": "get_or_default({}, 'x', 'none')", "expect": "'none'" },
+        { "expr": "get_or_default({'a': 1, 'b': 2}, 'b', 0)", "expect": "2" }
+      ],
+      "hints": [
+        "The trap is that d.get(key) or default hands back default whenever the stored value is falsy — but a stored 0 or False should come back unchanged.",
+        "d.get(key, default) returns the value when the key is present and default only when the key is truly absent — it never mistakes a falsy value for a missing one.",
+        "return d.get(key, default) — the second argument is the fallback, used only when key is not in d."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-sum-values",
+      "prompt": "Implement sum_values(d) so it returns the sum of all the values in the dict d. sum_values({'a': 1, 'b': 2, 'c': 3}) is 6. The keys don't matter, only the values. An empty dict returns 0.",
+      "functionName": "sum_values",
+      "starter": "def sum_values(d):\n    # add up every value in the dict\n    pass",
+      "solution": "def sum_values(d):\n    return sum(d.values())",
+      "tests": [
+        { "expr": "sum_values({'a': 1, 'b': 2, 'c': 3})", "expect": "6" },
+        { "expr": "sum_values({})", "expect": "0" },
+        { "expr": "sum_values({'x': 10})", "expect": "10" },
+        { "expr": "sum_values({'a': -5, 'b': 5})", "expect": "0" },
+        { "expr": "sum_values({'a': 2, 'b': 2, 'c': 2})", "expect": "6" },
+        { "expr": "sum_values({'neg': -3, 'pos': 3, 'zero': 0})", "expect": "0" }
+      ],
+      "hints": [
+        "You only need the values, not the keys — d.values() hands them to you ready to total.",
+        "Once you have the values, this is the same sum you already use on a list.",
+        "return sum(d.values()) — the sum of no values is 0, so the empty dict falls out for free."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-invert",
+      "prompt": "Implement invert(d) so it returns a new dict with keys and values swapped: each value becomes a key, and its original key becomes that key's value. invert({'a': 1, 'b': 2}) is {1: 'a', 2: 'b'}. Assume the values are unique and usable as keys. An empty dict returns an empty dict.",
+      "functionName": "invert",
+      "starter": "def invert(d):\n    # return a new dict with keys and values swapped\n    pass",
+      "solution": "def invert(d):\n    result = {}\n    for key, value in d.items():\n        result[value] = key\n    return result",
+      "tests": [
+        { "expr": "invert({'a': 1, 'b': 2})", "expect": "{1: 'a', 2: 'b'}" },
+        { "expr": "invert({})", "expect": "{}" },
+        { "expr": "invert({'x': 'y'})", "expect": "{'y': 'x'}" },
+        { "expr": "invert({'name': 'sql', 'level': 'hard'})", "expect": "{'sql': 'name', 'hard': 'level'}" },
+        { "expr": "invert({'a': 'x', 'b': 'y', 'c': 'z'})", "expect": "{'x': 'a', 'y': 'b', 'z': 'c'}" }
+      ],
+      "hints": [
+        "d.items() gives you each (key, value) pair, which is exactly what you need to flip.",
+        "Build a fresh result dict and, for each pair, store result[value] = key — the old value becomes the new key.",
+        "Loop for key, value in d.items() setting result[value] = key, then return result."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-keys-where",
+      "prompt": "Implement keys_where(d, minimum) so it returns a list of the keys whose value is greater than or equal to minimum, in the dict's own key order. keys_where({'a': 1, 'b': 5, 'c': 3}, 3) is ['b', 'c']. An empty dict, or one where no value reaches minimum, returns an empty list.",
+      "functionName": "keys_where",
+      "starter": "def keys_where(d, minimum):\n    # return the keys whose value is at least minimum\n    pass",
+      "solution": "def keys_where(d, minimum):\n    return [key for key, value in d.items() if value >= minimum]",
+      "tests": [
+        { "expr": "keys_where({'a': 1, 'b': 5, 'c': 3}, 3)", "expect": "['b', 'c']" },
+        { "expr": "keys_where({}, 0)", "expect": "[]" },
+        { "expr": "keys_where({'a': 1, 'b': 2}, 10)", "expect": "[]" },
+        { "expr": "keys_where({'x': 5, 'y': 5}, 5)", "expect": "['x', 'y']" },
+        { "expr": "keys_where({'a': 10, 'b': 2, 'c': 8}, 8)", "expect": "['a', 'c']" },
+        { "expr": "keys_where({'only': 100}, 50)", "expect": "['only']" }
+      ],
+      "hints": [
+        "Walk the pairs with d.items() so you can test each value while remembering its key.",
+        "A list comprehension with a trailing if keeps only the keys that pass: value >= minimum.",
+        "return [key for key, value in d.items() if value >= minimum] — use >= so a value exactly equal to minimum is kept."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-pick",
+      "prompt": "Implement pick(d, keys) so it returns a new dict containing only the entries of d whose key appears in the keys list AND actually exists in d. pick({'a': 1, 'b': 2, 'c': 3}, ['a', 'c']) is {'a': 1, 'c': 3}. A requested key that d does not have is skipped; a key present with value 0 or False still counts as existing and is kept. An empty keys list, or keys none of which exist, returns an empty dict.",
+      "functionName": "pick",
+      "starter": "def pick(d, keys):\n    # copy over only the requested keys that exist in d\n    pass",
+      "solution": "def pick(d, keys):\n    result = {}\n    for key in keys:\n        if key in d:\n            result[key] = d[key]\n    return result",
+      "tests": [
+        { "expr": "pick({'a': 1, 'b': 2, 'c': 3}, ['a', 'c'])", "expect": "{'a': 1, 'c': 3}" },
+        { "expr": "pick({'a': 1}, ['a', 'x'])", "expect": "{'a': 1}" },
+        { "expr": "pick({'a': 0}, ['a'])", "expect": "{'a': 0}" },
+        { "expr": "pick({}, ['a'])", "expect": "{}" },
+        { "expr": "pick({'a': 1, 'b': 2}, [])", "expect": "{}" },
+        { "expr": "pick({'x': 5}, ['x', 'y', 'z'])", "expect": "{'x': 5}" }
+      ],
+      "hints": [
+        "Walk the requested keys and, for each, decide whether d actually has it before copying it across.",
+        "key in d tests membership directly — it stays True even when the stored value is 0 or False, which a truthiness check would wrongly drop.",
+        "Loop the keys, guard with if key in d, then set result[key] = d[key]; return result."
+      ],
+      "xp": 15
+    }
+  ]
+}

@@ -1,0 +1,108 @@
+{
+  "skillId": "py-dict-comprehensions",
+  "exercises": [
+    {
+      "id": "py-square-map",
+      "prompt": "Implement square_map(n) so it returns a dict mapping each integer i from 1 to n (inclusive) to its square i*i — square_map(3) is {1: 1, 2: 4, 3: 9}. When n is 0 (or less) there are no integers to map, so it returns an empty dict.",
+      "functionName": "square_map",
+      "starter": "def square_map(n):\n    # map each i from 1..n to i*i\n    pass",
+      "solution": "def square_map(n):\n    return {i: i * i for i in range(1, n + 1)}",
+      "tests": [
+        { "expr": "square_map(3)", "expect": "{1: 1, 2: 4, 3: 9}" },
+        { "expr": "square_map(1)", "expect": "{1: 1}" },
+        { "expr": "square_map(0)", "expect": "{}" },
+        { "expr": "square_map(5)", "expect": "{1: 1, 2: 4, 3: 9, 4: 16, 5: 25}" },
+        { "expr": "square_map(2)", "expect": "{1: 1, 2: 4}" }
+      ],
+      "hints": [
+        "A dict comprehension has the shape {key: value for ...}, building both sides of each entry as it iterates.",
+        "range(1, n + 1) counts i from 1 through n inclusive; map each i to i * i.",
+        "return {i: i * i for i in range(1, n + 1)} — for n of 0, range(1, 1) is empty, so you get {} with no special case."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-invert-dict",
+      "prompt": "Implement invert_dict(d) so it returns a new dict with keys and values swapped, built as a single dict comprehension: each value becomes a key mapping back to its original key. invert_dict({'a': 1, 'b': 2}) is {1: 'a', 2: 'b'}. Assume the values are unique and usable as keys. An empty dict returns an empty dict.",
+      "functionName": "invert_dict",
+      "starter": "def invert_dict(d):\n    # swap keys and values with a dict comprehension\n    pass",
+      "solution": "def invert_dict(d):\n    return {value: key for key, value in d.items()}",
+      "tests": [
+        { "expr": "invert_dict({'a': 1, 'b': 2})", "expect": "{1: 'a', 2: 'b'}" },
+        { "expr": "invert_dict({})", "expect": "{}" },
+        { "expr": "invert_dict({'x': 'y'})", "expect": "{'y': 'x'}" },
+        { "expr": "invert_dict({'one': 1, 'two': 2, 'three': 3})", "expect": "{1: 'one', 2: 'two', 3: 'three'}" },
+        { "expr": "invert_dict({'a': 10})", "expect": "{10: 'a'}" }
+      ],
+      "hints": [
+        "You inverted a dict with a loop before; a dict comprehension does the same swap in one line.",
+        "Iterate the pairs with d.items() and put value first, key second: {value: key for key, value in d.items()}.",
+        "return {value: key for key, value in d.items()} — the original values become the new keys."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-keep-high",
+      "prompt": "Implement keep_high(d, threshold) so it returns a new dict holding only the entries of d whose value is greater than or equal to threshold, keys unchanged. keep_high({'a': 1, 'b': 5, 'c': 3}, 3) is {'b': 5, 'c': 3}. An empty dict, or one where no value reaches threshold, returns an empty dict.",
+      "functionName": "keep_high",
+      "starter": "def keep_high(d, threshold):\n    # keep only the entries whose value is at least threshold\n    pass",
+      "solution": "def keep_high(d, threshold):\n    return {key: value for key, value in d.items() if value >= threshold}",
+      "tests": [
+        { "expr": "keep_high({'a': 1, 'b': 5, 'c': 3}, 3)", "expect": "{'b': 5, 'c': 3}" },
+        { "expr": "keep_high({}, 0)", "expect": "{}" },
+        { "expr": "keep_high({'a': 1, 'b': 2}, 10)", "expect": "{}" },
+        { "expr": "keep_high({'x': 5, 'y': 5}, 5)", "expect": "{'x': 5, 'y': 5}" },
+        { "expr": "keep_high({'a': 10, 'b': 2, 'c': 8}, 8)", "expect": "{'a': 10, 'c': 8}" },
+        { "expr": "keep_high({'only': 100}, 50)", "expect": "{'only': 100}" }
+      ],
+      "hints": [
+        "A dict comprehension can filter as well as build — add a trailing if to decide which entries survive.",
+        "Keep the whole entry when its value clears the bar: {key: value for key, value in d.items() if value >= threshold}.",
+        "return {key: value for key, value in d.items() if value >= threshold} — >= keeps a value exactly equal to threshold."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-from-pairs",
+      "prompt": "Implement from_pairs(keys, values) so it pairs the two lists element-wise into a dict — the first key maps to the first value, and so on. from_pairs(['a', 'b', 'c'], [1, 2, 3]) is {'a': 1, 'b': 2, 'c': 3}. If the lists differ in length, stop at the shorter one. Two empty lists return an empty dict.",
+      "functionName": "from_pairs",
+      "starter": "def from_pairs(keys, values):\n    # build a dict pairing keys with values element-wise\n    pass",
+      "solution": "def from_pairs(keys, values):\n    return {k: v for k, v in zip(keys, values)}",
+      "tests": [
+        { "expr": "from_pairs(['a', 'b', 'c'], [1, 2, 3])", "expect": "{'a': 1, 'b': 2, 'c': 3}" },
+        { "expr": "from_pairs([], [])", "expect": "{}" },
+        { "expr": "from_pairs(['x'], [9])", "expect": "{'x': 9}" },
+        { "expr": "from_pairs(['a', 'b'], [1, 2, 3])", "expect": "{'a': 1, 'b': 2}" },
+        { "expr": "from_pairs(['a', 'b', 'c'], [1])", "expect": "{'a': 1}" },
+        { "expr": "from_pairs(['k', 'v'], [True, False])", "expect": "{'k': True, 'v': False}" }
+      ],
+      "hints": [
+        "zip walks the two lists in lockstep, handing you one key and one value at a time, and stops at the shorter list.",
+        "Feed those pairs into a dict comprehension: {k: v for k, v in zip(keys, values)}.",
+        "return {k: v for k, v in zip(keys, values)} — or equivalently dict(zip(keys, values)); zip stopping early handles the mismatched-length cases."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-scale-values",
+      "prompt": "Implement scale_values(d, factor) so it returns a new dict with the same keys as d but every value multiplied by factor. scale_values({'a': 1, 'b': 2}, 10) is {'a': 10, 'b': 20}. The keys are unchanged. An empty dict returns an empty dict.",
+      "functionName": "scale_values",
+      "starter": "def scale_values(d, factor):\n    # multiply every value by factor, keeping the keys\n    pass",
+      "solution": "def scale_values(d, factor):\n    return {key: value * factor for key, value in d.items()}",
+      "tests": [
+        { "expr": "scale_values({'a': 1, 'b': 2}, 10)", "expect": "{'a': 10, 'b': 20}" },
+        { "expr": "scale_values({}, 5)", "expect": "{}" },
+        { "expr": "scale_values({'x': 3}, 0)", "expect": "{'x': 0}" },
+        { "expr": "scale_values({'a': 2, 'b': 4}, 1)", "expect": "{'a': 2, 'b': 4}" },
+        { "expr": "scale_values({'n': -2}, 3)", "expect": "{'n': -6}" },
+        { "expr": "scale_values({'a': 5, 'b': 10}, 2)", "expect": "{'a': 10, 'b': 20}" }
+      ],
+      "hints": [
+        "You keep every key but transform its value, so this is a dict comprehension that rebuilds each entry.",
+        "Iterate the pairs and multiply the value: {key: value * factor for key, value in d.items()}.",
+        "return {key: value * factor for key, value in d.items()} — the keys pass through untouched while each value scales."
+      ],
+      "xp": 15
+    }
+  ]
+}

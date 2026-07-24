@@ -602,6 +602,67 @@
           }
         }
       ]
+    },
+    {
+      "id": "py-dicts-sets",
+      "name": "Python · Dicts & Sets",
+      "skills": [
+        {
+          "id": "py-dicts",
+          "name": "Dictionaries",
+          "trackId": "python",
+          "requires": ["py-tuples"],
+          "lesson": {
+            "intro": "A list finds a value by its position; a dict finds it by name, pairing keys with values — {'name': 'pikachu', 'hp': 35} — which makes it Python's natural shape for a record or a lookup table. Read a value with d[key] when you are sure the key is there, but reach for d.get(key, default) when it might be missing: d[key] raises KeyError on an absent key, while .get hands back the default (None if you don't supply one) instead. The subtlety is that .get(key, default) returns a stored 0, '', or False as-is — only a truly absent key falls through to the default — so it is the honest way to supply a fallback, unlike d.get(key) or default, which a falsy value fools. Test presence directly with key in d, which is True even when the value is falsy. Three views turn a dict back into things you already iterate: d.keys() lists its keys, d.values() its values, and d.items() the (key, value) pairs — feed any of them to a loop or a comprehension. To build a dict, start from {} and assign d[key] = value as you go, unpacking both sides at once with for key, value in d.items() when you need them together.",
+            "exampleSql": "",
+            "wrapUp": "A dict pairs named keys with values: reach one with d[key] or the safer d.get(key, default), and test presence with key in d rather than truthiness so a stored 0 or False survives. d.keys(), d.values(), and d.items() hand the dict back as sequences you can loop or comprehend over, and you build a new dict by assigning into {} one key at a time. Next you'll put these to work counting and bucketing — turning a list into a frequency map or a set of labeled groups."
+          }
+        },
+        {
+          "id": "py-grouping",
+          "name": "Grouping & Counting",
+          "trackId": "python",
+          "requires": ["py-dicts"],
+          "lesson": {
+            "intro": "Two dict shapes answer most 'how many' and 'which ones' questions. A frequency map counts occurrences — {value: count} — and a bucket map collects items into groups — {key: [items]}. Both are built the same way: start from an empty dict and, for each element, find its key and update that key's entry. For a count you write counts[key] = counts.get(key, 0) + 1, where .get(key, 0) supplies a starting 0 the first time a key appears. For a bucket you must create the list before appending to it, and dict.setdefault does both in one move: groups.setdefault(key, []).append(item) fetches the key's list — inserting a fresh [] when the key is new — then appends. The key can be the element itself (counting exact values), a character of a string, or something derived like a word's first letter or its length. When a prompt fixes the groups in advance — 'even' and 'odd', say — seed the result with both keys ({'even': [], 'odd': []}) so an empty or lopsided input still returns every bucket.",
+            "exampleSql": "",
+            "wrapUp": "Grouping is one move with two payloads: a frequency map tallies counts, a bucket map collects items — both built by keying each element and updating that entry, creating it the first time you reach it. counts.get(key, 0) seeds a tally and setdefault(key, []) seeds a bucket, while seeding fixed groups up front keeps empty inputs returning every key. These dicts key everything by value; next you'll meet the set, which keeps only distinct values and answers membership, union, and overlap directly."
+          }
+        },
+        {
+          "id": "py-sets",
+          "name": "Sets & Membership",
+          "trackId": "python",
+          "requires": ["py-grouping"],
+          "lesson": {
+            "intro": "A set is an unordered bag of distinct values, and it makes dedup and the classic set operations short and clear. set(xs) drops every duplicate in one call, x in s tests membership, and len(s) counts the distinct values. The operators read like their math: a | b is the union (everything in either), a & b the intersection (only what's in both), a - b the difference (what's in a but not b) — and because both sides are sets, the result never carries a duplicate. Two traps are worth pinning down now. First, a set is unordered and compared by membership, so {1, 2} == {2, 1} is True and duplicates collapse — {1, 1, 2} is just {1, 2}; a returned set is judged by what it contains, never by order. Second, {} is an empty dict, not an empty set — the empty set is written set(), the one value in the language without a literal of its own. Build a set from any list to dedup, and use one as a running memory of what you've already seen — checking x in seen before seen.add(x) catches the first repeat.",
+            "exampleSql": "",
+            "wrapUp": "A set holds distinct values and answers membership with in, count with len, and the set operations with | & - for union, intersection, and difference. Reach for it whenever presence or uniqueness is the whole question, and keep the two traps in mind: a set is unordered so duplicates and order never survive a round trip, and the empty set is set(), because {} is a dict. Next you'll fold dicts and sets back together with the comprehension — building a whole dict from one expressive line."
+          }
+        },
+        {
+          "id": "py-dict-comprehensions",
+          "name": "Dict Comprehensions",
+          "trackId": "python",
+          "requires": ["py-sets"],
+          "lesson": {
+            "intro": "You built dicts a key at a time with a loop; the dict comprehension builds a whole one from a single expression, exactly as a list comprehension does for lists. Its shape is {key: value for item in iterable} — the part before the colon becomes each entry's key, the part after its value. {i: i * i for i in range(1, n + 1)} maps each number to its square, and iterating d.items() lets you rebuild from an existing dict: {value: key for key, value in d.items()} inverts one in a line, and {key: value for key, value in d.items() if value >= threshold} filters it, the trailing if dropping entries just as it does in a list comprehension. Pair it with zip to weave two lists into a dict — {k: v for k, v in zip(keys, values)} lines them up element-wise and stops at the shorter — which is the comprehension form of dict(zip(keys, values)). As always, an empty iterable yields an empty dict {} with no special case.",
+            "exampleSql": "",
+            "wrapUp": "A dict comprehension builds a dict from one line: {key: value for item in iterable}, with an optional trailing if to filter which entries survive. It compresses the loops you wrote by hand — mapping a range to squares, inverting a dict by swapping key and value, filtering by value, or zipping two lists into paired entries. The empty iterable falls out as {} for free. One region skill remains, and it turns all of this on realistic data: lists of record dicts, the everyday shape of a table of rows."
+          }
+        },
+        {
+          "id": "py-records",
+          "name": "Working with Records",
+          "trackId": "python",
+          "requires": ["py-dict-comprehensions"],
+          "lesson": {
+            "intro": "Real data is rarely a bare list of numbers — it is a list of records, each a dict with named fields, which is exactly a database table in Python form. This skill works a roster of Pokémon: a list like [{'name': 'charmander', 'type': 'fire', 'attack': 52}, {'name': 'squirtle', 'type': 'water', 'attack': 48}, ...], which you can see in the data panel beside each exercise. Every tool you need is already in hand. Reach a field with p['name'] or p['attack']. A comprehension filters and projects in one line — [p['name'] for p in roster if p['type'] == kind] is 'the names of every fire type', the trailing if keeping rows and the expression picking a column. sum over a generator aggregates a field — sum(p['attack'] for p in roster) — and max with key=lambda p: p['attack'] finds the record scoring highest, whose ['name'] you then read off. The same tallying you practiced turns records into a summary: count_by_type walks the roster building counts[p['type']]. The prompts state each record's shape in words, so you can solve them from the description alone, but glance at the panel to picture the data you are shaping.",
+            "exampleSql": "",
+            "wrapUp": "A list of record dicts is the shape of real tabular data, and you now query it with tools you already had: p['field'] to read a column, a comprehension to filter rows and project a field, sum over a generator to aggregate, and max with a key= to find an extreme — while dict-tallying rolls the roster into a summary. Filter-then-project is the everyday 'select these fields where this holds', the same question SELECT answers in SQL. That completes Dicts & Sets: you can model records, count and bucket them, dedupe and test membership with sets, and build dicts from a comprehension — the full toolkit for shaping structured data in Python."
+          }
+        }
+      ]
     }
   ]
 }

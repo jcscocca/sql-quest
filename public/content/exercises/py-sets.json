@@ -1,0 +1,110 @@
+{
+  "skillId": "py-sets",
+  "exercises": [
+    {
+      "id": "py-unique",
+      "prompt": "Implement unique(xs) so it returns a set of the distinct values in xs, with duplicates collapsed. unique([1, 2, 2, 3, 3, 3]) is {1, 2, 3}. An empty list returns an empty set, written set() (not {}, which is an empty dict).",
+      "functionName": "unique",
+      "starter": "def unique(xs):\n    # return a set of the distinct values\n    pass",
+      "solution": "def unique(xs):\n    return set(xs)",
+      "tests": [
+        { "expr": "unique([1, 2, 2, 3, 3, 3])", "expect": "{1, 2, 3}" },
+        { "expr": "unique([])", "expect": "set()" },
+        { "expr": "unique([5, 5, 5])", "expect": "{5}" },
+        { "expr": "unique(['a', 'b', 'a'])", "expect": "{'a', 'b'}" },
+        { "setup": "s = unique([1, 1, 2, 3, 3])", "expr": "len(s)", "expect": "3" },
+        { "setup": "s = unique([7, 8, 7])", "expr": "8 in s", "expect": "True" }
+      ],
+      "hints": [
+        "A set stores each value at most once, so it dedupes for free — the task is just getting your list's values into one.",
+        "The set() constructor takes any list and keeps only the distinct values: set([1, 1, 2]) is {1, 2}.",
+        "return set(xs) — returning a list would fail, since a set is compared by membership not order, and the empty case must be set(), because {} is an empty dict."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-union",
+      "prompt": "Implement union(a, b), where a and b are lists, so it returns a set of every value that appears in either list, with duplicates collapsed. union([1, 2], [2, 3]) is {1, 2, 3}. Two empty lists return an empty set, set().",
+      "functionName": "union",
+      "starter": "def union(a, b):\n    # return a set of all values from both lists\n    pass",
+      "solution": "def union(a, b):\n    return set(a) | set(b)",
+      "tests": [
+        { "expr": "union([1, 2], [2, 3])", "expect": "{1, 2, 3}" },
+        { "expr": "union([], [])", "expect": "set()" },
+        { "expr": "union([1, 1], [1])", "expect": "{1}" },
+        { "expr": "union(['x'], ['y', 'x'])", "expect": "{'x', 'y'}" },
+        { "setup": "s = union([1, 2, 3], [3, 4])", "expr": "len(s)", "expect": "4" },
+        { "setup": "s = union([1, 2], [3])", "expr": "3 in s", "expect": "True" }
+      ],
+      "hints": [
+        "A set already removes duplicates, so if you pour both lists into sets and combine them, the overlap collapses on its own.",
+        "The | operator unions two sets: set(a) | set(b) keeps every value from either side, once each.",
+        "return set(a) | set(b) — the size test proves the value shared by both lists is counted only once."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-intersection",
+      "prompt": "Implement intersection(a, b), where a and b are lists, so it returns a set of the values that appear in BOTH lists, with duplicates collapsed. intersection([1, 2, 3], [2, 3, 4]) is {2, 3}. If the lists share nothing, or either is empty, the result is an empty set, set().",
+      "functionName": "intersection",
+      "starter": "def intersection(a, b):\n    # return a set of the values found in both lists\n    pass",
+      "solution": "def intersection(a, b):\n    return set(a) & set(b)",
+      "tests": [
+        { "expr": "intersection([1, 2, 3], [2, 3, 4])", "expect": "{2, 3}" },
+        { "expr": "intersection([1, 2], [3, 4])", "expect": "set()" },
+        { "expr": "intersection([], [1, 2])", "expect": "set()" },
+        { "expr": "intersection([1, 1, 2], [1, 2, 2])", "expect": "{1, 2}" },
+        { "setup": "s = intersection([1, 2, 3, 4], [2, 4, 6])", "expr": "len(s)", "expect": "2" },
+        { "setup": "s = intersection([5, 6], [6, 7])", "expr": "6 in s", "expect": "True" }
+      ],
+      "hints": [
+        "You want the values common to both — a set keeps each once, which is exactly the shape of the answer.",
+        "The & operator intersects two sets: set(a) & set(b) keeps only values present on both sides.",
+        "return set(a) & set(b) — the duplicate-heavy test proves repeats collapse to a single value in the result."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-difference",
+      "prompt": "Implement difference(a, b), where a and b are lists, so it returns a set of the values that appear in a but NOT in b, with duplicates collapsed. difference([1, 2, 3], [2]) is {1, 3}. If every value of a is also in b, or a is empty, the result is an empty set, set().",
+      "functionName": "difference",
+      "starter": "def difference(a, b):\n    # return a set of the values in a that are not in b\n    pass",
+      "solution": "def difference(a, b):\n    return set(a) - set(b)",
+      "tests": [
+        { "expr": "difference([1, 2, 3], [2])", "expect": "{1, 3}" },
+        { "expr": "difference([1, 2], [1, 2])", "expect": "set()" },
+        { "expr": "difference([], [1])", "expect": "set()" },
+        { "expr": "difference([1, 1, 2, 3], [2])", "expect": "{1, 3}" },
+        { "setup": "s = difference([1, 2, 3, 4], [1, 3])", "expr": "len(s)", "expect": "2" },
+        { "setup": "s = difference([5, 6, 7], [6])", "expr": "6 in s", "expect": "False" }
+      ],
+      "hints": [
+        "This is the intersection idea with the test flipped: keep the values of a that are not in b.",
+        "The - operator subtracts one set from another: set(a) - set(b) drops every value that b contains.",
+        "return set(a) - set(b) — the membership test confirms a value present in b is absent from the result."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-has-duplicates",
+      "prompt": "Implement has_duplicates(xs) so it returns True when some value appears more than once in xs, and False when every value is distinct. has_duplicates([1, 2, 2]) is True; has_duplicates([1, 2, 3]) is False. An empty list has no duplicates, so it returns False. Return a bool.",
+      "functionName": "has_duplicates",
+      "starter": "def has_duplicates(xs):\n    # return True if any value repeats, else False\n    pass",
+      "solution": "def has_duplicates(xs):\n    return len(set(xs)) != len(xs)",
+      "tests": [
+        { "expr": "has_duplicates([1, 2, 2])", "expect": "True" },
+        { "expr": "has_duplicates([1, 2, 3])", "expect": "False" },
+        { "expr": "has_duplicates([])", "expect": "False" },
+        { "expr": "has_duplicates([5, 5, 5])", "expect": "True" },
+        { "expr": "has_duplicates([1, 2, 3, 1])", "expect": "True" },
+        { "expr": "has_duplicates([9])", "expect": "False" }
+      ],
+      "hints": [
+        "Building a set drops duplicates, so if the set is smaller than the list, something must have collapsed.",
+        "Compare the two sizes: len(set(xs)) is the count of distinct values, len(xs) the total.",
+        "return len(set(xs)) != len(xs) — equal sizes mean no repeats (False), including the empty list; the non-adjacent test proves repeats are caught anywhere."
+      ],
+      "xp": 15
+    }
+  ]
+}
