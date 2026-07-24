@@ -4,12 +4,11 @@ export const PY_RUNNER = `
 import json as _json
 
 def _run_exercise(_code, _tests_json):
-    _base = {}
-    exec(_code, _base)
     _tests = _json.loads(_tests_json)
     _out = []
     for _t in _tests:
-        _ns = dict(_base)
+        _ns = {}
+        exec(_code, _ns)
         _setup = _t.get("setup", "")
         if _setup:
             exec(_setup, _ns)

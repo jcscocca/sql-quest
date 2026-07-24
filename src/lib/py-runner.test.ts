@@ -52,3 +52,9 @@ test('reports a wrong answer with reprs', () => {
   expect(out[0][1]).toBe('3')
   expect(out[0][2]).toBe('-1')
 })
+
+test('captures a harness error', () => {
+  const out = run('def f():\n    return 1', [{ expr: 'undefined_name', expect: '1' }])
+  expect(out[0][0]).toBe(false)
+  expect(out[0][3]).toContain('NameError')
+})
