@@ -1,0 +1,109 @@
+{
+  "skillId": "py-classes",
+  "exercises": [
+    {
+      "id": "py-cls-counter",
+      "prompt": "Implement a class Counter that tracks an integer count. Its __init__ takes an optional start value that defaults to 0. It has three methods: inc() adds 1 to the count, dec() subtracts 1, and value() returns the current count. A new Counter() starts at 0, and after three inc() calls value() is 3. Separate Counter instances hold independent counts.",
+      "functionName": "Counter",
+      "starter": "class Counter:\n    def __init__(self, start=0):\n        self.count = start\n\n    def inc(self):\n        # add 1 to the count\n        pass\n\n    def dec(self):\n        # subtract 1 from the count\n        pass\n\n    def value(self):\n        # return the current count\n        pass",
+      "solution": "class Counter:\n    def __init__(self, start=0):\n        self.count = start\n\n    def inc(self):\n        self.count += 1\n\n    def dec(self):\n        self.count -= 1\n\n    def value(self):\n        return self.count",
+      "tests": [
+        { "setup": "c = Counter()", "expr": "c.value()", "expect": "0" },
+        { "setup": "c = Counter()\nc.inc()\nc.inc()\nc.inc()", "expr": "c.value()", "expect": "3" },
+        { "setup": "c = Counter(10)\nc.dec()\nc.dec()", "expr": "c.value()", "expect": "8" },
+        { "setup": "c = Counter()\nc.inc()\nc.dec()\nc.dec()", "expr": "c.value()", "expect": "-1" },
+        { "setup": "a = Counter()\nb = Counter()\na.inc()\na.inc()", "expr": "b.value()", "expect": "0" }
+      ],
+      "hints": [
+        "Store the count on the instance as self.count in __init__, then have each method read or change it through self.",
+        "inc() and dec() adjust self.count by 1 with += and -=, while value() returns it.",
+        "Set self.count = start in __init__ and use self.count += 1, self.count -= 1, and return self.count — because each new Counter() gets its own self.count, incrementing a stays invisible to b."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-cls-stack",
+      "prompt": "Implement a class Stack — a last-in, first-out collection. Its __init__ takes no arguments and starts empty. push(x) adds x on top; pop() removes and returns the top element; peek() returns the top element WITHOUT removing it; size() returns how many elements are stored. After push(1) then push(2), pop() returns 2. On a new empty stack size() is 0.",
+      "functionName": "Stack",
+      "starter": "class Stack:\n    def __init__(self):\n        self.items = []\n\n    def push(self, x):\n        # add x to the top\n        pass\n\n    def pop(self):\n        # remove and return the top element\n        pass\n\n    def peek(self):\n        # return the top element without removing it\n        pass\n\n    def size(self):\n        # return how many elements are stored\n        pass",
+      "solution": "class Stack:\n    def __init__(self):\n        self.items = []\n\n    def push(self, x):\n        self.items.append(x)\n\n    def pop(self):\n        return self.items.pop()\n\n    def peek(self):\n        return self.items[-1]\n\n    def size(self):\n        return len(self.items)",
+      "tests": [
+        { "setup": "s = Stack()", "expr": "s.size()", "expect": "0" },
+        { "setup": "s = Stack()\ns.push(1)\ns.push(2)", "expr": "s.pop()", "expect": "2" },
+        { "setup": "s = Stack()\ns.push(1)\ns.push(2)\ns.push(3)", "expr": "s.size()", "expect": "3" },
+        { "setup": "s = Stack()\ns.push(10)\ns.pop()", "expr": "s.size()", "expect": "0" },
+        { "setup": "s = Stack()\ns.push('a')\ns.push('b')", "expr": "s.peek()", "expect": "'b'" },
+        { "setup": "s = Stack()\ns.push('a')\ns.push('b')\ns.peek()", "expr": "s.size()", "expect": "2" }
+      ],
+      "hints": [
+        "Back the stack with a plain list on the instance — self.items = [] in __init__ — and let the list's own methods do the work.",
+        "list.append and list.pop already give last-in-first-out; peek reads the last element self.items[-1] without removing it, and size is len(self.items).",
+        "return self.items.pop() for pop and self.items[-1] for peek — peek must not call pop, or the size-after-peek test would drop to 1 instead of staying at 2."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-cls-bank-account",
+      "prompt": "Implement a class BankAccount. Its __init__ takes an optional starting balance that defaults to 0. deposit(amount) adds amount to the balance; withdraw(amount) subtracts amount but raises ValueError when amount is greater than the current balance (an overdraft); balance() returns the current balance. Withdrawing the exact balance is allowed and leaves 0. Separate accounts are independent.",
+      "functionName": "BankAccount",
+      "starter": "class BankAccount:\n    def __init__(self, start=0):\n        self.bal = start\n\n    def deposit(self, amount):\n        # add amount to the balance\n        pass\n\n    def withdraw(self, amount):\n        # raise ValueError on overdraft; otherwise subtract amount\n        pass\n\n    def balance(self):\n        # return the current balance\n        pass",
+      "solution": "class BankAccount:\n    def __init__(self, start=0):\n        self.bal = start\n\n    def deposit(self, amount):\n        self.bal += amount\n\n    def withdraw(self, amount):\n        if amount > self.bal:\n            raise ValueError('insufficient funds')\n        self.bal -= amount\n\n    def balance(self):\n        return self.bal",
+      "tests": [
+        { "setup": "a = BankAccount(100)\na.deposit(50)", "expr": "a.balance()", "expect": "150" },
+        { "setup": "a = BankAccount()\na.deposit(20)\na.withdraw(5)", "expr": "a.balance()", "expect": "15" },
+        { "setup": "a = BankAccount(30)\na.withdraw(30)", "expr": "a.balance()", "expect": "0" },
+        { "setup": "a = BankAccount(50)", "expr": "a.withdraw(100)", "raises": "ValueError" },
+        { "setup": "a = BankAccount(0)", "expr": "a.withdraw(1)", "raises": "ValueError" },
+        { "setup": "a = BankAccount(100)\nb = BankAccount(100)\na.withdraw(40)", "expr": "b.balance()", "expect": "100" }
+      ],
+      "hints": [
+        "Keep the balance on the instance (self.bal), set from __init__'s start argument, and have each method read or adjust it.",
+        "In withdraw, guard first — if amount > self.bal: raise ValueError(...) — and only subtract when the funds are there; that raising line is what the raises tests exercise.",
+        "Use if amount > self.bal: raise ValueError('insufficient funds') before self.bal -= amount — the guard is > (not >=), so withdrawing exactly the balance succeeds and leaves 0, while over-withdrawing raises."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-cls-rectangle",
+      "prompt": "Using a dataclass, implement Rectangle with two fields, width and height. Add two methods: area() returns width × height, and perimeter() returns 2 × (width + height). For Rectangle(3, 4), area() is 12 and perimeter() is 14. Because it is a dataclass, two rectangles with the same fields compare equal: Rectangle(3, 4) == Rectangle(3, 4) is True. Decorate the class with @dataclass (from dataclasses import dataclass) so __init__ and equality are generated for you.",
+      "functionName": "Rectangle",
+      "starter": "from dataclasses import dataclass\n\n@dataclass\nclass Rectangle:\n    width: int\n    height: int\n\n    def area(self):\n        # return width times height\n        pass\n\n    def perimeter(self):\n        # return twice the sum of width and height\n        pass",
+      "solution": "from dataclasses import dataclass\n\n@dataclass\nclass Rectangle:\n    width: int\n    height: int\n\n    def area(self):\n        return self.width * self.height\n\n    def perimeter(self):\n        return 2 * (self.width + self.height)",
+      "tests": [
+        { "setup": "r = Rectangle(3, 4)", "expr": "r.area()", "expect": "12" },
+        { "setup": "r = Rectangle(3, 4)", "expr": "r.perimeter()", "expect": "14" },
+        { "setup": "r = Rectangle(5, 5)", "expr": "r.area()", "expect": "25" },
+        { "setup": "r = Rectangle(10, 2)", "expr": "r.perimeter()", "expect": "24" },
+        { "expr": "Rectangle(3, 4) == Rectangle(3, 4)", "expect": "True" },
+        { "setup": "a = Rectangle(2, 3)\nb = Rectangle(4, 5)", "expr": "a.area() + b.area()", "expect": "26" }
+      ],
+      "hints": [
+        "@dataclass turns the two annotated fields, width: int and height: int, into a generated __init__ — so Rectangle(3, 4) just works — and you only write the two methods.",
+        "Inside the methods reach the fields through self: area() returns self.width * self.height, perimeter() returns 2 * (self.width + self.height).",
+        "With @dataclass, equality is generated to compare field-by-field, which is why Rectangle(3, 4) == Rectangle(3, 4) is True — a plain class (no dataclass) would compare by identity and that test would fail."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-cls-queue",
+      "prompt": "Implement a class Queue — a first-in, first-out collection. Its __init__ takes no arguments and starts empty. enqueue(x) adds x to the back; dequeue() removes and returns the front (oldest) element; size() returns how many elements are stored; is_empty() returns True when the queue has no elements and False otherwise. After enqueue(1) then enqueue(2), dequeue() returns 1 — the first one in.",
+      "functionName": "Queue",
+      "starter": "class Queue:\n    def __init__(self):\n        self.items = []\n\n    def enqueue(self, x):\n        # add x to the back\n        pass\n\n    def dequeue(self):\n        # remove and return the front element\n        pass\n\n    def size(self):\n        # return how many elements are stored\n        pass\n\n    def is_empty(self):\n        # return True when empty, False otherwise\n        pass",
+      "solution": "class Queue:\n    def __init__(self):\n        self.items = []\n\n    def enqueue(self, x):\n        self.items.append(x)\n\n    def dequeue(self):\n        return self.items.pop(0)\n\n    def size(self):\n        return len(self.items)\n\n    def is_empty(self):\n        return len(self.items) == 0",
+      "tests": [
+        { "setup": "q = Queue()\nq.enqueue(1)\nq.enqueue(2)", "expr": "q.dequeue()", "expect": "1" },
+        { "setup": "q = Queue()\nq.enqueue('a')\nq.enqueue('b')\nq.enqueue('c')", "expr": "q.dequeue()", "expect": "'a'" },
+        { "setup": "q = Queue()\nq.enqueue(1)\nq.enqueue(2)\nq.dequeue()", "expr": "q.size()", "expect": "1" },
+        { "setup": "q = Queue()", "expr": "q.is_empty()", "expect": "True" },
+        { "setup": "q = Queue()\nq.enqueue(1)", "expr": "q.is_empty()", "expect": "False" },
+        { "setup": "q = Queue()\nq.enqueue(1)\nq.enqueue(2)\nq.dequeue()\nq.dequeue()", "expr": "q.is_empty()", "expect": "True" }
+      ],
+      "hints": [
+        "Back the queue with a list on the instance; the difference from a stack is which end you remove from.",
+        "enqueue adds to the back with append; dequeue removes from the FRONT with self.items.pop(0), giving first-in-first-out; is_empty checks whether len(self.items) is 0.",
+        "return self.items.pop(0) for dequeue — pop(0) removes the oldest element, so the first test returns 1; using self.items.pop() with no index would return 2 and turn the queue into a stack."
+      ],
+      "xp": 15
+    }
+  ]
+}

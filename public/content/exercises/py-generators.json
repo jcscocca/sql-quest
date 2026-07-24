@@ -1,0 +1,106 @@
+{
+  "skillId": "py-generators",
+  "exercises": [
+    {
+      "id": "py-gen-count-up",
+      "prompt": "Implement count_up(n) as a GENERATOR that yields the integers 0, 1, 2, …, n − 1 in order — one at a time, using yield rather than building and returning a list. list(count_up(3)) is [0, 1, 2]. count_up(0) yields nothing, so list(count_up(0)) is []. Assume n is a non-negative integer.",
+      "functionName": "count_up",
+      "starter": "def count_up(n):\n    # yield 0, 1, ..., n - 1 one at a time\n    pass",
+      "solution": "def count_up(n):\n    for i in range(n):\n        yield i",
+      "tests": [
+        { "expr": "list(count_up(3))", "expect": "[0, 1, 2]" },
+        { "expr": "list(count_up(0))", "expect": "[]" },
+        { "expr": "list(count_up(1))", "expect": "[0]" },
+        { "expr": "list(count_up(5))", "expect": "[0, 1, 2, 3, 4]" },
+        { "setup": "g = count_up(5)\nfirst = next(g)", "expr": "first", "expect": "0" }
+      ],
+      "hints": [
+        "A generator produces values lazily: instead of return, it uses yield inside a loop, handing back one value per iteration.",
+        "Loop over range(n) — which counts 0, 1, …, n − 1 — and yield each number.",
+        "for i in range(n): yield i — because range(n) stops before n and is empty for n = 0, list(count_up(0)) is [] and next(count_up(5)) is 0, the first value pulled."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-gen-count-down",
+      "prompt": "Implement count_down(n) as a GENERATOR that yields the integers n, n − 1, …, down to 1, in that descending order, using yield. It stops before 0. list(count_down(3)) is [3, 2, 1]. count_down(0) yields nothing, so list(count_down(0)) is []. Assume n is a non-negative integer.",
+      "functionName": "count_down",
+      "starter": "def count_down(n):\n    # yield n, n - 1, ..., 1 in descending order\n    pass",
+      "solution": "def count_down(n):\n    for i in range(n, 0, -1):\n        yield i",
+      "tests": [
+        { "expr": "list(count_down(3))", "expect": "[3, 2, 1]" },
+        { "expr": "list(count_down(0))", "expect": "[]" },
+        { "expr": "list(count_down(1))", "expect": "[1]" },
+        { "expr": "list(count_down(5))", "expect": "[5, 4, 3, 2, 1]" },
+        { "setup": "g = count_down(3)\nfirst = next(g)", "expr": "first", "expect": "3" }
+      ],
+      "hints": [
+        "This is count_up run backwards: yield the largest value first and work down to 1, stopping before 0.",
+        "range(n, 0, -1) counts down from n to 1 (the stop value 0 is excluded); yield each step.",
+        "for i in range(n, 0, -1): yield i — the descending range makes list(count_down(3)) come out [3, 2, 1], not [1, 2, 3], and yields nothing when n is 0."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-gen-evens-up-to",
+      "prompt": "Implement evens_up_to(n) as a GENERATOR that yields the even numbers 0, 2, 4, … from 0 up to but NOT including n, in order, using yield. list(evens_up_to(10)) is [0, 2, 4, 6, 8] — 10 itself is excluded. list(evens_up_to(0)) is []. Assume n is a non-negative integer.",
+      "functionName": "evens_up_to",
+      "starter": "def evens_up_to(n):\n    # yield 0, 2, 4, ... while they stay below n\n    pass",
+      "solution": "def evens_up_to(n):\n    for i in range(0, n, 2):\n        yield i",
+      "tests": [
+        { "expr": "list(evens_up_to(10))", "expect": "[0, 2, 4, 6, 8]" },
+        { "expr": "list(evens_up_to(0))", "expect": "[]" },
+        { "expr": "list(evens_up_to(1))", "expect": "[0]" },
+        { "expr": "list(evens_up_to(2))", "expect": "[0]" },
+        { "expr": "list(evens_up_to(9))", "expect": "[0, 2, 4, 6, 8]" }
+      ],
+      "hints": [
+        "You want every second number starting at 0, stopping once you reach n — so the value n never appears.",
+        "range(0, n, 2) does exactly that: it starts at 0, steps by 2, and stops before n.",
+        "for i in range(0, n, 2): yield i — because the stop is exclusive, evens_up_to(10) ends at 8 (not 10) and evens_up_to(2) is just [0]."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-gen-take",
+      "prompt": "Implement take(n, xs) as a GENERATOR that yields the first n elements of the list xs, in order, using yield — and stops early once it has yielded n of them. list(take(2, [10, 20, 30])) is [10, 20]. If n is 0, it yields nothing; if n is larger than the list, it yields the whole list. list(take(5, [1, 2])) is [1, 2].",
+      "functionName": "take",
+      "starter": "def take(n, xs):\n    # yield the first n elements of xs, then stop\n    pass",
+      "solution": "def take(n, xs):\n    for i, x in enumerate(xs):\n        if i >= n:\n            return\n        yield x",
+      "tests": [
+        { "expr": "list(take(2, [10, 20, 30]))", "expect": "[10, 20]" },
+        { "expr": "list(take(0, [1, 2, 3]))", "expect": "[]" },
+        { "expr": "list(take(5, [1, 2]))", "expect": "[1, 2]" },
+        { "expr": "list(take(3, [1, 2, 3, 4, 5]))", "expect": "[1, 2, 3]" },
+        { "expr": "list(take(2, []))", "expect": "[]" },
+        { "setup": "g = take(3, [7, 8, 9, 10])\nfirst = next(g)", "expr": "first", "expect": "7" }
+      ],
+      "hints": [
+        "Walk xs and yield elements, but keep count so you can stop the moment you have handed back n of them.",
+        "enumerate(xs) pairs each element with its index i; once i reaches n, stop with a bare return so no more values are yielded.",
+        "for i, x in enumerate(xs): if i >= n: return; else yield x — stopping at i >= n makes take(2, [10, 20, 30]) yield [10, 20], and take(0, …) yields nothing at all."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-gen-repeat-each",
+      "prompt": "Implement repeat_each(xs) as a GENERATOR that yields every element of the list xs TWICE in a row, in order, using yield. list(repeat_each([1, 2])) is [1, 1, 2, 2] — each element appears back-to-back, not [1, 2, 1, 2]. An empty list yields nothing, so list(repeat_each([])) is [].",
+      "functionName": "repeat_each",
+      "starter": "def repeat_each(xs):\n    # yield each element of xs twice in a row\n    pass",
+      "solution": "def repeat_each(xs):\n    for x in xs:\n        yield x\n        yield x",
+      "tests": [
+        { "expr": "list(repeat_each([1, 2]))", "expect": "[1, 1, 2, 2]" },
+        { "expr": "list(repeat_each([]))", "expect": "[]" },
+        { "expr": "list(repeat_each([5]))", "expect": "[5, 5]" },
+        { "expr": "list(repeat_each(['a', 'b']))", "expect": "['a', 'a', 'b', 'b']" },
+        { "expr": "list(repeat_each([1, 2, 3]))", "expect": "[1, 1, 2, 2, 3, 3]" }
+      ],
+      "hints": [
+        "For each element you need two yields, one right after the other, before moving on to the next element.",
+        "Inside a loop over xs, yield x and then yield x again — the second yield fires before the loop advances.",
+        "for x in xs: yield x; yield x — yielding twice per element keeps the copies adjacent, so [1, 2] becomes [1, 1, 2, 2], not [1, 2, 1, 2]."
+      ],
+      "xp": 15
+    }
+  ]
+}

@@ -1,0 +1,106 @@
+{
+  "skillId": "py-recursion",
+  "exercises": [
+    {
+      "id": "py-rec-factorial",
+      "prompt": "Implement factorial(n) so it returns n! = n × (n−1) × … × 1, computed recursively. factorial(5) is 120. By definition factorial(0) is 1. Assume n is a non-negative integer. Write it recursively, with a base case and a call to itself — no loops.",
+      "functionName": "factorial",
+      "starter": "def factorial(n):\n    # base case, then recurse toward it\n    pass",
+      "solution": "def factorial(n):\n    if n <= 1:\n        return 1\n    return n * factorial(n - 1)",
+      "tests": [
+        { "expr": "factorial(0)", "expect": "1" },
+        { "expr": "factorial(1)", "expect": "1" },
+        { "expr": "factorial(3)", "expect": "6" },
+        { "expr": "factorial(5)", "expect": "120" },
+        { "expr": "factorial(6)", "expect": "720" }
+      ],
+      "hints": [
+        "A recursive function calls itself on a smaller input and needs a base case to stop — for factorial the smallest cases are n = 0 and n = 1, both worth 1.",
+        "For any larger n the answer is n times the factorial of n − 1 — the same function, one step smaller.",
+        "if n <= 1: return 1, otherwise return n * factorial(n - 1) — the base case returns 1 (so factorial(0) is 1), and each call multiplies by the result of the next-smaller call."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-rec-sum-to",
+      "prompt": "Implement sum_to(n) so it returns the sum 1 + 2 + … + n, computed recursively. sum_to(5) is 15. sum_to(0) is 0. Assume n is a non-negative integer. Use recursion with a base case — no loops.",
+      "functionName": "sum_to",
+      "starter": "def sum_to(n):\n    # base case at 0, then add n to the sum of everything below it\n    pass",
+      "solution": "def sum_to(n):\n    if n <= 0:\n        return 0\n    return n + sum_to(n - 1)",
+      "tests": [
+        { "expr": "sum_to(0)", "expect": "0" },
+        { "expr": "sum_to(1)", "expect": "1" },
+        { "expr": "sum_to(3)", "expect": "6" },
+        { "expr": "sum_to(5)", "expect": "15" },
+        { "expr": "sum_to(10)", "expect": "55" }
+      ],
+      "hints": [
+        "The base case is the smallest sum: sum_to(0) is 0, with nothing to add.",
+        "For n above 0 the total is n plus the sum of everything below it — sum_to(n - 1).",
+        "if n <= 0: return 0, otherwise return n + sum_to(n - 1) — the base case stops the recursion and returns 0 for n = 0, while each step peels off the current n."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-rec-power",
+      "prompt": "Implement power(base, exp) so it returns base raised to the exp power, computed recursively. power(2, 10) is 1024. By definition power(base, 0) is 1 for any base. Assume exp is a non-negative integer. Recurse on exp with a base case — no loops and no ** operator.",
+      "functionName": "power",
+      "starter": "def power(base, exp):\n    # base case when exp is 0, then recurse on exp - 1\n    pass",
+      "solution": "def power(base, exp):\n    if exp == 0:\n        return 1\n    return base * power(base, exp - 1)",
+      "tests": [
+        { "expr": "power(2, 0)", "expect": "1" },
+        { "expr": "power(5, 1)", "expect": "5" },
+        { "expr": "power(3, 3)", "expect": "27" },
+        { "expr": "power(2, 10)", "expect": "1024" },
+        { "expr": "power(10, 2)", "expect": "100" }
+      ],
+      "hints": [
+        "Anything to the power 0 is 1 — that is your base case, and it is what stops the recursion.",
+        "For exp above 0, base to the exp is base times base to the exp − 1: keep base fixed and count exp down.",
+        "if exp == 0: return 1, otherwise return base * power(base, exp - 1) — the exponent shrinks each call until it hits 0 and returns 1, so power(2, 0) is 1, not 0."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-rec-sum-list",
+      "prompt": "Implement sum_list(xs), where xs is a list of numbers, so it returns their sum, computed recursively. sum_list([1, 2, 3]) is 6. An empty list sums to 0. Use recursion with a base case — no loops, and no built-in sum().",
+      "functionName": "sum_list",
+      "starter": "def sum_list(xs):\n    # base case for the empty list, then first element plus the sum of the rest\n    pass",
+      "solution": "def sum_list(xs):\n    if not xs:\n        return 0\n    return xs[0] + sum_list(xs[1:])",
+      "tests": [
+        { "expr": "sum_list([])", "expect": "0" },
+        { "expr": "sum_list([5])", "expect": "5" },
+        { "expr": "sum_list([1, 2, 3])", "expect": "6" },
+        { "expr": "sum_list([10, -2, 4])", "expect": "12" },
+        { "expr": "sum_list([1, 1, 1, 1])", "expect": "4" }
+      ],
+      "hints": [
+        "The empty list is the base case — its sum is 0.",
+        "Otherwise the sum is the first element plus the sum of everything after it; xs[1:] is a new list of all but the first.",
+        "if not xs: return 0, otherwise return xs[0] + sum_list(xs[1:]) — slicing off the head shrinks the list each call until it is empty and returns 0."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-rec-sum-nested",
+      "prompt": "Implement sum_nested(xs) so it returns the sum of all numbers in xs, where each element is either a number OR a nested list of numbers, to any depth. sum_nested([1, [2, 3], [[4]]]) is 10. An empty list sums to 0. Use recursion to descend into the nested lists — no loops. (isinstance(x, list) tells you whether x is itself a list.)",
+      "functionName": "sum_nested",
+      "starter": "def sum_nested(xs):\n    # sum numbers, recursing into any element that is itself a list\n    pass",
+      "solution": "def sum_nested(xs):\n    if not xs:\n        return 0\n    first, rest = xs[0], xs[1:]\n    head = sum_nested(first) if isinstance(first, list) else first\n    return head + sum_nested(rest)",
+      "tests": [
+        { "expr": "sum_nested([])", "expect": "0" },
+        { "expr": "sum_nested([1, 2, 3])", "expect": "6" },
+        { "expr": "sum_nested([1, [2, 3]])", "expect": "6" },
+        { "expr": "sum_nested([1, [2, [3, 4]], 5])", "expect": "15" },
+        { "expr": "sum_nested([[1], [2], [3]])", "expect": "6" },
+        { "expr": "sum_nested([[[5]]])", "expect": "5" }
+      ],
+      "hints": [
+        "Two kinds of element need two kinds of handling: a plain number adds itself, while a nested list must be summed by the same function.",
+        "Split into the first element and the rest. If the first is a list, sum it with a recursive call; otherwise it is a number. Then add the recursive sum of the rest.",
+        "first, rest = xs[0], xs[1:]; head = sum_nested(first) if isinstance(first, list) else first; return head + sum_nested(rest) — recursing on both the list element and the rest reaches every number at any depth, where a flat sum would miss [[4]]."
+      ],
+      "xp": 15
+    }
+  ]
+}

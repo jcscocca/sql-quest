@@ -724,6 +724,67 @@
           }
         }
       ]
+    },
+    {
+      "id": "py-functions",
+      "name": "Python · Functions & Classes",
+      "skills": [
+        {
+          "id": "py-higher-order",
+          "name": "Higher-Order Functions & Lambdas",
+          "trackId": "python",
+          "requires": ["py-records"],
+          "lesson": {
+            "intro": "Until now a function has taken values and returned a value. A higher-order function breaks that ceiling: it takes another function as an argument, returns a new function, or both — and it is the idea quietly underneath tools you already use, like the key=lambda p: p['attack'] you handed to max and sorted. Passing a function is routine — count_matching(xs, pred) applies whatever test pred it was given, calling pred(x) rather than hard-coding a condition — and map_values(d, f) does the same over a dict, rebuilding it as {k: f(v) for k, v in d.items()}. A lambda is Python's one-line anonymous function: lambda x: x + 1 is a function you can pass inline without a def, ideal for these small callbacks. The other direction is a function factory: make_adder(n) returns a brand-new function, so add5 = make_adder(5) builds an adder you call later with add5(10). That returned function remembers the n that was in scope when it was created — each make_adder call makes its own — which keeps two adders independent. compose(f, g) does both jobs at once: it takes two functions and returns a third, lambda x: f(g(x)), and here order is everything, since g runs before f. Because the function you pass or return is just a value, you can name it, store it in a list, and hand it around like any number or string.",
+            "exampleSql": "",
+            "wrapUp": "A higher-order function treats other functions as data — accepting them as callbacks (apply_twice, map_values, count_matching), returning them from a factory (make_adder, compose), or both. That is the machinery under the key= arguments and the map and filter you already reach for, and the same move scales from one-liners to whole libraries. A lambda writes those small functions inline, right where they are needed. Next you'll turn a function on itself: recursion, where a function calls itself on a smaller version of the same problem until it bottoms out."
+          }
+        },
+        {
+          "id": "py-recursion",
+          "name": "Recursion",
+          "trackId": "python",
+          "requires": ["py-higher-order"],
+          "lesson": {
+            "intro": "A recursive function solves a problem by calling itself on a smaller version of that problem, until it reaches a case small enough to answer outright. Every recursion needs two parts, and getting both right is the whole skill: a base case that returns directly without recursing — factorial(0) is 1, the sum of an empty list is 0 — and a recursive case that does a little work and defers the rest to a call on smaller input. factorial(n) is n * factorial(n - 1); the multiplications stack up until n reaches the base case, then unwind into the answer. The shrinking argument is what guarantees you reach the base case — count n down toward 0, or peel the first element off a list and recurse on xs[1:] — and forgetting to shrink, or forgetting the base case, is an infinite recursion that never returns (Python eventually stops it with a RecursionError). The pattern generalizes past single numbers: sum_list adds xs[0] to the sum of the rest, and when the data is nested — lists inside lists — an element can branch into two recursive calls, one descending into the nested list and one across the remaining elements, so the function naturally follows the data's own shape to any depth. Model each solution as 'the answer for this equals one step combined with the answer for something smaller,' and let the base case stop it.",
+            "exampleSql": "",
+            "wrapUp": "Recursion expresses an answer in terms of smaller copies of the same question: a base case ends it (0, 1, or the empty list), and a recursive case does one step and hands the rest to itself on a shrunken input. Keep the input shrinking toward the base case and the calls stack up and then unwind into the result — factorials, running sums, powers, and arbitrarily nested lists all fall to the same shape. Recursion produces a whole answer at once; next you'll produce a sequence lazily, one value at a time, with a function that yields instead of returns — a generator."
+          }
+        },
+        {
+          "id": "py-generators",
+          "name": "Generators",
+          "trackId": "python",
+          "requires": ["py-recursion"],
+          "lesson": {
+            "intro": "A generator is a function that produces a sequence lazily — one value at a time — by using yield instead of return. Where a normal function runs to a single return and hands back one value, a generator pauses at each yield, gives that value to whoever is iterating, and resumes from exactly there on the next request. Writing one is a small change with a big consequence: count_up(n) is just for i in range(n): yield i, and calling it does not run the loop — it hands back a generator object that runs the loop only as you pull from it. You materialize the values by iterating: list(count_up(3)) drives it to exhaustion and collects [0, 1, 2], and a for loop consumes it the same way. You can also pull a single value with next(g): next(count_up(5)) is 0, the first thing yielded, leaving the rest unproduced. The order you yield in is the order the consumer sees — count_down(n) counting from n down to 1 yields [n, …, 1], not the reverse — and a generator can yield more than once per step: repeat_each(xs) does yield x twice inside the loop to double each element. It can stop early, too: return with no value (or simply falling off the end) ends the sequence, which is how take(n, xs) yields only the first n items and then quits. Because nothing is computed until it is asked for, a generator can describe a long or even endless sequence while only ever holding one value at a time.",
+            "exampleSql": "",
+            "wrapUp": "A generator yields a sequence one value at a time, computing each only when asked: write yield instead of return, and calling the function hands back a lazy iterator. You drive it with list() to collect every value — the natural way to check one in a test — or with next() to pull a single one, and the sequence comes out in the exact order you yielded, ending when the function returns or runs off the end. count_up, count_down, evens_up_to, take, and repeat_each all shape a stream this way without ever building the whole list up front. So far a bad input has always had some answer to yield or return; next you'll handle the inputs that deserve none, raising an error instead of faking a result."
+          }
+        },
+        {
+          "id": "py-exceptions",
+          "name": "Exceptions",
+          "trackId": "python",
+          "requires": ["py-generators"],
+          "lesson": {
+            "intro": "Not every input deserves an answer — some deserve an error. When a value falls outside the range a function can handle, the right move is not to return None and hope the caller notices, but to raise, which stops the function immediately and hands a labeled exception up to whoever called it. You raise with raise ValueError('message'): ValueError signals a value of the right type but wrong value (a negative under a square root, a non-positive count), ZeroDivisionError a division by zero, IndexError an index past the end of a sequence, and TypeError a value of the wrong kind entirely. Each exception has a class name — 'ValueError', 'TypeError' — and that name is exactly what a caller, and the tests here, check to tell one failure from another, so choosing the right class is part of the contract. The shape of these functions is a guard clause up front: test the bad case first, raise if it holds, and let the normal return sit below for every valid input — if b == 0: raise ZeroDivisionError('cannot divide by zero'), then return a / b. Get the boundary exactly right, since it decides which side of the line raises: checked_sqrt(0) is fine because 0 has a root, but any negative raises; parse_positive(0) raises because 0 is not positive. You'll validate the error cases and the valid cases side by side, because a function that always raised would be as broken as one that never did.",
+            "exampleSql": "",
+            "wrapUp": "Raising turns a bad input into a loud, catchable failure instead of a silently wrong answer: guard the invalid case at the top of the function, raise ValueError, ZeroDivisionError, IndexError, or TypeError with a clear message, and return normally for everything valid. The exception's class name is the signal the caller keys on, so the one you pick matters, and the boundary — < versus <=, the explicit i < 0 check — decides exactly which inputs cross the line. You now write functions that police their own inputs. Next you'll gather state and the methods that guard and change it into a single unit: a class."
+          }
+        },
+        {
+          "id": "py-classes",
+          "name": "Classes & Dataclasses",
+          "trackId": "python",
+          "requires": ["py-exceptions"],
+          "lesson": {
+            "intro": "A class is a blueprint for objects that bundle data together with the methods that operate on it. You define it once with class Counter: and create instances by calling it, Counter(): the __init__ method runs at creation, receiving any arguments and setting up the instance's state as attributes on self — self.count = start. Methods are functions written inside the class body whose first parameter is self, and they reach the instance's own data through it: inc(self) does self.count += 1 on this specific counter, value(self) returns it. Note that self is explicit in every method definition but supplied automatically when you call c.value(). The pivotal idea is that each instance carries its own state — two counters from two Counter() calls have separate self.count, so incrementing one never touches the other. Methods can do more than read and write a field; they can enforce rules, folding in the error handling you just learned — a bank account's withdraw raises a ValueError rather than let the balance go negative — and a constructor parameter can carry a default, def __init__(self, start=0), for the common case. For a class that is mostly a bundle of data fields, Python offers a shortcut: decorate it with @dataclass and just annotate the fields — width: int, height: int — and the __init__ and a value-based == are generated for you, so Rectangle(3, 4) == Rectangle(3, 4) is True with no boilerplate. Model a class as a little machine: the constructor builds it, the methods are the buttons, and a sequence of calls drives it from one state to the next.",
+            "exampleSql": "",
+            "wrapUp": "A class packages state and behavior: __init__ initializes each instance's own attributes on self, and methods read, update, and guard that state — a counter that steps, a stack and a queue that order their elements, an account that refuses to overdraw. Because every instance owns its data, many objects of the same class run independently, and a method can enforce an invariant by raising just as your standalone validators did. @dataclass strips the boilerplate from data-holding classes, generating the constructor and value equality from the fields alone. That completes Functions & Classes — from higher-order functions and lambdas through recursion, generators, exception handling, and now the objects that tie state and methods together, you hold the tools to structure real Python programs, not just single expressions."
+          }
+        }
+      ]
     }
   ]
 }

@@ -1,0 +1,109 @@
+{
+  "skillId": "py-exceptions",
+  "exercises": [
+    {
+      "id": "py-exc-checked-sqrt",
+      "prompt": "Implement checked_sqrt(x) so it returns the square root of x (as a float) — but raises ValueError when x is negative, since a real square root is undefined there. checked_sqrt(9) is 3.0 and checked_sqrt(0) is 0.0, while checked_sqrt(-1) raises ValueError. Guard the bad case first, then return x ** 0.5 for any x that is 0 or greater.",
+      "functionName": "checked_sqrt",
+      "starter": "def checked_sqrt(x):\n    # raise ValueError when x is negative; otherwise return its square root\n    pass",
+      "solution": "def checked_sqrt(x):\n    if x < 0:\n        raise ValueError('x must be non-negative')\n    return x ** 0.5",
+      "tests": [
+        { "expr": "checked_sqrt(9)", "expect": "3.0" },
+        { "expr": "checked_sqrt(0)", "expect": "0.0" },
+        { "expr": "checked_sqrt(4)", "expect": "2.0" },
+        { "expr": "checked_sqrt(0.25)", "expect": "0.5" },
+        { "expr": "checked_sqrt(-1)", "raises": "ValueError" },
+        { "expr": "checked_sqrt(-9)", "raises": "ValueError" }
+      ],
+      "hints": [
+        "Test the invalid case at the top: if x is negative there is no answer to return, so raise instead of computing.",
+        "raise ValueError('...') stops the function and signals the bad input; put it behind an if x < 0 guard, then return the root below.",
+        "if x < 0: raise ValueError('x must be non-negative'), then return x ** 0.5 — the guard is < (not <=), so checked_sqrt(0) still returns 0.0 while a negative input raises."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-exc-safe-divide",
+      "prompt": "Implement safe_divide(a, b) so it returns a / b, but raises ZeroDivisionError when b is 0 rather than letting the division fail silently or return something misleading. safe_divide(10, 2) is 5.0 and safe_divide(7, 2) is 3.5, while safe_divide(1, 0) raises ZeroDivisionError. A zero numerator is fine: safe_divide(0, 5) is 0.0.",
+      "functionName": "safe_divide",
+      "starter": "def safe_divide(a, b):\n    # raise ZeroDivisionError when b is 0; otherwise return a / b\n    pass",
+      "solution": "def safe_divide(a, b):\n    if b == 0:\n        raise ZeroDivisionError('cannot divide by zero')\n    return a / b",
+      "tests": [
+        { "expr": "safe_divide(10, 2)", "expect": "5.0" },
+        { "expr": "safe_divide(9, 3)", "expect": "3.0" },
+        { "expr": "safe_divide(7, 2)", "expect": "3.5" },
+        { "expr": "safe_divide(0, 5)", "expect": "0.0" },
+        { "expr": "safe_divide(1, 0)", "raises": "ZeroDivisionError" },
+        { "expr": "safe_divide(-6, 2)", "expect": "-3.0" }
+      ],
+      "hints": [
+        "The one input to reject is a divisor of 0 — guard it before you divide, since that is the only value of b with no valid result.",
+        "if b == 0: raise ZeroDivisionError('...'), then return a / b for every other divisor.",
+        "Use true division a / b (not //): it returns a float, so safe_divide(7, 2) is 3.5, and the guard means only b == 0 raises — a zero numerator like safe_divide(0, 5) is a perfectly fine 0.0."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-exc-get-at",
+      "prompt": "Implement get_at(xs, i) so it returns the element of the list xs at index i, but raises IndexError when i is out of range — that is, when i is negative or i is greater than or equal to len(xs). get_at([10, 20, 30], 0) is 10 and get_at([10, 20, 30], 2) is 30, while get_at([10, 20, 30], 3) and get_at([10, 20, 30], -1) both raise IndexError. An empty list raises IndexError for any i.",
+      "functionName": "get_at",
+      "starter": "def get_at(xs, i):\n    # raise IndexError when i is out of range; otherwise return xs[i]\n    pass",
+      "solution": "def get_at(xs, i):\n    if i < 0 or i >= len(xs):\n        raise IndexError('index out of range')\n    return xs[i]",
+      "tests": [
+        { "expr": "get_at([10, 20, 30], 0)", "expect": "10" },
+        { "expr": "get_at([10, 20, 30], 2)", "expect": "30" },
+        { "expr": "get_at([5], 0)", "expect": "5" },
+        { "expr": "get_at([10, 20, 30], 3)", "raises": "IndexError" },
+        { "expr": "get_at([10, 20, 30], -1)", "raises": "IndexError" },
+        { "expr": "get_at([], 0)", "raises": "IndexError" }
+      ],
+      "hints": [
+        "A valid index runs from 0 up to len(xs) − 1; anything outside that — negative, or too big — has no element to return.",
+        "Guard with if i < 0 or i >= len(xs): raise IndexError('...'), then return xs[i] when i is in range.",
+        "You must check i < 0 yourself: a plain return xs[i] would let xs[-1] succeed and return the last element, so the get_at(..., -1) test is what forces the explicit lower-bound guard."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-exc-parse-positive",
+      "prompt": "Implement parse_positive(n) so it returns n unchanged when n is a positive number, but raises ValueError when n is zero or negative. parse_positive(5) is 5 and parse_positive(1) is 1, while parse_positive(0) and parse_positive(-3) both raise ValueError. The boundary matters: 0 is NOT positive, so it raises.",
+      "functionName": "parse_positive",
+      "starter": "def parse_positive(n):\n    # raise ValueError when n is zero or negative; otherwise return n\n    pass",
+      "solution": "def parse_positive(n):\n    if n <= 0:\n        raise ValueError('n must be positive')\n    return n",
+      "tests": [
+        { "expr": "parse_positive(5)", "expect": "5" },
+        { "expr": "parse_positive(1)", "expect": "1" },
+        { "expr": "parse_positive(100)", "expect": "100" },
+        { "expr": "parse_positive(0)", "raises": "ValueError" },
+        { "expr": "parse_positive(-3)", "raises": "ValueError" }
+      ],
+      "hints": [
+        "Only strictly positive numbers are allowed through — so 0, like any negative, must be rejected.",
+        "if n <= 0: raise ValueError('...'), then return n for anything larger.",
+        "The guard is <= (not <), so parse_positive(0) raises while parse_positive(1) returns 1 — putting the boundary exactly at 0."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-exc-require-int",
+      "prompt": "Implement require_int(x) so it returns x unchanged when x is an int, but raises TypeError when x is any other type — a str, a float, a list, and so on. require_int(5) is 5, while require_int('5') and require_int(3.0) both raise TypeError. Use isinstance(x, int) to test the type; do NOT convert the value, just accept or reject it.",
+      "functionName": "require_int",
+      "starter": "def require_int(x):\n    # raise TypeError when x is not an int; otherwise return x\n    pass",
+      "solution": "def require_int(x):\n    if not isinstance(x, int):\n        raise TypeError('expected an int')\n    return x",
+      "tests": [
+        { "expr": "require_int(5)", "expect": "5" },
+        { "expr": "require_int(0)", "expect": "0" },
+        { "expr": "require_int(-7)", "expect": "-7" },
+        { "expr": "require_int('5')", "raises": "TypeError" },
+        { "expr": "require_int(3.0)", "raises": "TypeError" },
+        { "expr": "require_int([1])", "raises": "TypeError" }
+      ],
+      "hints": [
+        "This guard is about the type of the value, not its size — the wrong KIND of value is what you reject.",
+        "isinstance(x, int) is True only for integers; raise TypeError when it is not, then return x.",
+        "if not isinstance(x, int): raise TypeError('expected an int'), then return x — note require_int('5') must raise rather than convert, and require_int(3.0) raises too because a float is not an int."
+      ],
+      "xp": 15
+    }
+  ]
+}

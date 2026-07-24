@@ -1,0 +1,105 @@
+{
+  "skillId": "py-higher-order",
+  "exercises": [
+    {
+      "id": "py-apply-twice",
+      "prompt": "Implement apply_twice(f, x) so it returns the result of applying the function f to x twice — that is, f(f(x)). apply_twice(lambda n: n + 1, 5) is 7, because f turns 5 into 6 and then 6 into 7. apply_twice(lambda n: n - 1, 10) is 8. The function f is passed in as an argument, so call it rather than writing the operation yourself.",
+      "functionName": "apply_twice",
+      "starter": "def apply_twice(f, x):\n    # apply f to x, then apply f to that result\n    pass",
+      "solution": "def apply_twice(f, x):\n    return f(f(x))",
+      "tests": [
+        { "expr": "apply_twice(lambda n: n + 1, 5)", "expect": "7" },
+        { "expr": "apply_twice(lambda n: n - 1, 10)", "expect": "8" },
+        { "expr": "apply_twice(lambda n: n * 2, 3)", "expect": "12" },
+        { "expr": "apply_twice(lambda s: s + '!', 'hi')", "expect": "'hi!!'" },
+        { "expr": "apply_twice(lambda n: n, 9)", "expect": "9" }
+      ],
+      "hints": [
+        "f is an ordinary function you were handed — call it like any other, f(x), to run it on a value.",
+        "You need f applied twice: feed x through once, then feed that result through f again.",
+        "return f(f(x)) — the inner f(x) runs first, and its result becomes the argument to the outer f. Applying f only once would return 6, not 7, for lambda n: n + 1 on 5."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-map-values",
+      "prompt": "Implement map_values(d, f) so it returns a NEW dict with the same keys as d but each value replaced by f(value). map_values({'a': 1, 'b': 2}, lambda n: n * 10) is {'a': 10, 'b': 20}. An empty dict returns an empty dict. Do not modify the input dict.",
+      "functionName": "map_values",
+      "starter": "def map_values(d, f):\n    # return a new dict with each value transformed by f\n    pass",
+      "solution": "def map_values(d, f):\n    return {k: f(v) for k, v in d.items()}",
+      "tests": [
+        { "expr": "map_values({'a': 1, 'b': 2}, lambda n: n * 10)", "expect": "{'a': 10, 'b': 20}" },
+        { "expr": "map_values({}, lambda n: n)", "expect": "{}" },
+        { "expr": "map_values({'x': 3}, lambda n: n + 1)", "expect": "{'x': 4}" },
+        { "expr": "map_values({'a': 'hi', 'b': 'yo'}, lambda s: s.upper())", "expect": "{'a': 'HI', 'b': 'YO'}" },
+        { "setup": "src = {'a': 1}\nmap_values(src, lambda n: n + 1)", "expr": "src", "expect": "{'a': 1}" }
+      ],
+      "hints": [
+        "d.items() hands you the (key, value) pairs, which you can walk to build a fresh dict.",
+        "A dict comprehension does both jobs at once: keep the key k, transform the value with f(v).",
+        "return {k: f(v) for k, v in d.items()} — building a new dict leaves the caller's d untouched, which the last test checks by re-reading src afterward."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-make-adder",
+      "prompt": "Implement make_adder(n) so it returns a NEW function that adds n to whatever it is given. make_adder is called once to build the adder, then that adder is called with a number: add5 = make_adder(5); add5(10) is 15. Two adders built from different n values are independent of each other.",
+      "functionName": "make_adder",
+      "starter": "def make_adder(n):\n    # return a function that adds n to its argument\n    pass",
+      "solution": "def make_adder(n):\n    return lambda x: x + n",
+      "tests": [
+        { "setup": "add5 = make_adder(5)", "expr": "add5(10)", "expect": "15" },
+        { "setup": "add0 = make_adder(0)", "expr": "add0(7)", "expect": "7" },
+        { "setup": "add_neg = make_adder(-3)", "expr": "add_neg(10)", "expect": "7" },
+        { "expr": "make_adder(3)(4)", "expect": "7" },
+        { "setup": "a = make_adder(1)\nb = make_adder(100)", "expr": "a(1) + b(1)", "expect": "103" }
+      ],
+      "hints": [
+        "make_adder does not add anything itself — it builds and hands back a function that will do the adding later.",
+        "Return a one-argument function that remembers n: given x, it produces x + n. A lambda is the shortest way to write it.",
+        "return lambda x: x + n — each call to make_adder creates a fresh function holding its own n, so add5 and the adder built from 100 never interfere."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-compose",
+      "prompt": "Implement compose(f, g) so it returns a NEW function that feeds its input through g first and then through f — the result is f(g(x)). h = compose(lambda x: x + 1, lambda x: x * 2); h(5) is 11, because g doubles 5 to 10 and then f adds 1. Order matters here: g runs before f.",
+      "functionName": "compose",
+      "starter": "def compose(f, g):\n    # return a function that computes f(g(x))\n    pass",
+      "solution": "def compose(f, g):\n    return lambda x: f(g(x))",
+      "tests": [
+        { "setup": "h = compose(lambda x: x + 1, lambda x: x * 2)", "expr": "h(5)", "expect": "11" },
+        { "setup": "h = compose(lambda x: x * 2, lambda x: x + 1)", "expr": "h(5)", "expect": "12" },
+        { "setup": "h = compose(lambda x: x - 3, lambda x: x - 1)", "expr": "h(10)", "expect": "6" },
+        { "expr": "compose(lambda x: x + 1, lambda x: x + 1)(0)", "expect": "2" },
+        { "setup": "same = compose(lambda x: x, lambda x: x)", "expr": "same(42)", "expect": "42" }
+      ],
+      "hints": [
+        "compose returns a function; inside it, you have two functions to run in a specific order on the input.",
+        "g is the inner step and f the outer: apply g to x, then apply f to whatever g returned.",
+        "return lambda x: f(g(x)) — g runs first. Flipping to g(f(x)) would give 12 instead of 11 for the first test, which is exactly why another test swaps the two functions."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-hof-count-matching",
+      "prompt": "Implement count_matching(xs, pred) so it returns how many elements of the list xs satisfy the predicate function pred — that is, how many elements x make pred(x) return True. count_matching([1, 2, 3, 4, 5], lambda n: n > 2) is 3. An empty list returns 0. pred is supplied by the caller, so apply it rather than hard-coding a test.",
+      "functionName": "count_matching",
+      "starter": "def count_matching(xs, pred):\n    # count how many elements satisfy pred\n    pass",
+      "solution": "def count_matching(xs, pred):\n    return sum(1 for x in xs if pred(x))",
+      "tests": [
+        { "expr": "count_matching([1, 2, 3, 4, 5], lambda n: n > 2)", "expect": "3" },
+        { "expr": "count_matching([], lambda x: True)", "expect": "0" },
+        { "expr": "count_matching([1, 3, 5], lambda n: n % 2 == 0)", "expect": "0" },
+        { "expr": "count_matching(['a', 'bb', 'ccc'], lambda s: len(s) >= 2)", "expect": "2" },
+        { "expr": "count_matching([10, 20, 30], lambda n: n == 20)", "expect": "1" }
+      ],
+      "hints": [
+        "pred is a test you can apply to each element — you do not write the condition yourself, you call pred(x).",
+        "Count the elements where pred(x) is true: a generator that emits 1 per match, summed, gives the tally.",
+        "return sum(1 for x in xs if pred(x)) — the filter keeps only matches and sum counts them; returning len(xs) instead would ignore pred and fail the middle tests."
+      ],
+      "xp": 15
+    }
+  ]
+}
