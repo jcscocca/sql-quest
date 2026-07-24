@@ -83,6 +83,21 @@ button:disabled { opacity: 0.45; cursor: default; }
 }
 .lesson-actions { display: flex; gap: 10px; }
 
+.fixture {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+.fixture pre {
+  margin: 6px 0 0;
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-x: auto;
+  white-space: pre;
+}
+
 .exercise-layout {
   display: grid;
   grid-template-columns: minmax(260px, 340px) minmax(0, 1fr);

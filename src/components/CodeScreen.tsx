@@ -135,6 +135,12 @@ export function CodeScreen({ skill, bank, region, onBack, createTrack = createJa
             <p>{ex.prompt}</p>
             {exSolved && !feedback && <p className="already-solved">Already solved — replaying is free practice.</p>}
           </div>
+          {ex.fixture && (
+            <div className="fixture">
+              <span className="label">Data available to your code</span>
+              <pre>{ex.fixture}</pre>
+            </div>
+          )}
           <div className="hints">
             {ex.hints.slice(0, hintsShown).map((h, i) => (
               <div key={i} className="hint">
