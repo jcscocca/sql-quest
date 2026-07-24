@@ -1,0 +1,110 @@
+{
+  "skillId": "py-loops",
+  "exercises": [
+    {
+      "id": "py-sum-to",
+      "prompt": "Implement sum_to(n) so it returns the sum of every whole number from 1 up to and including n, using a loop. sum_to(5) is 1+2+3+4+5 = 15. sum_to(0) is 0.",
+      "functionName": "sum_to",
+      "starter": "def sum_to(n):\n    # add up 1, 2, ..., n with a loop\n    pass",
+      "solution": "def sum_to(n):\n    total = 0\n    for i in range(1, n + 1):\n        total += i\n    return total",
+      "tests": [
+        { "expr": "sum_to(5)", "expect": "15" },
+        { "expr": "sum_to(1)", "expect": "1" },
+        { "expr": "sum_to(0)", "expect": "0" },
+        { "expr": "sum_to(10)", "expect": "55" },
+        { "expr": "sum_to(3)", "expect": "6" },
+        { "expr": "sum_to(100)", "expect": "5050" }
+      ],
+      "hints": [
+        "Keep a running total in a variable declared before the loop, and add each number to it as you pass.",
+        "range(1, n + 1) counts i from 1 through n; the + 1 is needed because range stops just before its second argument.",
+        "Start total = 0, do total += i inside the loop, and return total after it — when n is 0 the loop never runs and 0 comes back."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-factorial",
+      "prompt": "Implement factorial(n) so it returns n! — the product of every whole number from 1 to n — using a loop. factorial(4) is 1*2*3*4 = 24. By definition factorial(0) is 1.",
+      "functionName": "factorial",
+      "starter": "def factorial(n):\n    # multiply together 1, 2, ..., n\n    pass",
+      "solution": "def factorial(n):\n    product = 1\n    for i in range(2, n + 1):\n        product *= i\n    return product",
+      "tests": [
+        { "expr": "factorial(0)", "expect": "1" },
+        { "expr": "factorial(1)", "expect": "1" },
+        { "expr": "factorial(5)", "expect": "120" },
+        { "expr": "factorial(3)", "expect": "6" },
+        { "expr": "factorial(4)", "expect": "24" },
+        { "expr": "factorial(6)", "expect": "720" }
+      ],
+      "hints": [
+        "A product accumulator must start at 1 — starting at 0 would zero everything out — then you multiply each number in.",
+        "Loop i over range(2, n + 1) and do product *= i each pass.",
+        "Set product = 1, run the loop, then return product — for n of 0 or 1 the loop never runs and 1 is returned."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-count-matching",
+      "prompt": "Implement count_matching(xs, target) so it returns how many elements of the list xs are equal to target, using a loop. An empty list returns 0.",
+      "functionName": "count_matching",
+      "starter": "def count_matching(xs, target):\n    # count how many elements equal target\n    pass",
+      "solution": "def count_matching(xs, target):\n    count = 0\n    for x in xs:\n        if x == target:\n            count += 1\n    return count",
+      "tests": [
+        { "expr": "count_matching([1, 2, 2, 3], 2)", "expect": "2" },
+        { "expr": "count_matching([], 5)", "expect": "0" },
+        { "expr": "count_matching([1, 1, 1], 1)", "expect": "3" },
+        { "expr": "count_matching([1, 2, 3], 9)", "expect": "0" },
+        { "expr": "count_matching([5], 5)", "expect": "1" },
+        { "expr": "count_matching([4, 4, 1, 4], 4)", "expect": "3" }
+      ],
+      "hints": [
+        "Walk the list and keep a counter that only rises when an element equals target.",
+        "for x in xs visits each element; test it with if x == target and bump a counter.",
+        "Start count = 0, do count += 1 inside the if, and return count — an empty list skips the loop and returns 0."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-first-index-of",
+      "prompt": "Implement first_index_of(xs, target) so it returns the index of the first element equal to target, or -1 when no element matches. Use a loop and stop as soon as you find it. first_index_of([3, 1, 4], 1) is 1. An empty list returns -1.",
+      "functionName": "first_index_of",
+      "starter": "def first_index_of(xs, target):\n    # return the index of the first match, or -1\n    pass",
+      "solution": "def first_index_of(xs, target):\n    for i, x in enumerate(xs):\n        if x == target:\n            return i\n    return -1",
+      "tests": [
+        { "expr": "first_index_of([3, 1, 4], 1)", "expect": "1" },
+        { "expr": "first_index_of([1, 2, 3], 9)", "expect": "-1" },
+        { "expr": "first_index_of([], 5)", "expect": "-1" },
+        { "expr": "first_index_of([7, 7, 7], 7)", "expect": "0" },
+        { "expr": "first_index_of([5, 6, 7], 7)", "expect": "2" },
+        { "expr": "first_index_of([9, 1, 2], 9)", "expect": "0" }
+      ],
+      "hints": [
+        "Scan from the front; the first element that matches is your answer, so hand back its index right away.",
+        "enumerate(xs) gives you both the index and the value each pass: for i, x in enumerate(xs).",
+        "return i from inside the loop the instant x == target, and return -1 after the loop for the no-match case (which also covers the empty list)."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-collatz",
+      "prompt": "Implement collatz_steps(n) so it returns how many steps it takes to reach 1 by repeatedly applying this rule: if the number is even, halve it; if it is odd, triple it and add 1. Start from a positive integer n. collatz_steps(1) is 0 (already at 1), and collatz_steps(8) is 3 (8 → 4 → 2 → 1). Use a while loop.",
+      "functionName": "collatz_steps",
+      "starter": "def collatz_steps(n):\n    # count steps to reach 1\n    pass",
+      "solution": "def collatz_steps(n):\n    steps = 0\n    while n != 1:\n        if n % 2 == 0:\n            n = n // 2\n        else:\n            n = 3 * n + 1\n        steps += 1\n    return steps",
+      "tests": [
+        { "expr": "collatz_steps(1)", "expect": "0" },
+        { "expr": "collatz_steps(2)", "expect": "1" },
+        { "expr": "collatz_steps(4)", "expect": "2" },
+        { "expr": "collatz_steps(3)", "expect": "7" },
+        { "expr": "collatz_steps(6)", "expect": "8" },
+        { "expr": "collatz_steps(8)", "expect": "3" }
+      ],
+      "hints": [
+        "You cannot know the number of steps ahead of time, so loop while n != 1 and count each change.",
+        "Each pass, replace n with n // 2 when n is even (n % 2 == 0), otherwise 3 * n + 1, and add one to a step counter.",
+        "Start steps = 0; inside while n != 1: update n and do steps += 1; then return steps, which stays 0 when n starts at 1."
+      ],
+      "xp": 15
+    }
+  ]
+}

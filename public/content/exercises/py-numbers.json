@@ -1,0 +1,110 @@
+{
+  "skillId": "py-numbers",
+  "exercises": [
+    {
+      "id": "py-average3",
+      "prompt": "Implement average3(a, b, c) so it returns the average of the three numbers, rounded to the nearest whole number.",
+      "functionName": "average3",
+      "starter": "def average3(a, b, c):\n    # return the mean of a, b, c rounded to the nearest whole number\n    pass",
+      "solution": "def average3(a, b, c):\n    return round((a + b + c) / 3)",
+      "tests": [
+        { "expr": "average3(1, 2, 3)", "expect": "2" },
+        { "expr": "average3(2, 2, 2)", "expect": "2" },
+        { "expr": "average3(1, 2, 4)", "expect": "2" },
+        { "expr": "average3(10, 20, 30)", "expect": "20" },
+        { "expr": "average3(0, 0, 1)", "expect": "0" },
+        { "expr": "average3(2, 3, 4)", "expect": "3" }
+      ],
+      "hints": [
+        "An average is the sum of the values divided by how many there are — three here — and then rounded.",
+        "(a + b + c) / 3 gives the raw mean as a float; round(x) snaps it to the nearest whole number.",
+        "return round((a + b + c) / 3); the inner parentheses make the addition happen before the division."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-floor-divide",
+      "prompt": "Implement floor_divide(a, b) so it returns how many whole times b fits into a, discarding any remainder — integer division. For example floor_divide(7, 2) is 3. Assume a is zero or positive and b is a positive integer.",
+      "functionName": "floor_divide",
+      "starter": "def floor_divide(a, b):\n    # return the whole-number part of a / b\n    pass",
+      "solution": "def floor_divide(a, b):\n    return a // b",
+      "tests": [
+        { "expr": "floor_divide(7, 2)", "expect": "3" },
+        { "expr": "floor_divide(10, 5)", "expect": "2" },
+        { "expr": "floor_divide(9, 4)", "expect": "2" },
+        { "expr": "floor_divide(3, 5)", "expect": "0" },
+        { "expr": "floor_divide(100, 7)", "expect": "14" },
+        { "expr": "floor_divide(6, 3)", "expect": "2" }
+      ],
+      "hints": [
+        "Plain division with / gives a float (7 / 2 is 3.5); you want only the whole-number part.",
+        "Floor division // divides and rounds down to a whole number in one step: 7 // 2 is 3.",
+        "return a // b."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-last-digit-of-power",
+      "prompt": "Implement last_digit_of_power(base, exp) so it returns the last (units) digit of base raised to the exp power. Because 2 ** 10 is 1024, last_digit_of_power(2, 10) is 4. Assume base and exp are non-negative integers, and remember that any number to the 0 power is 1.",
+      "functionName": "last_digit_of_power",
+      "starter": "def last_digit_of_power(base, exp):\n    # return the last digit of base ** exp\n    pass",
+      "solution": "def last_digit_of_power(base, exp):\n    return (base ** exp) % 10",
+      "tests": [
+        { "expr": "last_digit_of_power(2, 10)", "expect": "4" },
+        { "expr": "last_digit_of_power(3, 2)", "expect": "9" },
+        { "expr": "last_digit_of_power(7, 1)", "expect": "7" },
+        { "expr": "last_digit_of_power(10, 3)", "expect": "0" },
+        { "expr": "last_digit_of_power(2, 0)", "expect": "1" },
+        { "expr": "last_digit_of_power(5, 3)", "expect": "5" }
+      ],
+      "hints": [
+        "Two steps: raise base to the exp power, then pull off the last digit of that result.",
+        "base ** exp computes the power; the last digit of a whole number is its remainder when divided by 10, i.e. % 10.",
+        "return (base ** exp) % 10."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-abs-difference",
+      "prompt": "Implement abs_difference(a, b) so it returns the distance between the two numbers — how far apart they are — as a non-negative value. abs_difference(3, 5) and abs_difference(5, 3) are both 2.",
+      "functionName": "abs_difference",
+      "starter": "def abs_difference(a, b):\n    # return the non-negative distance between a and b\n    pass",
+      "solution": "def abs_difference(a, b):\n    return abs(a - b)",
+      "tests": [
+        { "expr": "abs_difference(5, 3)", "expect": "2" },
+        { "expr": "abs_difference(3, 5)", "expect": "2" },
+        { "expr": "abs_difference(-2, 2)", "expect": "4" },
+        { "expr": "abs_difference(0, 0)", "expect": "0" },
+        { "expr": "abs_difference(-5, -1)", "expect": "4" },
+        { "expr": "abs_difference(7, 7)", "expect": "0" }
+      ],
+      "hints": [
+        "The distance between two numbers is their difference with any negative sign removed.",
+        "a - b might come out negative; abs(x) turns a negative into its positive twin and leaves positives unchanged.",
+        "return abs(a - b)."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-clamp-range",
+      "prompt": "Implement clamp_range(x, lo, hi) so it limits x to the range lo..hi, this time without any if — use min and max. Return lo when x is below lo, hi when x is above hi, and x otherwise. Assume lo <= hi.",
+      "functionName": "clamp_range",
+      "starter": "def clamp_range(x, lo, hi):\n    # bound x to lo..hi using min and max\n    pass",
+      "solution": "def clamp_range(x, lo, hi):\n    return max(lo, min(x, hi))",
+      "tests": [
+        { "expr": "clamp_range(5, 0, 10)", "expect": "5" },
+        { "expr": "clamp_range(-3, 0, 10)", "expect": "0" },
+        { "expr": "clamp_range(15, 0, 10)", "expect": "10" },
+        { "expr": "clamp_range(0, 0, 10)", "expect": "0" },
+        { "expr": "clamp_range(10, 0, 10)", "expect": "10" },
+        { "expr": "clamp_range(7, 1, 5)", "expect": "5" }
+      ],
+      "hints": [
+        "Do it in two moves with no if: first stop x from going above hi, then stop that result from dropping below lo.",
+        "min(x, hi) caps the top; wrapping it in max(lo, ...) raises the floor.",
+        "return max(lo, min(x, hi))."
+      ],
+      "xp": 15
+    }
+  ]
+}

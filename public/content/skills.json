@@ -377,8 +377,8 @@
       ]
     },
     {
-      "id": "python",
-      "name": "Python",
+      "id": "py-foundations",
+      "name": "Python · Foundations",
       "skills": [
         {
           "id": "py-basics",
@@ -392,10 +392,60 @@
           }
         },
         {
+          "id": "py-conditionals",
+          "name": "Conditionals & Truthiness",
+          "trackId": "python",
+          "requires": ["py-basics"],
+          "lesson": {
+            "intro": "A program makes decisions by branching. Python's `if` runs a block only when its condition is true; `elif` chains another test after it, and `else` catches everything left. Conditions compare with `==` `!=` `<` `>` `<=` `>=`, and combine with the keywords `and` (both sides true), `or` (either side true), and `not` (flip a boolean) — Python spells these as words, not symbols. Beyond `True`/`False`, every value is 'truthy' or 'falsy' in a condition: the empty string `''`, the number `0`, the empty list `[]`, and `None` are all falsy, so `if items:` reads as 'run this when items is non-empty'. When you are choosing between two values rather than running two blocks, the conditional expression `a if cond else b` is the compact form — `'pass' if score >= 60 else 'fail'`. Order matters in an `if`/`elif` ladder: the first branch whose test passes wins and the rest are skipped, so put the most specific test first. And a `return` inside a branch hands the answer back the instant a case is decided.",
+            "exampleSql": "",
+            "wrapUp": "You can now branch: an `if`/`elif`/`else` ladder for several cases, the keywords `and`/`or`/`not` to combine tests, truthiness to treat empty values as false, and the `a if cond else b` expression when you only need one of two values. The habits that pay off are ordering branches from most specific to least, and returning the moment a case is settled. Next you will put these tests to work on numbers — division, remainders, rounding, and the arithmetic Python does exactly."
+          }
+        },
+        {
+          "id": "py-numbers",
+          "name": "Numbers & Arithmetic",
+          "trackId": "python",
+          "requires": ["py-conditionals"],
+          "lesson": {
+            "intro": "Python has two division operators, and the difference between them matters. True division `/` always gives a float — `7 / 2` is `3.5`, and even `6 / 2` is `3.0` — while floor division `//` divides and rounds down to a whole number, so `7 // 2` is `3`. The remainder operator `%` gives what is left over — `7 % 3` is `1` — and pairs with `== 0` to test divisibility. The built-ins cover the rest: `round(x)` rounds to the nearest integer (and `round(x, 2)` to two decimals), `abs(x)` drops a negative sign, and `min(a, b, c)` / `max(a, b, c)` pick the smallest or largest of their arguments. Exponents use `**`: `2 ** 10` is `1024`. One habit to keep: `/` produces a float even when the math looks exact, so when a prompt asks for a whole number, reach for `//` or `round` on purpose rather than hoping the value lands clean.",
+            "exampleSql": "",
+            "wrapUp": "Numbers in Python come with two divisions: `/` for an exact float, `//` for the floored whole number, with `%` for the remainder left behind. Reach for `round`, `abs`, `min`, `max`, and `**` as named tools, and choose `//` or `round` deliberately whenever a result must be a whole number. Next you turn from numbers to text: slicing, casing, searching, and building strings."
+          }
+        },
+        {
+          "id": "py-strings",
+          "name": "Strings & f-strings",
+          "trackId": "python",
+          "requires": ["py-numbers"],
+          "lesson": {
+            "intro": "A string is a sequence of characters, and Python gives you sharp tools to take it apart. `len(s)` counts the characters, `s[i]` reads the one at position `i` (zero-based, so `s[0]` is the first and `s[-1]` the last), and the slice `s[a:b]` copies out a run — `'hello'[0:2]` is `'he'`. A slice with a step reverses in one stroke: `s[::-1]`. Case is a method call away — `s.upper()` and `s.lower()` return brand-new strings, because a string never changes in place (strings are immutable). To search, `sub in s` gives a boolean and `s.find(sub)` gives the position, or `-1` when the piece is absent. `s.split(sep)` breaks a string into a list of pieces and `sep.join(parts)` glues a list back into a string — together they reverse or reorder words. And f-strings build text by interpolation: `f'Hi, {name}!'` drops each value right into place. Mind the empty string `''` — length 0, nothing to index — it usually deserves an empty-but-valid answer of its own.",
+            "exampleSql": "",
+            "wrapUp": "Text bends to a small set of tools: index and slice to reach characters, `len` to measure, `upper` and `lower` to recase, `in` and `find` to search, `split` and `join` to take a string apart and rebuild it, and f-strings to compose. Because strings are immutable, each of these hands you a new string rather than changing the old one. Next you will write the loops that walk a string, a list, or a range one element at a time."
+          }
+        },
+        {
+          "id": "py-loops",
+          "name": "Loops, range & enumerate",
+          "trackId": "python",
+          "requires": ["py-strings"],
+          "lesson": {
+            "intro": "A loop repeats work. Python's `for` walks a sequence directly — `for x in xs:` visits each element, and `for i in range(1, n + 1):` counts `i` from 1 through `n` (the stop value is excluded, so the `+ 1` is what includes `n`). Most loops accumulate: declare a variable before the loop and update it inside, like `total = 0` then `total += x`, or a counter you bump with `count += 1` to tally matches. Start a product accumulator at `1`, not `0`. When you need the position alongside the value, `enumerate(xs)` hands you both: `for i, x in enumerate(xs):`. A `while condition:` loop is the choice when you do not know the count up front — you repeat until the condition flips. And a `return` inside a loop is an early exit: the instant you find what you need, hand it back and the loop stops. Guard the empty case — a loop over an empty sequence simply never runs, so whatever you initialized the accumulator to is your answer.",
+            "exampleSql": "",
+            "wrapUp": "You can now drive a computation by hand: a `for` loop over a `range` to count, an accumulator to build a sum, product, or tally, `enumerate` when you need the index too, a `while` loop when the end is not known in advance, and an early `return` to stop the moment the answer is in hand. The empty input falls out for free — the loop just never runs. That completes Foundations; next you will meet list comprehensions, which fold many of these same loops into a single expressive line."
+          }
+        }
+      ]
+    },
+    {
+      "id": "py-lists",
+      "name": "Python · Lists & Comprehensions",
+      "skills": [
+        {
           "id": "py-collections",
           "name": "Lists & Comprehensions",
           "trackId": "python",
-          "requires": ["py-basics"],
+          "requires": ["py-loops"],
           "lesson": {
             "intro": "A list is an ordered collection — [1, 2, 3], [], or the characters you iterate out of a string — and most real work is walking one to build a result. Python's signature tool is the comprehension: [x * 2 for x in xs] builds a brand-new list by evaluating an expression for each element, and adding an if filters which elements take part ([x for x in xs if x % 2 == 0]). Drop the brackets and you have a generator, which sum() folds straight into one number: sum(x for x in xs if x % 2 == 0). The remainder operator % classifies numbers — x % 2 == 0 tests evenness and stays correct for negatives and zero (-4 % 2 and 0 % 2 are both 0). Strings iterate too: for ch in s visits each character, s.lower() normalizes case, and ch in 'aeiou' is a compact membership test. Watch the empty case — an empty list or string should return the empty-but-valid answer ([], 0, ''), and comprehensions and sum() handle it for free: an empty input yields [] or 0 with no special code.",
             "exampleSql": "",

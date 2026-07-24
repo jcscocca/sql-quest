@@ -1,0 +1,109 @@
+{
+  "skillId": "py-strings",
+  "exercises": [
+    {
+      "id": "py-initials",
+      "prompt": "Implement initials(first, last) so it returns the two uppercase initials of a first and last name. initials('ada', 'lovelace') returns 'AL'. Assume both names are non-empty.",
+      "functionName": "initials",
+      "starter": "def initials(first, last):\n    # return the uppercase first letters of each name\n    pass",
+      "solution": "def initials(first, last):\n    return f'{first[0]}{last[0]}'.upper()",
+      "tests": [
+        { "expr": "initials('ada', 'lovelace')", "expect": "'AL'" },
+        { "expr": "initials('grace', 'hopper')", "expect": "'GH'" },
+        { "expr": "initials('john', 'doe')", "expect": "'JD'" },
+        { "expr": "initials('Marie', 'Curie')", "expect": "'MC'" },
+        { "expr": "initials('a', 'b')", "expect": "'AB'" }
+      ],
+      "hints": [
+        "You need the first character of each name, joined together and forced to uppercase.",
+        "Read the first characters with first[0] and last[0]; an f-string f'{first[0]}{last[0]}' drops them side by side.",
+        "return f'{first[0]}{last[0]}'.upper() — uppercasing the joined pair handles both letters at once."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-is-palindrome",
+      "prompt": "Implement is_palindrome(s) so it returns True when s reads the same forwards and backwards, ignoring case, and False otherwise. is_palindrome('Anna') is True and is_palindrome('hello') is False. The empty string counts as a palindrome.",
+      "functionName": "is_palindrome",
+      "starter": "def is_palindrome(s):\n    # return True when s reads the same forwards and backwards, ignoring case\n    pass",
+      "solution": "def is_palindrome(s):\n    return s.lower() == s.lower()[::-1]",
+      "tests": [
+        { "expr": "is_palindrome('Anna')", "expect": "True" },
+        { "expr": "is_palindrome('racecar')", "expect": "True" },
+        { "expr": "is_palindrome('hello')", "expect": "False" },
+        { "expr": "is_palindrome('')", "expect": "True" },
+        { "expr": "is_palindrome('a')", "expect": "True" },
+        { "expr": "is_palindrome('ab')", "expect": "False" }
+      ],
+      "hints": [
+        "A palindrome reads the same forwards and backwards, so compare the word against its own reverse — ignoring case.",
+        "s.lower() normalizes the case, and the slice s[::-1] gives the reversed string.",
+        "return s.lower() == s.lower()[::-1]; the empty string reverses to itself, so it counts as a palindrome."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-truncate",
+      "prompt": "Implement truncate(s, max_len) so that when s is longer than max_len characters it is cut to the first max_len characters followed by '...', and otherwise s is returned unchanged. truncate('hello world', 5) returns 'hello...'; truncate('hi', 5) returns 'hi'.",
+      "functionName": "truncate",
+      "starter": "def truncate(s, max_len):\n    # add an ellipsis only when s is longer than max_len\n    pass",
+      "solution": "def truncate(s, max_len):\n    return s if len(s) <= max_len else f'{s[:max_len]}...'",
+      "tests": [
+        { "expr": "truncate('hello world', 5)", "expect": "'hello...'" },
+        { "expr": "truncate('hi', 5)", "expect": "'hi'" },
+        { "expr": "truncate('exactly', 7)", "expect": "'exactly'" },
+        { "expr": "truncate('abcdef', 3)", "expect": "'abc...'" },
+        { "expr": "truncate('', 5)", "expect": "''" },
+        { "expr": "truncate('abcde', 5)", "expect": "'abcde'" }
+      ],
+      "hints": [
+        "Compare the string's length against max_len first; only the too-long case gets an ellipsis.",
+        "len(s) measures the string and s[:max_len] keeps its first max_len characters.",
+        "return s if len(s) <= max_len else f'{s[:max_len]}...' builds the shortened form with an f-string."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-reverse-words",
+      "prompt": "Implement reverse_words(s) so it returns the words of s in reverse order, joined by single spaces. reverse_words('hello world') returns 'world hello'. A single word is returned unchanged, and the empty string returns the empty string. Assume words are separated by single spaces.",
+      "functionName": "reverse_words",
+      "starter": "def reverse_words(s):\n    # return the words of s in reverse order\n    pass",
+      "solution": "def reverse_words(s):\n    return ' '.join(s.split(' ')[::-1])",
+      "tests": [
+        { "expr": "reverse_words('hello world')", "expect": "'world hello'" },
+        { "expr": "reverse_words('single')", "expect": "'single'" },
+        { "expr": "reverse_words('a b c')", "expect": "'c b a'" },
+        { "expr": "reverse_words('one two three')", "expect": "'three two one'" },
+        { "expr": "reverse_words('')", "expect": "''" },
+        { "expr": "reverse_words('hi there')", "expect": "'there hi'" }
+      ],
+      "hints": [
+        "Break the sentence into its words, reverse their order, then glue them back with spaces between.",
+        "s.split(' ') gives a list of words, the slice [::-1] reverses that list, and ' '.join(...) rebuilds the string.",
+        "return ' '.join(s.split(' ')[::-1])."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-first-word",
+      "prompt": "Implement first_word(s) so it returns the portion of s before the first space. If there is no space, return the whole string. first_word('hello world') returns 'hello'; first_word('single') returns 'single'. Assume s has no leading space; the empty string returns the empty string.",
+      "functionName": "first_word",
+      "starter": "def first_word(s):\n    # return everything before the first space\n    pass",
+      "solution": "def first_word(s):\n    i = s.find(' ')\n    return s if i == -1 else s[:i]",
+      "tests": [
+        { "expr": "first_word('hello world')", "expect": "'hello'" },
+        { "expr": "first_word('single')", "expect": "'single'" },
+        { "expr": "first_word('a b c')", "expect": "'a'" },
+        { "expr": "first_word('one two three')", "expect": "'one'" },
+        { "expr": "first_word('')", "expect": "''" },
+        { "expr": "first_word('hi there')", "expect": "'hi'" }
+      ],
+      "hints": [
+        "Find where the first space sits; the answer is everything before it, or the whole string when there is no space.",
+        "s.find(' ') returns the position of the first space, or -1 when there is none — the -1 case means return s unchanged.",
+        "Set i = s.find(' '), then return s if i == -1 else s[:i]."
+      ],
+      "xp": 15
+    }
+  ]
+}
