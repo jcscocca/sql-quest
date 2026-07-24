@@ -194,6 +194,105 @@ test('seeded two-world collection groups by world section', async ({ page }) => 
   await expect(page.locator('.tile-sprite img[src*="/sprites/pokemon/"]')).toHaveCount(1)
 })
 
+test('the lesson example block wraps instead of overflowing its border', async ({ page }) => {
+  await page.addInitScript(() => {
+    const req = indexedDB.open('keyval-store')
+    req.onupgradeneeded = () => req.result.createObjectStore('keyval')
+    req.onsuccess = () => {
+      const tx = req.result.transaction('keyval', 'readwrite')
+      tx.objectStore('keyval').put(
+        {
+          version: 1,
+          xp: 0,
+          streak: { count: 0, lastDay: '' },
+          skills: {},
+          collection: [],
+          badges: [],
+          unlockAll: true,
+        },
+        'sql-quest-progress',
+      )
+    }
+  })
+  await page.goto('/')
+  await page.getByRole('button', { name: /Arena: Duelist Analytics/ }).click()
+  const example = page.locator('.example-sql')
+  await expect(example).toBeVisible()
+  const overflow = await example.evaluate(el => el.scrollWidth - el.clientWidth)
+  expect(overflow).toBeLessThanOrEqual(0)
+})
+
+test('a wide result grid scrolls inside its panel instead of widening the page', async ({ page }) => {
+  await page.addInitScript(() => {
+    const req = indexedDB.open('keyval-store')
+    req.onupgradeneeded = () => req.result.createObjectStore('keyval')
+    req.onsuccess = () => {
+      const tx = req.result.transaction('keyval', 'readwrite')
+      tx.objectStore('keyval').put(
+        {
+          version: 1,
+          xp: 0,
+          streak: { count: 0, lastDay: '' },
+          skills: {},
+          collection: [],
+          badges: [],
+        },
+        'sql-quest-progress',
+      )
+    }
+  })
+  await page.goto('/')
+  await page.getByRole('button', { name: /SELECT Basics/ }).click()
+  await page.getByRole('button', { name: 'Start exercises' }).click()
+  await page.locator('.cm-content').click()
+  await page.keyboard.type('SELECT * FROM pokemon LIMIT 40')
+  await page.getByRole('button', { name: '▶ Run' }).click()
+  await expect(page.locator('.result-grid tbody tr').first()).toBeVisible({ timeout: 30_000 })
+
+  const m = await page.evaluate(() => {
+    const grid = document.querySelector('.result-grid')!
+    return {
+      pageOverflow: document.documentElement.scrollWidth - window.innerWidth,
+      gridScrolls: grid.scrollWidth > grid.clientWidth,
+    }
+  })
+  expect(m.pageOverflow).toBeLessThanOrEqual(0)
+  expect(m.gridScrolls).toBe(true)
+})
+
+test('a long collection name stays inside its tile', async ({ page }) => {
+  await page.addInitScript(() => {
+    const req = indexedDB.open('keyval-store')
+    req.onupgradeneeded = () => req.result.createObjectStore('keyval')
+    req.onsuccess = () => {
+      const tx = req.result.transaction('keyval', 'readwrite')
+      tx.objectStore('keyval').put(
+        {
+          version: 1,
+          xp: 0,
+          streak: { count: 0, lastDay: '' },
+          skills: {},
+          collection: [
+            {
+              world: 'yugioh',
+              name: 'Number 39: Utopia the Lightning Overwhelming Dragon King',
+              label: 'XYZ Monster',
+            },
+          ],
+          badges: [],
+        },
+        'sql-quest-progress',
+      )
+    }
+  })
+  await page.goto('/')
+  await page.getByRole('button', { name: /📚/ }).click()
+  const tile = page.locator('.tile').first()
+  await expect(tile).toBeVisible()
+  const overflow = await tile.evaluate(el => el.scrollWidth - el.clientWidth)
+  expect(overflow).toBeLessThanOrEqual(0)
+})
+
 test('free roam opens a skill whose prerequisites are unmet', async ({ page }) => {
   await page.addInitScript(() => {
     const req = indexedDB.open('keyval-store')
