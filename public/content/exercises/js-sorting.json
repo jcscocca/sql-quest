@@ -1,0 +1,109 @@
+{
+  "skillId": "js-sorting",
+  "exercises": [
+    {
+      "id": "js-sort-asc",
+      "prompt": "Implement sortAsc(arr) so it returns a new array with arr's numbers in ascending order. Do not modify the original array — sort a copy. An empty array returns an empty array.",
+      "functionName": "sortAsc",
+      "starter": "function sortAsc(arr) {\n  // return a new array sorted smallest-first\n}",
+      "solution": "function sortAsc(arr) {\n  return [...arr].sort((a, b) => a - b)\n}",
+      "tests": [
+        { "expr": "sortAsc([3, 1, 2, 1])", "expect": "[1, 1, 2, 3]" },
+        { "expr": "sortAsc([])", "expect": "[]" },
+        { "expr": "sortAsc([10, 2, 1])", "expect": "[1, 2, 10]" },
+        { "expr": "sortAsc([-3, 5, -1, 0])", "expect": "[-3, -1, 0, 5]" },
+        { "expr": "sortAsc([42])", "expect": "[42]" },
+        { "setup": "const original = [3, 1, 2]; sortAsc(original)", "expr": "original", "expect": "[3, 1, 2]" }
+      ],
+      "hints": [
+        "sort orders an array, but with no comparator it sorts by text, so numbers need one — and it changes the array in place, so work on a copy.",
+        "Spread into a fresh array first with [...arr], then sort that; the numeric comparator is (a, b) => a - b.",
+        "return [...arr].sort((a, b) => a - b) — the copy protects the caller's array and a - b orders numbers ascending."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-sort-desc",
+      "prompt": "Implement sortDesc(arr) so it returns a new array with arr's numbers in descending order (largest first), without modifying the original. An empty array returns an empty array.",
+      "functionName": "sortDesc",
+      "starter": "function sortDesc(arr) {\n  // return a new array sorted largest-first\n}",
+      "solution": "function sortDesc(arr) {\n  return [...arr].sort((a, b) => b - a)\n}",
+      "tests": [
+        { "expr": "sortDesc([1, 3, 2, 3])", "expect": "[3, 3, 2, 1]" },
+        { "expr": "sortDesc([])", "expect": "[]" },
+        { "expr": "sortDesc([10, 2, 1])", "expect": "[10, 2, 1]" },
+        { "expr": "sortDesc([-3, 5, -1, 0])", "expect": "[5, 0, -1, -3]" },
+        { "expr": "sortDesc([42])", "expect": "[42]" },
+        { "expr": "sortDesc([1, 2])", "expect": "[2, 1]" }
+      ],
+      "hints": [
+        "Descending is the same sort with the comparison reversed.",
+        "Swap the operands: (a, b) => b - a puts larger numbers first.",
+        "return [...arr].sort((a, b) => b - a) — still sorting a copy so the original is untouched."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-sort-by-length",
+      "prompt": "Implement sortByLength(arr), where arr is an array of strings, so it returns a new array ordered from shortest to longest by string length, without modifying the original. Strings of equal length keep their original relative order. An empty array returns an empty array.",
+      "functionName": "sortByLength",
+      "starter": "function sortByLength(arr) {\n  // return a new array of the strings, shortest first\n}",
+      "solution": "function sortByLength(arr) {\n  return [...arr].sort((a, b) => a.length - b.length)\n}",
+      "tests": [
+        { "expr": "sortByLength(['ccc', 'a', 'bb'])", "expect": "['a', 'bb', 'ccc']" },
+        { "expr": "sortByLength([])", "expect": "[]" },
+        { "expr": "sortByLength(['dog', 'a', 'cat', 'be'])", "expect": "['a', 'be', 'dog', 'cat']" },
+        { "expr": "sortByLength(['hello'])", "expect": "['hello']" },
+        { "expr": "sortByLength(['aa', 'b', 'cc', 'd'])", "expect": "['b', 'd', 'aa', 'cc']" }
+      ],
+      "hints": [
+        "Sort by a derived value — each string's length — rather than by the strings themselves.",
+        "Compare the lengths in the comparator: (a, b) => a.length - b.length.",
+        "return [...arr].sort((a, b) => a.length - b.length); equal-length strings stay in their original order because sort is stable."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-sort-by-abs",
+      "prompt": "Implement sortByAbs(arr) so it returns a new array with arr's numbers ordered by absolute value (distance from zero), smallest distance first, without modifying the original. So [-3, 1, -2] becomes [1, -2, -3]. An empty array returns an empty array.",
+      "functionName": "sortByAbs",
+      "starter": "function sortByAbs(arr) {\n  // return a new array ordered by distance from zero\n}",
+      "solution": "function sortByAbs(arr) {\n  return [...arr].sort((a, b) => Math.abs(a) - Math.abs(b))\n}",
+      "tests": [
+        { "expr": "sortByAbs([-3, 1, -2])", "expect": "[1, -2, -3]" },
+        { "expr": "sortByAbs([])", "expect": "[]" },
+        { "expr": "sortByAbs([5, -5, 5])", "expect": "[5, -5, 5]" },
+        { "expr": "sortByAbs([0, -1, 1])", "expect": "[0, -1, 1]" },
+        { "expr": "sortByAbs([-10, 2, -3])", "expect": "[2, -3, -10]" },
+        { "expr": "sortByAbs([7])", "expect": "[7]" }
+      ],
+      "hints": [
+        "Order by a computed key again — this time each number's absolute value, its distance from zero.",
+        "Math.abs(x) drops the sign; compare those in the comparator: (a, b) => Math.abs(a) - Math.abs(b).",
+        "return [...arr].sort((a, b) => Math.abs(a) - Math.abs(b)) — note -2 sorts before -3 because 2 < 3."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-k-smallest",
+      "prompt": "Implement kSmallest(arr, k) so it returns a new array of the k smallest numbers in arr, in ascending order. If k is 0 the result is empty; if k is larger than arr.length, return all of arr sorted. Do not modify the original array.",
+      "functionName": "kSmallest",
+      "starter": "function kSmallest(arr, k) {\n  // return the k smallest numbers, sorted ascending\n}",
+      "solution": "function kSmallest(arr, k) {\n  return [...arr].sort((a, b) => a - b).slice(0, k)\n}",
+      "tests": [
+        { "expr": "kSmallest([5, 3, 1, 4, 2], 3)", "expect": "[1, 2, 3]" },
+        { "expr": "kSmallest([5, 3, 1, 4, 2], 0)", "expect": "[]" },
+        { "expr": "kSmallest([2, 1], 5)", "expect": "[1, 2]" },
+        { "expr": "kSmallest([9, -1, 3, -5], 2)", "expect": "[-5, -1]" },
+        { "expr": "kSmallest([7], 1)", "expect": "[7]" },
+        { "expr": "kSmallest([3, 3, 1, 2], 2)", "expect": "[1, 2]" }
+      ],
+      "hints": [
+        "Two steps: put the numbers in ascending order, then take the first k of them.",
+        "Sort a copy with (a, b) => a - b, then slice(0, k) keeps the first k — and slice is safe when k is 0 or larger than the array.",
+        "return [...arr].sort((a, b) => a - b).slice(0, k)."
+      ],
+      "xp": 15
+    }
+  ]
+}

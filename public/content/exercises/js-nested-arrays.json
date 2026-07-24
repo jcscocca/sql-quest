@@ -1,0 +1,109 @@
+{
+  "skillId": "js-nested-arrays",
+  "exercises": [
+    {
+      "id": "js-row-sums",
+      "prompt": "Implement rowSums(matrix), where matrix is an array of rows and each row is an array of numbers, so it returns an array with the sum of each row — rowSums([[1, 2], [3, 4]]) is [3, 7]. Rows may have different lengths, and an empty row sums to 0. An empty matrix returns an empty array.",
+      "functionName": "rowSums",
+      "starter": "function rowSums(matrix) {\n  // return an array of per-row sums\n}",
+      "solution": "function rowSums(matrix) {\n  return matrix.map(row => row.reduce((s, x) => s + x, 0))\n}",
+      "tests": [
+        { "expr": "rowSums([[1, 2], [3, 4]])", "expect": "[3, 7]" },
+        { "expr": "rowSums([])", "expect": "[]" },
+        { "expr": "rowSums([[1], [2, 3, 4]])", "expect": "[1, 9]" },
+        { "expr": "rowSums([[], [5]])", "expect": "[0, 5]" },
+        { "expr": "rowSums([[10]])", "expect": "[10]" },
+        { "expr": "rowSums([[-1, 1], [-2, -3]])", "expect": "[0, -5]" }
+      ],
+      "hints": [
+        "You want one number per row, so map over the rows and collapse each one to its sum.",
+        "Inside the map, sum a row with reduce: row.reduce((s, x) => s + x, 0).",
+        "return matrix.map(row => row.reduce((s, x) => s + x, 0)) — the 0 seed makes an empty row sum to 0."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-flatten-once",
+      "prompt": "Implement flattenOnce(matrix) so it merges the rows of matrix into a single array, one level deep — flattenOnce([[1, 2], [3], [4, 5]]) is [1, 2, 3, 4, 5]. Only one level is removed: an element that is itself an array stays nested. Empty rows contribute nothing, and an empty matrix returns an empty array.",
+      "functionName": "flattenOnce",
+      "starter": "function flattenOnce(matrix) {\n  // merge the rows into one array, one level deep\n}",
+      "solution": "function flattenOnce(matrix) {\n  return matrix.flat()\n}",
+      "tests": [
+        { "expr": "flattenOnce([[1, 2], [3], [4, 5]])", "expect": "[1, 2, 3, 4, 5]" },
+        { "expr": "flattenOnce([])", "expect": "[]" },
+        { "expr": "flattenOnce([[1], [], [2]])", "expect": "[1, 2]" },
+        { "expr": "flattenOnce([[1, [2]], [3]])", "expect": "[1, [2], 3]" },
+        { "expr": "flattenOnce([[7]])", "expect": "[7]" },
+        { "expr": "flattenOnce([[], []])", "expect": "[]" }
+      ],
+      "hints": [
+        "Flattening joins the inner arrays end to end into one array.",
+        "arr.flat() removes exactly one level of nesting — which is all this asks for.",
+        "return matrix.flat() — because it peels only one level, an element that is itself an array stays an array."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-column-at",
+      "prompt": "Implement columnAt(matrix, c) so it returns column c of the matrix as an array — the element at index c taken from each row. columnAt([[1, 2], [3, 4], [5, 6]], 0) is [1, 3, 5]. Assume every row has an element at index c. An empty matrix returns an empty array.",
+      "functionName": "columnAt",
+      "starter": "function columnAt(matrix, c) {\n  // return the c-th element of every row\n}",
+      "solution": "function columnAt(matrix, c) {\n  return matrix.map(row => row[c])\n}",
+      "tests": [
+        { "expr": "columnAt([[1, 2], [3, 4], [5, 6]], 0)", "expect": "[1, 3, 5]" },
+        { "expr": "columnAt([[1, 2], [3, 4], [5, 6]], 1)", "expect": "[2, 4, 6]" },
+        { "expr": "columnAt([], 0)", "expect": "[]" },
+        { "expr": "columnAt([[9, 8, 7]], 2)", "expect": "[7]" },
+        { "expr": "columnAt([[1, 2, 3], [4, 5, 6]], 1)", "expect": "[2, 5]" },
+        { "expr": "columnAt([[0, -1], [-2, 0]], 0)", "expect": "[0, -2]" }
+      ],
+      "hints": [
+        "A column is one element taken from every row — so produce one value per row again.",
+        "map each row to its element at index c: row => row[c].",
+        "return matrix.map(row => row[c])."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-grid-max",
+      "prompt": "Implement gridMax(matrix) so it returns the largest number anywhere in the matrix, across all rows. gridMax([[1, 9], [3, 4]]) is 9. Assume the matrix holds at least one number, though rows may vary in length. The values may all be negative.",
+      "functionName": "gridMax",
+      "starter": "function gridMax(matrix) {\n  // return the largest value found anywhere in the grid\n}",
+      "solution": "function gridMax(matrix) {\n  return Math.max(...matrix.flat())\n}",
+      "tests": [
+        { "expr": "gridMax([[1, 9], [3, 4]])", "expect": "9" },
+        { "expr": "gridMax([[-5, -2], [-9, -1]])", "expect": "-1" },
+        { "expr": "gridMax([[7]])", "expect": "7" },
+        { "expr": "gridMax([[1], [2, 3, 4]])", "expect": "4" },
+        { "expr": "gridMax([[5, 5], [5, 5]])", "expect": "5" },
+        { "expr": "gridMax([[-1, -3], [-2]])", "expect": "-1" }
+      ],
+      "hints": [
+        "The largest cell could be in any row, so it helps to consider all the numbers together.",
+        "flat() merges the grid into one array; Math.max(...arr) then finds the biggest — the spread ... passes the array's numbers as separate arguments.",
+        "return Math.max(...matrix.flat()) — this stays correct even when every value is negative."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-transpose",
+      "prompt": "Implement transpose(matrix) so it swaps the rows and columns of a rectangular matrix: the first row of the result is the first element of each original row, and so on. transpose([[1, 2, 3], [4, 5, 6]]) is [[1, 4], [2, 5], [3, 6]]. Assume the matrix has at least one row, every row has the same length, and that length is at least one.",
+      "functionName": "transpose",
+      "starter": "function transpose(matrix) {\n  // swap rows and columns\n}",
+      "solution": "function transpose(matrix) {\n  return matrix[0].map((_, c) => matrix.map(row => row[c]))\n}",
+      "tests": [
+        { "expr": "transpose([[1, 2, 3], [4, 5, 6]])", "expect": "[[1, 4], [2, 5], [3, 6]]" },
+        { "expr": "transpose([[1], [2], [3]])", "expect": "[[1, 2, 3]]" },
+        { "expr": "transpose([[1, 2], [3, 4]])", "expect": "[[1, 3], [2, 4]]" },
+        { "expr": "transpose([[5]])", "expect": "[[5]]" },
+        { "expr": "transpose([[1, 2, 3]])", "expect": "[[1], [2], [3]]" }
+      ],
+      "hints": [
+        "The result has one row per original column, and each new row gathers that column's value from every original row.",
+        "Build one output row per column index c, each row being matrix.map(row => row[c]); the number of columns is matrix[0].length.",
+        "return matrix[0].map((_, c) => matrix.map(row => row[c])) — mapping over the first row gives you a c for each column."
+      ],
+      "xp": 15
+    }
+  ]
+}

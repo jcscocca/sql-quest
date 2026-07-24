@@ -373,6 +373,50 @@
             "exampleSql": "",
             "wrapUp": "You can now consume a collection and produce one: a for loop with an accumulator when you need control, or map / filter / reduce when the shape is standard. The modulo operator classifies numbers, string indexing walks characters, and the empty input is always the test that separates a robust function from a fragile one — handle it first and the rest follows. That completes the JavaScript track: you've implemented and tested functions over both single values and whole arrays."
           }
+        },
+        {
+          "id": "js-reduce",
+          "name": "Reduce & Aggregation",
+          "trackId": "javascript",
+          "requires": ["js-arrays"],
+          "lesson": {
+            "intro": "map and filter each hand back an array; reduce is the third fold, and it collapses a whole array down to a single accumulated value — a sum, a maximum, a count, even an object. Its shape is arr.reduce((acc, x) => next, initial): acc is the running result carried from one element to the next, x is the current element, and that second argument is the initial value acc starts at. To add numbers you write arr.reduce((sum, x) => sum + x, 0) — start at 0, and each step returns the new running sum; a product starts at 1 instead, because 0 would swallow everything. The initial value is not idle bookkeeping: it is both the answer for an empty array and the seed the first element builds on, so summing [] with an initial 0 correctly returns 0. A running max compares acc to x each step (x > acc ? x : acc), and a counter adds 1 conditionally (acc + (x > 0 ? 1 : 0)). Most powerfully, the accumulator can be an object you update and return — acc[x] = (acc[x] || 0) + 1; return acc — which tallies how many times each value appears, the countBy pattern. Always return the accumulator from the callback, or the next step receives undefined.",
+            "exampleSql": "",
+            "wrapUp": "reduce folds an array into one value by threading an accumulator through every element: pick the right initial value (0 to sum, 1 to multiply, {} to tally), return the updated accumulator each step, and let that initial value stand in as the empty-array answer. Sum, product, min, max, conditional counts, and frequency objects are all the same move with a different callback. Next you'll put arrays in order with sort and a comparator."
+          }
+        },
+        {
+          "id": "js-sorting",
+          "name": "Sorting & Comparators",
+          "trackId": "javascript",
+          "requires": ["js-reduce"],
+          "lesson": {
+            "intro": "Array's sort orders elements, but two surprises trip up newcomers. First, with no argument it sorts by text, so [10, 2, 1] becomes [1, 10, 2] — numbers need a comparator. A comparator is a function of two elements that returns a negative number when a should come first, positive when b should, and 0 when they tie: (a, b) => a - b sorts numbers ascending, and (a, b) => b - a sorts descending. To sort by a derived key, compare the keys — (a, b) => a.length - b.length orders strings shortest-first, and (a, b) => Math.abs(a) - Math.abs(b) orders by distance from zero. Second, sort MUTATES the array in place and returns that same array, so sorting a caller's array corrupts their data. The fix is to sort a copy: [...arr].sort((a, b) => a - b) spreads the elements into a fresh array first, then sorts and returns it, leaving the original untouched. sort is stable, so elements that tie keep their original relative order — handy when sorting by a key that repeats across elements.",
+            "exampleSql": "",
+            "wrapUp": "A comparator (a, b) => a - b tells sort which of two elements comes first: subtract for numbers, flip the operands for descending, and compare a derived key like length or absolute value to sort by anything you like. Because sort mutates and returns the same array, reach for [...arr].sort(...) and return the copy so the caller's array survives. Next you'll search arrays for elements, indices, and yes/no answers."
+          }
+        },
+        {
+          "id": "js-searching",
+          "name": "Searching",
+          "trackId": "javascript",
+          "requires": ["js-sorting"],
+          "lesson": {
+            "intro": "Once an array is built, you often need to look inside it, and the method you pick depends on what you want back. To find an element, arr.find(x => x > 10) returns the first element that passes the test, or undefined when none do. To find where it sits, arr.findIndex(x => x > 10) returns that element's index, or -1 when nothing matches — and the simpler arr.indexOf(value) does the same for an exact value. For a plain yes/no, arr.some(x => x < 0) returns true when at least one element passes (and false for an empty array, since nothing is there to pass), while arr.every(x => x > 0) returns true only when all of them do — and true for an empty array, since there is nothing to violate the rule. arr.includes(value) is the boolean cousin of indexOf, asking only whether a value is present. The two edge cases to keep straight are the empty array — some is false, every is true — and the not-found result, where find gives undefined while findIndex and indexOf give -1, never 0, which is a real index.",
+            "exampleSql": "",
+            "wrapUp": "Searching is a matter of choosing the return shape: find for the element (undefined if none), findIndex or indexOf for its position (-1 if none), some and every for a boolean, and includes to ask only whether a value is present. Keep the empty-array defaults in mind — some is false, every is true — and remember a miss is -1, never 0. Next you'll step into arrays of arrays: grids, rows, columns, and flattening."
+          }
+        },
+        {
+          "id": "js-nested-arrays",
+          "name": "Nested Arrays & Flatten",
+          "trackId": "javascript",
+          "requires": ["js-searching"],
+          "lesson": {
+            "intro": "Arrays can hold other arrays, and that nesting models grids, tables, and groups. A matrix is an array of rows, each row an array of numbers: [[1, 2], [3, 4]] is two rows of two. To work a matrix row by row, map over the outer array and reduce each inner one — matrix.map(row => row.reduce((s, x) => s + x, 0)) gives one total per row. Reach a single cell with two indices, matrix[r][c] (row first, then column), and pull a whole column by mapping every row to the same index: matrix.map(row => row[c]). Flattening merges the rows into one array: arr.flat() removes exactly one level of nesting — [[1, 2], [3]] becomes [1, 2, 3] — while arr.flat(Infinity) would descend all the way, which is usually more than you want. Real data is often ragged, with rows of differing lengths or even empty rows, so lean on length and the array methods rather than assuming every row is the same size; an empty row contributes 0 to a sum and nothing to a flatten, which falls out for free when you build on reduce and flat.",
+            "exampleSql": "",
+            "wrapUp": "A matrix is just an array of row arrays: index it [r][c] row-first, map over the outer array to process each row, and map every row to the same index to lift out a column. flat() peels one level of nesting; reduce turns a row into its sum, and mapping that over all rows gives row totals or a grid-wide max. Build on length and the array methods and ragged or empty rows handle themselves. That completes Arrays & Iteration — you can now fold, sort, search, and reshape whole collections."
+          }
         }
       ]
     },
