@@ -62,3 +62,9 @@ test('runCodeTests folds an exercise fixture into every test setup', () => {
   const r = runCodeTests(code, [{ expr: 'count(data)', expect: '2' }], 'const data = [10, 20]')
   expect(r[0].pass).toBe(true)
 })
+
+test('runCodeTests reports a thrown error on a value test', () => {
+  const r = runCodeTests('function add() { throw new Error("boom") }', [{ expr: 'add()', expect: '3' }])
+  expect(r[0].pass).toBe(false)
+  expect(r[0].error).toContain('boom')
+})

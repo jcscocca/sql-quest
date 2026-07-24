@@ -10,11 +10,13 @@ export interface TestResult {
 export function deepEqual(a: unknown, b: unknown): boolean {
   if (a === b) return true
   if (typeof a !== typeof b) return false
+  // primitives only: Set/Map members compared by SameValueZero (identity), not structurally
   if (a instanceof Set || b instanceof Set) {
     if (!(a instanceof Set) || !(b instanceof Set) || a.size !== b.size) return false
     for (const x of a) if (!b.has(x)) return false
     return true
   }
+  // primitives only: Set/Map members compared by SameValueZero (identity), not structurally
   if (a instanceof Map || b instanceof Map) {
     if (!(a instanceof Map) || !(b instanceof Map) || a.size !== b.size) return false
     for (const [k, v] of a) if (!b.has(k) || !deepEqual(v, b.get(k))) return false
