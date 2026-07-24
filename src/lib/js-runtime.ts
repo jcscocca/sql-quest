@@ -1,15 +1,25 @@
-import type { JsTest } from './content'
+import type { CodeTest } from './content'
 
 export interface TestResult {
   pass: boolean
-  expected: unknown
-  actual: unknown
+  expected: string
+  actual: string
   error?: string
 }
 
 export function deepEqual(a: unknown, b: unknown): boolean {
   if (a === b) return true
   if (typeof a !== typeof b) return false
+  if (a instanceof Set || b instanceof Set) {
+    if (!(a instanceof Set) || !(b instanceof Set) || a.size !== b.size) return false
+    for (const x of a) if (!b.has(x)) return false
+    return true
+  }
+  if (a instanceof Map || b instanceof Map) {
+    if (!(a instanceof Map) || !(b instanceof Map) || a.size !== b.size) return false
+    for (const [k, v] of a) if (!b.has(k) || !deepEqual(v, b.get(k))) return false
+    return true
+  }
   if (Array.isArray(a) || Array.isArray(b)) {
     if (!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length) return false
     return a.every((v, i) => deepEqual(v, b[i]))
@@ -23,20 +33,53 @@ export function deepEqual(a: unknown, b: unknown): boolean {
   return false
 }
 
-export function runTests(fn: Function, tests: JsTest[]): TestResult[] {
+export function render(v: unknown): string {
+  if (typeof v === 'string') return JSON.stringify(v)
+  if (v === null) return 'null'
+  if (v === undefined) return 'undefined'
+  if (v instanceof Set) return `Set(${[...v].map(render).join(', ')})`
+  if (v instanceof Map) return `Map(${[...v].map(([k, val]) => `${render(k)} => ${render(val)}`).join(', ')})`
+  if (Array.isArray(v)) return `[${v.map(render).join(', ')}]`
+  if (typeof v === 'object') return `{${Object.entries(v as object).map(([k, val]) => `${k}: ${render(val)}`).join(', ')}}`
+  return String(v)
+}
+
+export function withFixtureSetup(fixture: string | undefined, setup: string | undefined): string {
+  return [fixture, setup].filter(Boolean).join('\n')
+}
+
+function evalPair(code: string, setup: string, expr: string, expectExpr: string): [unknown, unknown] {
+  return new Function(`"use strict";\n${code}\n${setup}\nreturn [ (${expr}), (${expectExpr}) ];`)() as [unknown, unknown]
+}
+
+function evalOne(code: string, setup: string, expr: string): unknown {
+  return new Function(`"use strict";\n${code}\n${setup}\nreturn ( ${expr} );`)()
+}
+
+export function runCodeTests(code: string, tests: CodeTest[], fixture?: string): TestResult[] {
   return tests.map(t => {
+    const setup = withFixtureSetup(fixture, t.setup)
     try {
-      const actual = fn(...t.input)
-      return { pass: deepEqual(actual, t.expected), expected: t.expected, actual }
+      if (t.raises !== undefined) {
+        try {
+          evalOne(code, setup, t.expr)
+          return { pass: false, expected: `raises ${t.raises}`, actual: 'no error thrown' }
+        } catch (e) {
+          const name = e instanceof Error ? e.name : String(e)
+          return { pass: name === t.raises, expected: `raises ${t.raises}`, actual: `raises ${name}` }
+        }
+      }
+      const [actual, expected] = evalPair(code, setup, t.expr, t.expect ?? 'undefined')
+      return { pass: deepEqual(actual, expected), expected: render(expected), actual: render(actual) }
     } catch (e) {
-      return { pass: false, expected: t.expected, actual: undefined, error: String(e) }
+      return { pass: false, expected: t.expect ?? '', actual: '', error: String(e) }
     }
   })
 }
 
 export async function runJs(
   code: string,
-  ex: { functionName: string; tests: JsTest[] },
+  ex: { tests: CodeTest[]; fixture?: string },
 ): Promise<{ results: TestResult[]; error?: string }> {
   try {
     const worker = new Worker(new URL('./js-worker.ts', import.meta.url), { type: 'module' })
@@ -55,7 +98,7 @@ export async function runJs(
         worker.terminate()
         resolve({ results: [], error: e.message || 'worker error' })
       }
-      worker.postMessage({ code, functionName: ex.functionName, tests: ex.tests })
+      worker.postMessage({ code, tests: ex.tests, fixture: ex.fixture })
     })
   } catch (e) {
     return { results: [], error: String(e) }
