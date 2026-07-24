@@ -10,9 +10,14 @@ backbone, all in-browser with no accounts.
   Digimon, Seattle 311). Correct queries catch the entities they return into a
   collection with real sprite/card art; Daily Review resurfaces rusty SQL
   skills on an expanding schedule.
-- **JavaScript** & **Python** — implement a named function; it runs in-browser
-  (a Web Worker for JS, Pyodide for Python) against test cases. Python fetches
-  Pyodide from a CDN on first run (the app's only online dependency).
+- **JavaScript** & **Python** — implement a named function verified by
+  in-language test cases (each test is an `{expr, expect}` pair, or `expr` +
+  `raises`, evaluated and compared inside the runtime — a Web Worker for JS,
+  Pyodide for Python). ~120 exercises each across five regions: Foundations,
+  Arrays/Lists & Iteration, Objects/Dicts/Maps & Sets, Functions & Classes, and
+  Applied Data — grounded capstones over inline Pokémon / Yu-Gi-Oh! / Seattle 311
+  datasets (shown in a per-exercise data panel). Python fetches Pyodide from a
+  CDN on first run (the app's only online dependency).
 
 Every subject plugs into the same backbone through a `Track` interface
 (`src/lib/tracks/`). See
@@ -31,7 +36,7 @@ Live: https://jcscocca.github.io/sql-quest/ (deployed from main by GitHub Action
 
     npm test           # unit tests (comparator, XP, errors, progress)
     npm run e2e        # Playwright smoke tests
-    npm run validate   # content gate: verifies every exercise against DuckDB
+    npm run validate   # content gate: executes every exercise — SQL on DuckDB, JS in Node, Python in Pyodide
     npm run build      # typecheck + production build
 
 ## Content

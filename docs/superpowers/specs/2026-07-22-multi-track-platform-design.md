@@ -91,6 +91,21 @@ only SQL skills enter Daily Review so far — non-SQL skills complete and earn
 badges but are not yet in the spaced-review rotation (a drill/code-aware review
 screen is future work).
 
+**Update (2026-07-24): Systems Design removed; JS/Python broadened to SQL
+parity.** The Systems Design track was removed entirely (drill/case UI, tracks,
+and content banks). The JavaScript and Python tracks were expanded to SQL-parity
+depth — ~23 skills / ~120 exercises each across five regions (Foundations,
+Arrays/Lists & Iteration, Objects/Dicts/Maps & Sets, Functions & Classes,
+Applied Data) — after replacing the JSON-round-trip test schema with in-language
+expression pairs (`CodeTest = {setup?, expr, expect?, raises?}`, compared inside
+the runtime, so sets/tuples/exceptions/generators/classes/mutation are all
+testable) and adding a Pyodide-backed Python execution gate to `npm run
+validate`. Grounded exercises carry a `fixture` shown in a data panel. See
+`docs/superpowers/specs/2026-07-24-code-track-expansion-design.md` and its plan.
+The two "broaden content" / "reward beyond SQL" threads below are now resolved
+for code content; **still deferred:** code tracks are XP + badges only (no
+collectibles), and only SQL enters Daily Review.
+
 0. **Extract the Core, define the Track interface.** SQL becomes Track #0 —
    zero behavior change, `npm run validate` stays green. Generalize content
    types (rename `exampleSql`/`referenceSql`, make `WorldSchema` an optional
