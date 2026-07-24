@@ -322,3 +322,49 @@ test('free roam opens a skill whose prerequisites are unmet', async ({ page }) =
   await expect(page.getByRole('heading', { name: 'Recursive CTEs' })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Start exercises' })).toBeVisible()
 })
+
+test('javascript: solve the first JS exercise end to end', async ({ page }) => {
+  await page.addInitScript(() => {
+    const req = indexedDB.open('keyval-store')
+    req.onupgradeneeded = () => req.result.createObjectStore('keyval')
+    req.onsuccess = () => {
+      const tx = req.result.transaction('keyval', 'readwrite')
+      tx.objectStore('keyval').put(
+        { version: 1, xp: 0, streak: { count: 0, lastDay: '' }, skills: {}, collection: [], badges: [], unlockAll: true },
+        'sql-quest-progress',
+      )
+    }
+  })
+  await page.goto('/')
+  await page.getByRole('button', { name: /JS Basics/ }).click()
+  await page.getByRole('button', { name: 'Start exercises' }).click()
+  await page.locator('.cm-content').click()
+  await page.keyboard.press('ControlOrMeta+a')
+  await page.keyboard.type('function add(a, b) { return a + b }')
+  await page.getByRole('button', { name: 'Submit' }).click()
+  await expect(page.getByText(/\+\d+ XP/)).toBeVisible({ timeout: 30_000 })
+})
+
+// Python fetches Pyodide from the CDN on first run — needs network and a longer timeout.
+test('python: solve the first Python exercise end to end', async ({ page }) => {
+  await page.addInitScript(() => {
+    const req = indexedDB.open('keyval-store')
+    req.onupgradeneeded = () => req.result.createObjectStore('keyval')
+    req.onsuccess = () => {
+      const tx = req.result.transaction('keyval', 'readwrite')
+      tx.objectStore('keyval').put(
+        { version: 1, xp: 0, streak: { count: 0, lastDay: '' }, skills: {}, collection: [], badges: [], unlockAll: true },
+        'sql-quest-progress',
+      )
+    }
+  })
+  await page.goto('/')
+  await page.getByRole('button', { name: /Python Basics/ }).click()
+  await page.getByRole('button', { name: 'Start exercises' }).click()
+  await page.locator('.cm-content').click()
+  await page.keyboard.press('ControlOrMeta+a')
+  // Single-line body dodges CodeMirror's auto-indent after ':' (a multi-line def would double-indent).
+  await page.keyboard.type('def add(a, b): return a + b')
+  await page.getByRole('button', { name: 'Submit' }).click()
+  await expect(page.getByText(/\+\d+ XP/)).toBeVisible({ timeout: 60_000 })
+})
