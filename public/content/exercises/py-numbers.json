@@ -13,7 +13,8 @@
         { "expr": "average3(1, 2, 4)", "expect": "2" },
         { "expr": "average3(10, 20, 30)", "expect": "20" },
         { "expr": "average3(0, 0, 1)", "expect": "0" },
-        { "expr": "average3(2, 3, 4)", "expect": "3" }
+        { "expr": "average3(2, 3, 4)", "expect": "3" },
+        { "expr": "average3(1, 2, 2)", "expect": "2" }
       ],
       "hints": [
         "An average is the sum of the values divided by how many there are — three here — and then rounded.",
@@ -40,6 +41,27 @@
         "Plain division with / gives a float (7 / 2 is 3.5); you want only the whole-number part.",
         "Floor division // divides and rounds down to a whole number in one step: 7 // 2 is 3.",
         "return a // b."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-is-even",
+      "prompt": "Implement is_even(n) so it returns True when the integer n is even and False when it is odd. Zero is even, and negative even numbers like -2 count as even too.",
+      "functionName": "is_even",
+      "starter": "def is_even(n):\n    # return True when n is even\n    pass",
+      "solution": "def is_even(n):\n    return n % 2 == 0",
+      "tests": [
+        { "expr": "is_even(4)", "expect": "True" },
+        { "expr": "is_even(7)", "expect": "False" },
+        { "expr": "is_even(0)", "expect": "True" },
+        { "expr": "is_even(-2)", "expect": "True" },
+        { "expr": "is_even(-3)", "expect": "False" },
+        { "expr": "is_even(100)", "expect": "True" }
+      ],
+      "hints": [
+        "A number is even exactly when dividing it by 2 leaves no remainder.",
+        "The remainder operator % gives that leftover: n % 2 is 0 for evens.",
+        "return n % 2 == 0 — this stays correct for 0 and for negatives."
       ],
       "xp": 15
     },

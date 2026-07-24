@@ -33,7 +33,13 @@
         { "expr": "letterGrade(90)", "expect": "'A'" },
         { "expr": "letterGrade(83)", "expect": "'B'" },
         { "expr": "letterGrade(72)", "expect": "'C'" },
+        { "expr": "letterGrade(89)", "expect": "'B'" },
+        { "expr": "letterGrade(80)", "expect": "'B'" },
+        { "expr": "letterGrade(79)", "expect": "'C'" },
+        { "expr": "letterGrade(70)", "expect": "'C'" },
+        { "expr": "letterGrade(69)", "expect": "'D'" },
         { "expr": "letterGrade(60)", "expect": "'D'" },
+        { "expr": "letterGrade(59)", "expect": "'F'" },
         { "expr": "letterGrade(45)", "expect": "'F'" }
       ],
       "hints": [
