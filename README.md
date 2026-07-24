@@ -10,9 +10,6 @@ backbone, all in-browser with no accounts.
   Digimon, Seattle 311). Correct queries catch the entities they return into a
   collection with real sprite/card art; Daily Review resurfaces rusty SQL
   skills on an expanding schedule.
-- **Systems Design** — decision drills and guided case-builds grounded in
-  public-sector / police data engineering (CAD ingestion, ALPR retention,
-  CJIS, NIBRS). Multiple-choice answer-check; no code execution.
 - **JavaScript** & **Python** — implement a named function; it runs in-browser
   (a Web Worker for JS, Pyodide for Python) against test cases. Python fetches
   Pyodide from a CDN on first run (the app's only online dependency).
