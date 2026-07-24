@@ -1,0 +1,110 @@
+{
+  "skillId": "js-loops",
+  "exercises": [
+    {
+      "id": "js-sum-to",
+      "prompt": "Implement sumTo(n) so it returns the sum of every whole number from 1 up to and including n, using a loop. sumTo(5) is 1+2+3+4+5 = 15. sumTo(0) is 0.",
+      "functionName": "sumTo",
+      "starter": "function sumTo(n) {\n  // add up 1, 2, ..., n with a loop\n}",
+      "solution": "function sumTo(n) {\n  let total = 0\n  for (let i = 1; i <= n; i++) total += i\n  return total\n}",
+      "tests": [
+        { "expr": "sumTo(5)", "expect": "15" },
+        { "expr": "sumTo(1)", "expect": "1" },
+        { "expr": "sumTo(0)", "expect": "0" },
+        { "expr": "sumTo(10)", "expect": "55" },
+        { "expr": "sumTo(3)", "expect": "6" },
+        { "expr": "sumTo(100)", "expect": "5050" }
+      ],
+      "hints": [
+        "Keep a running total in a variable declared before the loop, and add each number to it as you pass.",
+        "A for loop can count i from 1 up to n with for (let i = 1; i <= n; i++).",
+        "Do total += i inside the loop and return total after it — when n is 0 the loop never runs and 0 comes back."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-factorial",
+      "prompt": "Implement factorial(n) so it returns n! — the product of every whole number from 1 to n — using a loop. factorial(4) is 1*2*3*4 = 24. By definition factorial(0) is 1.",
+      "functionName": "factorial",
+      "starter": "function factorial(n) {\n  // multiply together 1, 2, ..., n\n}",
+      "solution": "function factorial(n) {\n  let product = 1\n  for (let i = 2; i <= n; i++) product *= i\n  return product\n}",
+      "tests": [
+        { "expr": "factorial(0)", "expect": "1" },
+        { "expr": "factorial(1)", "expect": "1" },
+        { "expr": "factorial(5)", "expect": "120" },
+        { "expr": "factorial(3)", "expect": "6" },
+        { "expr": "factorial(4)", "expect": "24" },
+        { "expr": "factorial(6)", "expect": "720" }
+      ],
+      "hints": [
+        "A product accumulator has to start at 1 — starting at 0 would zero out everything — then you multiply each number in.",
+        "Loop i from 2 up to n and do product *= i each pass.",
+        "let product = 1, then the loop, then return product — for n of 0 or 1 the loop never runs and 1 is returned."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-count-matching",
+      "prompt": "Implement countMatching(arr, target) so it returns how many elements of the array arr are strictly equal to target, using a loop. An empty array returns 0.",
+      "functionName": "countMatching",
+      "starter": "function countMatching(arr, target) {\n  // count how many elements equal target\n}",
+      "solution": "function countMatching(arr, target) {\n  let count = 0\n  for (let i = 0; i < arr.length; i++) if (arr[i] === target) count++\n  return count\n}",
+      "tests": [
+        { "expr": "countMatching([1, 2, 2, 3], 2)", "expect": "2" },
+        { "expr": "countMatching([], 5)", "expect": "0" },
+        { "expr": "countMatching([1, 1, 1], 1)", "expect": "3" },
+        { "expr": "countMatching([1, 2, 3], 9)", "expect": "0" },
+        { "expr": "countMatching([5], 5)", "expect": "1" },
+        { "expr": "countMatching([0, 0, 1, 0], 0)", "expect": "3" }
+      ],
+      "hints": [
+        "Walk the array by index and keep a counter that only rises when an element matches target.",
+        "for (let i = 0; i < arr.length; i++) visits each arr[i]; test it with arr[i] === target.",
+        "Start let count = 0, do count++ inside the if, and return count — an empty array skips the loop and returns 0."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-first-index-of",
+      "prompt": "Implement firstIndexOf(arr, target) so it returns the index of the first element strictly equal to target, or -1 when no element matches. Use a loop and stop as soon as you find it. firstIndexOf([3, 1, 4], 1) is 1. An empty array returns -1.",
+      "functionName": "firstIndexOf",
+      "starter": "function firstIndexOf(arr, target) {\n  // return the index of the first match, or -1\n}",
+      "solution": "function firstIndexOf(arr, target) {\n  for (let i = 0; i < arr.length; i++) if (arr[i] === target) return i\n  return -1\n}",
+      "tests": [
+        { "expr": "firstIndexOf([3, 1, 4], 1)", "expect": "1" },
+        { "expr": "firstIndexOf([1, 2, 3], 9)", "expect": "-1" },
+        { "expr": "firstIndexOf([], 5)", "expect": "-1" },
+        { "expr": "firstIndexOf([7, 7, 7], 7)", "expect": "0" },
+        { "expr": "firstIndexOf([5, 6, 7], 7)", "expect": "2" },
+        { "expr": "firstIndexOf([0, 1, 2], 0)", "expect": "0" }
+      ],
+      "hints": [
+        "Scan from the front; the first element that matches is your answer, so hand it back right away.",
+        "return i from inside the loop is an early exit that stops the scan the instant arr[i] === target.",
+        "Loop with an index and return i on a match; after the loop, return -1 for the no-match case, which also covers the empty array."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-collatz",
+      "prompt": "Implement collatzSteps(n) so it returns how many steps it takes to reach 1 by repeatedly applying this rule: if the number is even, halve it; if it is odd, triple it and add 1. Start from a positive integer n. collatzSteps(1) is 0 (already at 1), and collatzSteps(8) is 3 (8 → 4 → 2 → 1). Use a while loop.",
+      "functionName": "collatzSteps",
+      "starter": "function collatzSteps(n) {\n  // count steps to reach 1\n}",
+      "solution": "function collatzSteps(n) {\n  let steps = 0\n  while (n !== 1) {\n    n = n % 2 === 0 ? n / 2 : 3 * n + 1\n    steps++\n  }\n  return steps\n}",
+      "tests": [
+        { "expr": "collatzSteps(1)", "expect": "0" },
+        { "expr": "collatzSteps(2)", "expect": "1" },
+        { "expr": "collatzSteps(4)", "expect": "2" },
+        { "expr": "collatzSteps(3)", "expect": "7" },
+        { "expr": "collatzSteps(6)", "expect": "8" },
+        { "expr": "collatzSteps(8)", "expect": "3" }
+      ],
+      "hints": [
+        "You cannot know the number of steps ahead of time, so loop while (n !== 1) and count each change.",
+        "Each pass, replace n with n / 2 when n % 2 === 0, otherwise 3 * n + 1, and add one to a step counter.",
+        "Inside the while loop set n = n % 2 === 0 ? n / 2 : 3 * n + 1 then steps++; return steps, which stays 0 when n starts at 1."
+      ],
+      "xp": 15
+    }
+  ]
+}

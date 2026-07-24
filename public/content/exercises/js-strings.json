@@ -1,0 +1,109 @@
+{
+  "skillId": "js-strings",
+  "exercises": [
+    {
+      "id": "js-initials",
+      "prompt": "Implement initials(first, last) so it returns the two uppercase initials of a first and last name. initials('ada', 'lovelace') returns 'AL'. Assume both names are non-empty.",
+      "functionName": "initials",
+      "starter": "function initials(first, last) {\n  // return the uppercase first letters of each name\n}",
+      "solution": "function initials(first, last) {\n  return (first[0] + last[0]).toUpperCase()\n}",
+      "tests": [
+        { "expr": "initials('ada', 'lovelace')", "expect": "'AL'" },
+        { "expr": "initials('grace', 'hopper')", "expect": "'GH'" },
+        { "expr": "initials('john', 'doe')", "expect": "'JD'" },
+        { "expr": "initials('Marie', 'Curie')", "expect": "'MC'" },
+        { "expr": "initials('a', 'b')", "expect": "'AB'" }
+      ],
+      "hints": [
+        "You need the first character of each name, both forced to uppercase.",
+        "Read the first characters with first[0] and last[0], and join them with +.",
+        "return (first[0] + last[0]).toUpperCase() — uppercasing the joined pair handles both letters at once."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-capitalize",
+      "prompt": "Implement capitalize(str) so it returns str with its first character in uppercase and the rest in lowercase — capitalize('hELLO') returns 'Hello'. An empty string returns an empty string.",
+      "functionName": "capitalize",
+      "starter": "function capitalize(str) {\n  // uppercase the first letter, lowercase the rest\n}",
+      "solution": "function capitalize(str) {\n  if (str === '') return ''\n  return str[0].toUpperCase() + str.slice(1).toLowerCase()\n}",
+      "tests": [
+        { "expr": "capitalize('hello')", "expect": "'Hello'" },
+        { "expr": "capitalize('hELLO')", "expect": "'Hello'" },
+        { "expr": "capitalize('WORLD')", "expect": "'World'" },
+        { "expr": "capitalize('')", "expect": "''" },
+        { "expr": "capitalize('a')", "expect": "'A'" },
+        { "expr": "capitalize('javaScript')", "expect": "'Javascript'" }
+      ],
+      "hints": [
+        "Treat the word as two parts: its first character, and everything after it, cased differently.",
+        "str[0].toUpperCase() fixes the first letter; str.slice(1) is the rest, which you can send through .toLowerCase().",
+        "Guard the empty string first with if (str === '') return '', then return str[0].toUpperCase() + str.slice(1).toLowerCase()."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-reverse-string",
+      "prompt": "Implement reverse(str) so it returns the characters of str in reverse order. reverse('abc') returns 'cba'. An empty string returns an empty string.",
+      "functionName": "reverse",
+      "starter": "function reverse(str) {\n  // return str with its characters reversed\n}",
+      "solution": "function reverse(str) {\n  return str.split('').reverse().join('')\n}",
+      "tests": [
+        { "expr": "reverse('abc')", "expect": "'cba'" },
+        { "expr": "reverse('')", "expect": "''" },
+        { "expr": "reverse('a')", "expect": "'a'" },
+        { "expr": "reverse('hello')", "expect": "'olleh'" },
+        { "expr": "reverse('racecar')", "expect": "'racecar'" },
+        { "expr": "reverse('ab')", "expect": "'ba'" }
+      ],
+      "hints": [
+        "Break the string into characters, flip their order, then glue them back into a string.",
+        "str.split('') gives an array of characters, arrays have a .reverse() method, and .join('') rebuilds the string.",
+        "return str.split('').reverse().join('') — the empty string passes straight through."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-first-word",
+      "prompt": "Implement firstWord(str) so it returns the portion of str before the first space. If there is no space, return the whole string. firstWord('hello world') returns 'hello'; firstWord('single') returns 'single'. Assume str has no leading space.",
+      "functionName": "firstWord",
+      "starter": "function firstWord(str) {\n  // return everything before the first space\n}",
+      "solution": "function firstWord(str) {\n  const i = str.indexOf(' ')\n  return i === -1 ? str : str.slice(0, i)\n}",
+      "tests": [
+        { "expr": "firstWord('hello world')", "expect": "'hello'" },
+        { "expr": "firstWord('single')", "expect": "'single'" },
+        { "expr": "firstWord('a b c')", "expect": "'a'" },
+        { "expr": "firstWord('one two three')", "expect": "'one'" },
+        { "expr": "firstWord('')", "expect": "''" },
+        { "expr": "firstWord('hi there')", "expect": "'hi'" }
+      ],
+      "hints": [
+        "Find where the first space sits; the answer is everything up to that point.",
+        "str.indexOf(' ') returns the position of the first space, or -1 when there is none — the -1 case means return the whole string.",
+        "const i = str.indexOf(' '), then return i === -1 ? str : str.slice(0, i)."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-truncate",
+      "prompt": "Implement truncate(str, maxLength) so that when str is longer than maxLength characters it is cut to the first maxLength characters followed by '...', and otherwise str is returned unchanged. truncate('hello world', 5) returns 'hello...'; truncate('hi', 5) returns 'hi'.",
+      "functionName": "truncate",
+      "starter": "function truncate(str, maxLength) {\n  // add an ellipsis only when str exceeds maxLength\n}",
+      "solution": "function truncate(str, maxLength) {\n  return str.length <= maxLength ? str : `${str.slice(0, maxLength)}...`\n}",
+      "tests": [
+        { "expr": "truncate('hello world', 5)", "expect": "'hello...'" },
+        { "expr": "truncate('hi', 5)", "expect": "'hi'" },
+        { "expr": "truncate('exactly', 7)", "expect": "'exactly'" },
+        { "expr": "truncate('abcdef', 3)", "expect": "'abc...'" },
+        { "expr": "truncate('', 5)", "expect": "''" },
+        { "expr": "truncate('abcde', 5)", "expect": "'abcde'" }
+      ],
+      "hints": [
+        "Compare the string's length against maxLength first; only the too-long case gets an ellipsis.",
+        "str.slice(0, maxLength) keeps the first maxLength characters, and str.length gives the value to compare.",
+        "return str.length <= maxLength ? str : `${str.slice(0, maxLength)}...` builds the shortened form with a template literal."
+      ],
+      "xp": 15
+    }
+  ]
+}

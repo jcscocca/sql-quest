@@ -1,0 +1,131 @@
+{
+  "skillId": "js-numbers",
+  "exercises": [
+    {
+      "id": "js-average3",
+      "prompt": "Implement average3(a, b, c) so it returns the average of the three numbers, rounded to the nearest whole number with Math.round.",
+      "functionName": "average3",
+      "starter": "function average3(a, b, c) {\n  // return the mean of a, b, c rounded to the nearest integer\n}",
+      "solution": "function average3(a, b, c) {\n  return Math.round((a + b + c) / 3)\n}",
+      "tests": [
+        { "expr": "average3(1, 2, 3)", "expect": "2" },
+        { "expr": "average3(2, 2, 2)", "expect": "2" },
+        { "expr": "average3(1, 2, 4)", "expect": "2" },
+        { "expr": "average3(10, 20, 30)", "expect": "20" },
+        { "expr": "average3(0, 0, 1)", "expect": "0" },
+        { "expr": "average3(2, 3, 4)", "expect": "3" }
+      ],
+      "hints": [
+        "An average is the sum of the values divided by how many there are — three here.",
+        "(a + b + c) / 3 gives the raw mean; wrap it to snap it to a whole number.",
+        "return Math.round((a + b + c) / 3); the inner parentheses make the sum happen before the division."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-hypotenuse",
+      "prompt": "Implement hypotenuse(a, b) so it returns the length of the hypotenuse of a right triangle with legs a and b — the square root of a squared plus b squared — rounded to the nearest whole number with Math.round.",
+      "functionName": "hypotenuse",
+      "starter": "function hypotenuse(a, b) {\n  // return sqrt(a^2 + b^2) rounded to the nearest integer\n}",
+      "solution": "function hypotenuse(a, b) {\n  return Math.round(Math.sqrt(a ** 2 + b ** 2))\n}",
+      "tests": [
+        { "expr": "hypotenuse(3, 4)", "expect": "5" },
+        { "expr": "hypotenuse(5, 12)", "expect": "13" },
+        { "expr": "hypotenuse(8, 15)", "expect": "17" },
+        { "expr": "hypotenuse(0, 0)", "expect": "0" },
+        { "expr": "hypotenuse(1, 1)", "expect": "1" },
+        { "expr": "hypotenuse(6, 8)", "expect": "10" }
+      ],
+      "hints": [
+        "Square each leg, add the squares, take the square root, then round — you can nest all four into one expression.",
+        "a ** 2 raises a to the power of 2, and Math.sqrt(x) is the square root of x.",
+        "return Math.round(Math.sqrt(a ** 2 + b ** 2))."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-is-even",
+      "prompt": "Implement isEven(n) so it returns true when the integer n is even and false when it is odd. Zero is even, and negative even numbers like -2 count as even too.",
+      "functionName": "isEven",
+      "starter": "function isEven(n) {\n  // return true when n is even\n}",
+      "solution": "function isEven(n) {\n  return n % 2 === 0\n}",
+      "tests": [
+        { "expr": "isEven(4)", "expect": "true" },
+        { "expr": "isEven(7)", "expect": "false" },
+        { "expr": "isEven(0)", "expect": "true" },
+        { "expr": "isEven(-2)", "expect": "true" },
+        { "expr": "isEven(-3)", "expect": "false" },
+        { "expr": "isEven(100)", "expect": "true" }
+      ],
+      "hints": [
+        "A number is even exactly when dividing it by 2 leaves no remainder.",
+        "The remainder operator % gives that leftover: n % 2 is 0 for evens.",
+        "return n % 2 === 0 — this stays correct for 0 and for negatives."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-whole-divide",
+      "prompt": "Implement wholeDivide(a, b) so it returns how many whole times b fits into a, discarding any remainder — integer division. For example wholeDivide(7, 2) is 3. Assume a is zero or positive and b is a positive integer.",
+      "functionName": "wholeDivide",
+      "starter": "function wholeDivide(a, b) {\n  // return the whole-number part of a / b\n}",
+      "solution": "function wholeDivide(a, b) {\n  return Math.floor(a / b)\n}",
+      "tests": [
+        { "expr": "wholeDivide(7, 2)", "expect": "3" },
+        { "expr": "wholeDivide(10, 5)", "expect": "2" },
+        { "expr": "wholeDivide(9, 4)", "expect": "2" },
+        { "expr": "wholeDivide(3, 5)", "expect": "0" },
+        { "expr": "wholeDivide(100, 7)", "expect": "14" },
+        { "expr": "wholeDivide(6, 3)", "expect": "2" }
+      ],
+      "hints": [
+        "Plain division gives a decimal (7 / 2 is 3.5); you want only the whole-number part.",
+        "Math.floor(x) rounds down to the nearest integer, dropping the fractional remainder.",
+        "return Math.floor(a / b)."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-abs-difference",
+      "prompt": "Implement absoluteDifference(a, b) so it returns the distance between the two numbers — how far apart they are — as a non-negative value. absoluteDifference(3, 5) and absoluteDifference(5, 3) are both 2.",
+      "functionName": "absoluteDifference",
+      "starter": "function absoluteDifference(a, b) {\n  // return the non-negative distance between a and b\n}",
+      "solution": "function absoluteDifference(a, b) {\n  return Math.abs(a - b)\n}",
+      "tests": [
+        { "expr": "absoluteDifference(5, 3)", "expect": "2" },
+        { "expr": "absoluteDifference(3, 5)", "expect": "2" },
+        { "expr": "absoluteDifference(-2, 2)", "expect": "4" },
+        { "expr": "absoluteDifference(0, 0)", "expect": "0" },
+        { "expr": "absoluteDifference(-5, -1)", "expect": "4" },
+        { "expr": "absoluteDifference(7, 7)", "expect": "0" }
+      ],
+      "hints": [
+        "The distance between two numbers is their difference with any negative sign removed.",
+        "a - b might be negative; Math.abs(x) turns a negative into its positive twin and leaves positives unchanged.",
+        "return Math.abs(a - b)."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-clamp-to-range",
+      "prompt": "Implement clampToRange(x, lo, hi) so it limits x to the range lo..hi, but this time without any if or ternary — use Math.min and Math.max. Return lo when x is below lo, hi when x is above hi, and x otherwise. Assume lo <= hi.",
+      "functionName": "clampToRange",
+      "starter": "function clampToRange(x, lo, hi) {\n  // bound x to lo..hi using Math.min and Math.max\n}",
+      "solution": "function clampToRange(x, lo, hi) {\n  return Math.max(lo, Math.min(x, hi))\n}",
+      "tests": [
+        { "expr": "clampToRange(5, 0, 10)", "expect": "5" },
+        { "expr": "clampToRange(-3, 0, 10)", "expect": "0" },
+        { "expr": "clampToRange(15, 0, 10)", "expect": "10" },
+        { "expr": "clampToRange(0, 0, 10)", "expect": "0" },
+        { "expr": "clampToRange(10, 0, 10)", "expect": "10" },
+        { "expr": "clampToRange(7, 1, 5)", "expect": "5" }
+      ],
+      "hints": [
+        "Do it in two moves: first stop x from going above hi, then stop the result from dropping below lo.",
+        "Math.min(x, hi) caps the top; wrapping that in Math.max(lo, ...) raises the floor.",
+        "return Math.max(lo, Math.min(x, hi)) — no if needed."
+      ],
+      "xp": 15
+    }
+  ]
+}

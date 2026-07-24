@@ -299,8 +299,8 @@
       ]
     },
     {
-      "id": "javascript",
-      "name": "JavaScript",
+      "id": "js-foundations",
+      "name": "JavaScript · Foundations",
       "skills": [
         {
           "id": "js-basics",
@@ -314,10 +314,60 @@
           }
         },
         {
+          "id": "js-conditionals",
+          "name": "Conditionals & Logic",
+          "trackId": "javascript",
+          "requires": ["js-basics"],
+          "lesson": {
+            "intro": "A program makes decisions by branching. An if statement runs a block only when its condition is true; else if chains another test after it, and else catches everything that is left. The conditions are built from comparison operators — greater-than >, less-than <, >=, <=, strict-equals === and strict-not-equals !== (prefer the strict pair, since == quietly coerces types). Combine conditions with the boolean operators: && (and) is true only when both sides are, || (or) is true when either side is, and ! (not) flips a boolean. When you are choosing between two values rather than running two blocks, the ternary condition ? a : b is the compact form: score >= 60 ? 'pass' : 'fail'. Order matters in an if/else-if ladder — the first branch whose test passes wins and the rest are skipped, so put the most specific test first. And a return inside a branch hands the answer back the instant a case is decided.",
+            "exampleSql": "",
+            "wrapUp": "You can now branch: an if/else-if ladder for several cases, the boolean operators && || ! to combine tests, and the ternary when you only need one of two values. The habits that pay off are ordering branches from most specific to least, and returning the moment a case is settled. Next you will put these tests to work on numbers — remainders, rounding, and the Math toolkit."
+          }
+        },
+        {
+          "id": "js-numbers",
+          "name": "Numbers & Math",
+          "trackId": "javascript",
+          "requires": ["js-conditionals"],
+          "lesson": {
+            "intro": "JavaScript has a single number type — no separate integer and float — so 7 / 2 is 3.5, not 3. When you want whole-number (integer) division you floor the result yourself with Math.floor(7 / 2), which is 3. The Math object holds the rest of the toolkit: Math.round rounds to the nearest integer (a .5 rounds up), Math.floor and Math.ceil always go down and up, Math.abs drops a negative sign, and Math.min / Math.max pick the smallest or largest of their arguments. The remainder operator % gives what is left after division — 7 % 3 is 1 — and pairs with === 0 to test divisibility. Exponents use **: 2 ** 10 is 1024, and Math.sqrt(x) is the square root. One thing to watch: floating-point division rarely lands on a clean value, so when a prompt asks for a whole number, round explicitly with Math.round rather than hoping — an unrounded 4.999999 will fail a test that expects 5.",
+            "exampleSql": "",
+            "wrapUp": "Numbers in JavaScript are all one type, so integer division, rounding, and remainders are things you ask for on purpose — Math.floor, Math.round, %, and friends. Reach for Math.min and Math.max to bound a value and ** for powers, and round the moment a result stops being whole. Next you turn from numbers to text: slicing, casing, and searching strings."
+          }
+        },
+        {
+          "id": "js-strings",
+          "name": "Strings",
+          "trackId": "javascript",
+          "requires": ["js-numbers"],
+          "lesson": {
+            "intro": "A string is a sequence of characters, and JavaScript treats it much like a read-only array. str.length counts the characters, str[i] reads the one at position i (zero-based, so str[0] is the first), and str.slice(start, end) copies out a run — 'hello'.slice(0, 2) is 'he', and a negative index like str.slice(-1) counts back from the end. Case is a method call away: toUpperCase() and toLowerCase() return brand-new strings, because a string itself never changes — strings are immutable. To search, str.includes(sub) gives a boolean and str.indexOf(sub) gives the position, or -1 when the piece is absent. str.split(sep) breaks a string into an array of pieces and arr.join(sep) glues an array back into a string — together they reverse a word with str.split('').reverse().join('') or count its parts. Template literals build strings by interpolation: `Hi, ${name}!`. Mind the empty string — length 0, nothing to index — it should usually return an empty-but-valid answer of its own.",
+            "exampleSql": "",
+            "wrapUp": "Text bends to a small handful of tools: index and slice to reach characters, length to measure, toUpperCase and toLowerCase to normalize, includes and indexOf to search, and split and join (plus template literals) to take a string apart and rebuild it. Because strings are immutable, each of these hands you a new string instead of changing the old one. Next you will write the loops that walk a string or an array one element at a time."
+          }
+        },
+        {
+          "id": "js-loops",
+          "name": "Loops & Accumulation",
+          "trackId": "javascript",
+          "requires": ["js-strings"],
+          "lesson": {
+            "intro": "A loop repeats work. The for loop packs three moving parts into one line — for (let i = 0; i < n; i++) starts a counter, tests it before each pass, and advances it after — which makes it the natural way to walk a string or array by index, visiting every arr[i]. Most loops accumulate: declare a variable before the loop and update it inside, like let sum = 0 then sum += arr[i], or a counter that does count++ to tally matches. Start a product accumulator at 1, not 0. A while (condition) loop is the choice when you do not know the count up front — you repeat until a condition flips. And a return inside a loop is an early exit: the moment you have found what you need, such as a matching index, hand it back and the loop stops. Guard the empty case — a loop over an empty array or string simply never runs, so whatever you initialized the accumulator to is your answer.",
+            "exampleSql": "",
+            "wrapUp": "You can now drive a computation by hand: a for loop to walk indices, an accumulator to build up a sum, product, or count, a while loop when the end is not known in advance, and an early return to stop the instant the answer is in hand. The empty input falls out for free — the loop just never runs. That completes Foundations; next you will meet the array methods map, filter, and reduce, which fold many of these same loops into a single line."
+          }
+        }
+      ]
+    },
+    {
+      "id": "js-iteration",
+      "name": "JavaScript · Arrays & Iteration",
+      "skills": [
+        {
           "id": "js-arrays",
           "name": "Arrays & Iteration",
           "trackId": "javascript",
-          "requires": ["js-basics"],
+          "requires": ["js-loops"],
           "lesson": {
             "intro": "An array is an ordered list of values — [1, 2, 3], [], or a string's characters — and most real work is walking one to build a result. You have two families of tools. A for loop gives you full control: for (let i = 0; i < arr.length; i++) visits each index, and you accumulate into a variable you declared before the loop (let sum = 0; ... sum += arr[i]). The array methods are terser for common shapes: map returns a new array with each element transformed (arr.map(x => x * 2)), filter returns a new array of the elements that pass a test (arr.filter(x => x % 2 === 0)), and reduce folds a whole array down to one value. The modulo operator % gives a division remainder, so x % 2 === 0 tests evenness — and note it keeps the sign of the left operand, so -4 % 2 is still 0 but negatives need care. Strings iterate too: str.length counts characters and str[i] or a for...of loop reaches each one, which is all you need to tally letters. Watch the empty case — an empty array or string should return the empty-but-valid answer ([] , 0, ''), not crash.",
             "exampleSql": "",

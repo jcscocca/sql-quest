@@ -1,0 +1,108 @@
+{
+  "skillId": "js-conditionals",
+  "exercises": [
+    {
+      "id": "js-sign",
+      "prompt": "Implement sign(n) so it returns 1 when n is positive, -1 when n is negative, and 0 when n is exactly zero.",
+      "functionName": "sign",
+      "starter": "function sign(n) {\n  // return 1, -1, or 0 depending on the sign of n\n}",
+      "solution": "function sign(n) {\n  if (n > 0) return 1\n  if (n < 0) return -1\n  return 0\n}",
+      "tests": [
+        { "expr": "sign(5)", "expect": "1" },
+        { "expr": "sign(-3)", "expect": "-1" },
+        { "expr": "sign(0)", "expect": "0" },
+        { "expr": "sign(-0.5)", "expect": "-1" },
+        { "expr": "sign(100)", "expect": "1" },
+        { "expr": "sign(0.001)", "expect": "1" }
+      ],
+      "hints": [
+        "Three outcomes means three branches: positive, negative, and exactly zero — handle them with if statements.",
+        "Compare against zero: n > 0 is the positive case and n < 0 is the negative one; whatever is left must be zero.",
+        "Write if (n > 0) return 1, then if (n < 0) return -1, and a final return 0 for the rest."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-letter-grade",
+      "prompt": "Implement letterGrade(score) so it returns the letter grade for a 0-100 score: 'A' for 90 and above, 'B' for 80 to 89, 'C' for 70 to 79, 'D' for 60 to 69, and 'F' for anything below 60.",
+      "functionName": "letterGrade",
+      "starter": "function letterGrade(score) {\n  // return 'A', 'B', 'C', 'D', or 'F'\n}",
+      "solution": "function letterGrade(score) {\n  if (score >= 90) return 'A'\n  if (score >= 80) return 'B'\n  if (score >= 70) return 'C'\n  if (score >= 60) return 'D'\n  return 'F'\n}",
+      "tests": [
+        { "expr": "letterGrade(95)", "expect": "'A'" },
+        { "expr": "letterGrade(90)", "expect": "'A'" },
+        { "expr": "letterGrade(83)", "expect": "'B'" },
+        { "expr": "letterGrade(72)", "expect": "'C'" },
+        { "expr": "letterGrade(60)", "expect": "'D'" },
+        { "expr": "letterGrade(45)", "expect": "'F'" }
+      ],
+      "hints": [
+        "Check the grades from the highest threshold down, so each later test only has to handle the scores that did not already match.",
+        "Once 90-and-up has returned 'A', a plain score >= 80 is enough to mean 'B'.",
+        "Chain if (score >= 90) return 'A', then >= 80, >= 70, >= 60, and a final return 'F'."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-leap-year",
+      "prompt": "Implement isLeapYear(year) so it returns true when year is a leap year. A year is a leap year if it is divisible by 4, except that years divisible by 100 are not — unless they are also divisible by 400. So 2000 and 2024 are leap years, while 1900 and 2023 are not.",
+      "functionName": "isLeapYear",
+      "starter": "function isLeapYear(year) {\n  // return true when year is a leap year\n}",
+      "solution": "function isLeapYear(year) {\n  return year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0)\n}",
+      "tests": [
+        { "expr": "isLeapYear(2000)", "expect": "true" },
+        { "expr": "isLeapYear(1900)", "expect": "false" },
+        { "expr": "isLeapYear(2024)", "expect": "true" },
+        { "expr": "isLeapYear(2023)", "expect": "false" },
+        { "expr": "isLeapYear(2100)", "expect": "false" },
+        { "expr": "isLeapYear(1600)", "expect": "true" }
+      ],
+      "hints": [
+        "This is a single boolean expression: combine the divisible-by-4 rule with the century exception using && and ||.",
+        "Divisibility is a remainder test — year % 4 === 0 — and the exception is 'not divisible by 100, or divisible by 400', which is an || of two tests.",
+        "return year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0); keep the parentheses so the || groups first."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-clamp",
+      "prompt": "Implement clamp(value, low, high) so it constrains value to the range low..high: return low when value is below low, high when value is above high, and value itself when it already sits within the range. Assume low <= high.",
+      "functionName": "clamp",
+      "starter": "function clamp(value, low, high) {\n  // return value limited to the range low..high\n}",
+      "solution": "function clamp(value, low, high) {\n  return value < low ? low : value > high ? high : value\n}",
+      "tests": [
+        { "expr": "clamp(5, 0, 10)", "expect": "5" },
+        { "expr": "clamp(-3, 0, 10)", "expect": "0" },
+        { "expr": "clamp(15, 0, 10)", "expect": "10" },
+        { "expr": "clamp(0, 0, 10)", "expect": "0" },
+        { "expr": "clamp(10, 0, 10)", "expect": "10" },
+        { "expr": "clamp(7, 1, 5)", "expect": "5" }
+      ],
+      "hints": [
+        "There are three possibilities — value is below the range, above it, or already inside — and each returns a different thing.",
+        "A ternary can chain: value < low ? low : (decide between high and value for the rest).",
+        "return value < low ? low : value > high ? high : value covers below, above, and within in one line."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-exactly-one",
+      "prompt": "Implement exactlyOne(a, b), where a and b are booleans, so it returns true when exactly one of them is true — that is, when they differ. When both are true or both are false, return false.",
+      "functionName": "exactlyOne",
+      "starter": "function exactlyOne(a, b) {\n  // return true when exactly one of a, b is true\n}",
+      "solution": "function exactlyOne(a, b) {\n  return (a || b) && !(a && b)\n}",
+      "tests": [
+        { "expr": "exactlyOne(true, false)", "expect": "true" },
+        { "expr": "exactlyOne(false, true)", "expect": "true" },
+        { "expr": "exactlyOne(true, true)", "expect": "false" },
+        { "expr": "exactlyOne(false, false)", "expect": "false" }
+      ],
+      "hints": [
+        "Exactly one true means at least one is true, but not both — two conditions joined together.",
+        "At least one is a || b; both is a && b; flip a boolean with the ! operator.",
+        "return (a || b) && !(a && b) — either one holds, minus the case where both do."
+      ],
+      "xp": 15
+    }
+  ]
+}
