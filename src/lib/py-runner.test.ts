@@ -58,3 +58,19 @@ test('captures a harness error', () => {
   expect(out[0][0]).toBe(false)
   expect(out[0][3]).toContain('NameError')
 })
+
+test('a code/setup error is a per-test error row, not a whole-run abort', () => {
+  const out = run('def f():\n    return 1', [
+    { setup: 'raise ValueError("boom")', expr: 'f()', expect: '1' },
+    { expr: 'f()', expect: '1' },
+  ])
+  expect(out[0][0]).toBe(false)
+  expect(out[0][3]).toContain('ValueError')
+  expect(out[1][0]).toBe(true)
+})
+
+test('a Python raises match comes only from expr, not a throwing setup', () => {
+  const out = run('def f():\n    return 1', [{ setup: 'raise TypeError("x")', expr: 'f()', raises: 'TypeError' }])
+  expect(out[0][0]).toBe(false)
+  expect(out[0][3]).toContain('TypeError')
+})

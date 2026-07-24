@@ -15,7 +15,7 @@ function checkCodeTests(tag: string, tests: unknown): tests is CodeTest[] {
   }
   for (const [i, t] of tests.entries()) {
     const where = `${tag}: test ${i + 1}`
-    if (!t.expr?.trim()) failures.push(`${where}: missing expr`)
+    if (typeof t.expr !== 'string' || !t.expr.trim()) failures.push(`${where}: missing expr`)
     const hasExpect = typeof t.expect === 'string' && t.expect.trim() !== ''
     const hasRaises = typeof t.raises === 'string' && t.raises.trim() !== ''
     if (hasExpect === hasRaises) failures.push(`${where}: needs exactly one of expect or raises`)
@@ -92,6 +92,7 @@ for (const skill of skills) {
     for (const ex of jsBank.exercises) {
       checked++
       const tag = `${skill.id}/${ex.id}`
+      idBanks.set(ex.id, [...(idBanks.get(ex.id) ?? []), skill.id])
       if (!ex.functionName?.trim()) failures.push(`${tag}: missing functionName`)
       if (!ex.starter?.trim()) failures.push(`${tag}: missing starter`)
       if (!ex.solution?.trim()) failures.push(`${tag}: missing solution`)
@@ -104,6 +105,11 @@ for (const skill of skills) {
               `${tag}: solution fails test ${i + 1} — expected ${r.expected}, got ${r.error ? `error ${r.error}` : r.actual}`,
             )
         }
+      }
+      if (ex.starter?.trim()) {
+        const starterResults = runCodeTests(ex.starter, ex.tests, ex.fixture)
+        if (starterResults.length > 0 && starterResults.every(r => r.pass))
+          failures.push(`${tag}: starter already passes every test — no work for the learner`)
       }
     }
     continue
@@ -127,6 +133,7 @@ for (const skill of skills) {
     for (const ex of pyBank.exercises) {
       checked++
       const tag = `${skill.id}/${ex.id}`
+      idBanks.set(ex.id, [...(idBanks.get(ex.id) ?? []), skill.id])
       if (!ex.functionName?.trim()) failures.push(`${tag}: missing functionName`)
       if (!ex.starter?.trim()) failures.push(`${tag}: missing starter`)
       if (!ex.solution?.trim()) failures.push(`${tag}: missing solution`)
@@ -143,6 +150,15 @@ for (const skill of skills) {
           }
         } catch (e) {
           failures.push(`${tag}: Python solution did not run — ${e}`)
+        }
+      }
+      if (ex.starter?.trim()) {
+        try {
+          const sr = runPyExercise(ex.starter, ex.tests, ex.fixture)
+          if (sr.length > 0 && sr.every(row => row[0]))
+            failures.push(`${tag}: starter already passes every test — no work for the learner`)
+        } catch {
+          // a starter that errors out fails tests, which is fine
         }
       }
     }

@@ -50,28 +50,33 @@ export function withFixtureSetup(fixture: string | undefined, setup: string | un
   return [fixture, setup].filter(Boolean).join('\n')
 }
 
-function evalPair(code: string, setup: string, expr: string, expectExpr: string): [unknown, unknown] {
-  return new Function(`"use strict";\n${code}\n${setup}\nreturn [ (${expr}), (${expectExpr}) ];`)() as [unknown, unknown]
-}
-
-function evalOne(code: string, setup: string, expr: string): unknown {
-  return new Function(`"use strict";\n${code}\n${setup}\nreturn ( ${expr} );`)()
+function prepare(code: string, setup: string, expr: string, expectExpr: string): { expr: () => unknown; expect: () => unknown } {
+  return new Function(
+    `"use strict";\n${code}\n${setup}\nreturn { expr: () => (${expr}), expect: () => (${expectExpr}) };`,
+  )() as { expr: () => unknown; expect: () => unknown }
 }
 
 export function runCodeTests(code: string, tests: CodeTest[], fixture?: string): TestResult[] {
   return tests.map(t => {
     const setup = withFixtureSetup(fixture, t.setup)
+    let thunks: { expr: () => unknown; expect: () => unknown }
     try {
-      if (t.raises !== undefined) {
-        try {
-          evalOne(code, setup, t.expr)
-          return { pass: false, expected: `raises ${t.raises}`, actual: 'no error thrown' }
-        } catch (e) {
-          const name = e instanceof Error ? e.name : String(e)
-          return { pass: name === t.raises, expected: `raises ${t.raises}`, actual: `raises ${name}` }
-        }
+      thunks = prepare(code, setup, t.expr, t.expect ?? 'undefined')
+    } catch (e) {
+      return { pass: false, expected: t.raises ? `raises ${t.raises}` : t.expect ?? '', actual: '', error: String(e) }
+    }
+    if (t.raises !== undefined) {
+      try {
+        thunks.expr()
+        return { pass: false, expected: `raises ${t.raises}`, actual: 'no error thrown' }
+      } catch (e) {
+        const name = e instanceof Error ? e.name : String(e)
+        return { pass: name === t.raises, expected: `raises ${t.raises}`, actual: `raises ${name}` }
       }
-      const [actual, expected] = evalPair(code, setup, t.expr, t.expect ?? 'undefined')
+    }
+    try {
+      const actual = thunks.expr()
+      const expected = thunks.expect()
       return { pass: deepEqual(actual, expected), expected: render(expected), actual: render(actual) }
     } catch (e) {
       return { pass: false, expected: t.expect ?? '', actual: '', error: String(e) }

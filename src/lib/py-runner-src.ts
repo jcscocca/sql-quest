@@ -8,10 +8,14 @@ def _run_exercise(_code, _tests_json):
     _out = []
     for _t in _tests:
         _ns = {}
-        exec(_code, _ns)
-        _setup = _t.get("setup", "")
-        if _setup:
-            exec(_setup, _ns)
+        try:
+            exec(_code, _ns)
+            _setup = _t.get("setup", "")
+            if _setup:
+                exec(_setup, _ns)
+        except Exception as _e:
+            _out.append([False, "", "", repr(_e)])
+            continue
         _raises = _t.get("raises")
         _expr = _t["expr"]
         if _raises is not None:

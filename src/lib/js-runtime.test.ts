@@ -68,3 +68,22 @@ test('runCodeTests reports a thrown error on a value test', () => {
   expect(r[0].pass).toBe(false)
   expect(r[0].error).toContain('boom')
 })
+
+test('raises does not pass when the solution code fails to compile', () => {
+  const r = runCodeTests('function parse( {', [{ expr: 'parse("x")', raises: 'SyntaxError' }])
+  expect(r[0].pass).toBe(false)
+  expect(r[0].error).toBeTruthy()
+})
+
+test('a JS raises match comes only from expr, not a throwing setup', () => {
+  const r = runCodeTests('function ok() { return 1 }', [
+    { setup: 'throw new TypeError("boom")', expr: 'ok()', raises: 'TypeError' },
+  ])
+  expect(r[0].pass).toBe(false)
+  expect(r[0].error).toBeTruthy()
+})
+
+test('raises still matches a runtime throw from expr', () => {
+  const r = runCodeTests('function boom() { throw new TypeError("nope") }', [{ expr: 'boom()', raises: 'TypeError' }])
+  expect(r[0].pass).toBe(true)
+})
