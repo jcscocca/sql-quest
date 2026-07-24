@@ -1,0 +1,131 @@
+{
+  "skillId": "py-sorting",
+  "exercises": [
+    {
+      "id": "py-sort-asc",
+      "prompt": "Implement sort_asc(xs) so it returns a new list with xs's numbers in ascending order. Do not modify the original list — sorted() builds a new one for you. Duplicates are kept, and an empty list returns an empty list.",
+      "functionName": "sort_asc",
+      "starter": "def sort_asc(xs):\n    # return a new list sorted smallest-first, leaving xs untouched\n    pass",
+      "solution": "def sort_asc(xs):\n    return sorted(xs)",
+      "tests": [
+        { "expr": "sort_asc([3, 1, 2, 1])", "expect": "[1, 1, 2, 3]" },
+        { "expr": "sort_asc([])", "expect": "[]" },
+        { "expr": "sort_asc([10, 2, 1])", "expect": "[1, 2, 10]" },
+        { "expr": "sort_asc([-3, 5, -1, 0])", "expect": "[-3, -1, 0, 5]" },
+        { "expr": "sort_asc([42])", "expect": "[42]" },
+        { "setup": "original = [3, 1, 2]; sort_asc(original)", "expr": "original", "expect": "[3, 1, 2]" }
+      ],
+      "hints": [
+        "Python sorts with one built-in that hands back a brand-new list and leaves the original alone.",
+        "sorted(xs) returns the elements in ascending order without touching xs — unlike xs.sort(), which rearranges xs in place and returns None.",
+        "return sorted(xs) — because it builds a new list, the caller's original list is unchanged."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-sort-desc",
+      "prompt": "Implement sort_desc(xs) so it returns a new list with xs's numbers in descending order (largest first), without modifying the original. Duplicates are kept, and an empty list returns an empty list.",
+      "functionName": "sort_desc",
+      "starter": "def sort_desc(xs):\n    # return a new list sorted largest-first\n    pass",
+      "solution": "def sort_desc(xs):\n    return sorted(xs, reverse=True)",
+      "tests": [
+        { "expr": "sort_desc([1, 3, 2, 3])", "expect": "[3, 3, 2, 1]" },
+        { "expr": "sort_desc([])", "expect": "[]" },
+        { "expr": "sort_desc([10, 2, 1])", "expect": "[10, 2, 1]" },
+        { "expr": "sort_desc([-3, 5, -1, 0])", "expect": "[5, 0, -1, -3]" },
+        { "expr": "sort_desc([42])", "expect": "[42]" },
+        { "expr": "sort_desc([1, 2])", "expect": "[2, 1]" }
+      ],
+      "hints": [
+        "Descending is the same built-in with its direction flipped.",
+        "sorted takes a reverse flag: sorted(xs, reverse=True) orders the numbers largest-first.",
+        "return sorted(xs, reverse=True)."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-by-length",
+      "prompt": "Implement by_length(words) so it returns a new list of the strings in words ordered from shortest to longest. Strings of equal length keep their original relative order. An empty list returns an empty list.",
+      "functionName": "by_length",
+      "starter": "def by_length(words):\n    # return the words ordered shortest-first\n    pass",
+      "solution": "def by_length(words):\n    return sorted(words, key=len)",
+      "tests": [
+        { "expr": "by_length(['ccc', 'a', 'bb'])", "expect": "['a', 'bb', 'ccc']" },
+        { "expr": "by_length([])", "expect": "[]" },
+        { "expr": "by_length(['dog', 'a', 'cat', 'be'])", "expect": "['a', 'be', 'dog', 'cat']" },
+        { "expr": "by_length(['hello'])", "expect": "['hello']" },
+        { "expr": "by_length(['aa', 'b', 'cc', 'd'])", "expect": "['b', 'd', 'aa', 'cc']" },
+        { "expr": "by_length(['', 'ab', 'x'])", "expect": "['', 'x', 'ab']" }
+      ],
+      "hints": [
+        "Order the strings by a derived value — each one's length — rather than by the strings themselves.",
+        "Pass a key function: sorted(words, key=len) sorts by len(word) for each word.",
+        "return sorted(words, key=len) — equal-length words keep their original order because the sort is stable, so 'dog' stays ahead of 'cat'."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-by-abs",
+      "prompt": "Implement by_abs(xs) so it returns a new list with xs's numbers ordered by absolute value (distance from zero), smallest distance first. So [-3, 1, -2] becomes [1, -2, -3]. Numbers with the same absolute value keep their original order, and an empty list returns an empty list.",
+      "functionName": "by_abs",
+      "starter": "def by_abs(xs):\n    # return the numbers ordered by distance from zero\n    pass",
+      "solution": "def by_abs(xs):\n    return sorted(xs, key=abs)",
+      "tests": [
+        { "expr": "by_abs([-3, 1, -2])", "expect": "[1, -2, -3]" },
+        { "expr": "by_abs([])", "expect": "[]" },
+        { "expr": "by_abs([5, -5, 5])", "expect": "[5, -5, 5]" },
+        { "expr": "by_abs([0, -1, 1])", "expect": "[0, -1, 1]" },
+        { "expr": "by_abs([-10, 2, -3])", "expect": "[2, -3, -10]" },
+        { "expr": "by_abs([7])", "expect": "[7]" }
+      ],
+      "hints": [
+        "Sort by a computed value again: each number's distance from zero.",
+        "abs is itself a function, so hand it straight to key: sorted(xs, key=abs).",
+        "return sorted(xs, key=abs) — so -2 sorts before -3 because 2 < 3, even though -3 is the smaller number."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-by-last-digit",
+      "prompt": "Implement by_last_digit(xs) so it returns a new list with xs's numbers ordered by their last (units) digit, smallest last-digit first — the last digit of n is n % 10. So [15, 22, 13] becomes [22, 13, 15] (last digits 2, 3, 5). Numbers sharing a last digit keep their original relative order. Assume the numbers are non-negative, and an empty list returns an empty list.",
+      "functionName": "by_last_digit",
+      "starter": "def by_last_digit(xs):\n    # return the numbers ordered by their last digit\n    pass",
+      "solution": "def by_last_digit(xs):\n    return sorted(xs, key=lambda n: n % 10)",
+      "tests": [
+        { "expr": "by_last_digit([15, 22, 13])", "expect": "[22, 13, 15]" },
+        { "expr": "by_last_digit([])", "expect": "[]" },
+        { "expr": "by_last_digit([30, 20, 10])", "expect": "[30, 20, 10]" },
+        { "expr": "by_last_digit([9, 10, 3])", "expect": "[10, 3, 9]" },
+        { "expr": "by_last_digit([7])", "expect": "[7]" },
+        { "expr": "by_last_digit([14, 24, 3])", "expect": "[3, 14, 24]" }
+      ],
+      "hints": [
+        "The order you want depends not on each number but on its last digit, so sort by a computed key.",
+        "The last digit is n % 10; write the key as a lambda: key=lambda n: n % 10.",
+        "return sorted(xs, key=lambda n: n % 10) — numbers sharing a last digit, like 30, 20, 10, keep their original order."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-by-length-then-alpha",
+      "prompt": "Implement by_length_then_alpha(words) so it returns a new list of the strings in words sorted shortest-first, and among strings of equal length, alphabetically. So ['dog', 'cat', 'bird'] becomes ['cat', 'dog', 'bird']. An empty list returns an empty list.",
+      "functionName": "by_length_then_alpha",
+      "starter": "def by_length_then_alpha(words):\n    # sort by length, then alphabetically among equal lengths\n    pass",
+      "solution": "def by_length_then_alpha(words):\n    return sorted(words, key=lambda w: (len(w), w))",
+      "tests": [
+        { "expr": "by_length_then_alpha(['bb', 'a', 'cc', 'ab'])", "expect": "['a', 'ab', 'bb', 'cc']" },
+        { "expr": "by_length_then_alpha([])", "expect": "[]" },
+        { "expr": "by_length_then_alpha(['dog', 'cat', 'bird'])", "expect": "['cat', 'dog', 'bird']" },
+        { "expr": "by_length_then_alpha(['b', 'a'])", "expect": "['a', 'b']" },
+        { "expr": "by_length_then_alpha(['same', 'aaaa', 'zzzz'])", "expect": "['aaaa', 'same', 'zzzz']" },
+        { "expr": "by_length_then_alpha(['x'])", "expect": "['x']" }
+      ],
+      "hints": [
+        "You are sorting on two things at once — length first, then alphabetical order among equal lengths. A tuple key handles both in one pass.",
+        "Return a tuple from the key: key=lambda w: (len(w), w). Python compares tuples left to right, so length decides first and the word itself breaks ties.",
+        "return sorted(words, key=lambda w: (len(w), w))."
+      ],
+      "xp": 15
+    }
+  ]
+}

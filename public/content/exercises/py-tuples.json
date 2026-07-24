@@ -1,0 +1,110 @@
+{
+  "skillId": "py-tuples",
+  "exercises": [
+    {
+      "id": "py-swap",
+      "prompt": "Implement swap(a, b) so it returns a tuple holding the two arguments in swapped order — swap(1, 2) is (2, 1). The result must be a tuple, not a list.",
+      "functionName": "swap",
+      "starter": "def swap(a, b):\n    # return the two arguments as a tuple, swapped\n    pass",
+      "solution": "def swap(a, b):\n    return b, a",
+      "tests": [
+        { "expr": "swap(1, 2)", "expect": "(2, 1)" },
+        { "expr": "swap('a', 'b')", "expect": "('b', 'a')" },
+        { "expr": "swap(0, 0)", "expect": "(0, 0)" },
+        { "expr": "swap(-1, 5)", "expect": "(5, -1)" },
+        { "setup": "x, y = swap(3, 4)", "expr": "[x, y]", "expect": "[4, 3]" },
+        { "expr": "swap(7, 7)", "expect": "(7, 7)" }
+      ],
+      "hints": [
+        "A function returns several values by handing them back as a tuple — just separate them with a comma.",
+        "return b, a builds the tuple (b, a) with the two arguments in swapped order.",
+        "return b, a — the parentheses are optional, but the value is the tuple (b, a); a list [b, a] would not count as a tuple."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-min-max",
+      "prompt": "Implement min_max(xs) so it returns a tuple (smallest, largest) of the numbers in the non-empty list xs. min_max([4, 8, 1]) is (1, 8). A single-element list returns that element twice, and the result must be a tuple, not a list.",
+      "functionName": "min_max",
+      "starter": "def min_max(xs):\n    # return (smallest, largest) as a tuple\n    pass",
+      "solution": "def min_max(xs):\n    return min(xs), max(xs)",
+      "tests": [
+        { "expr": "min_max([4, 8, 1])", "expect": "(1, 8)" },
+        { "expr": "min_max([5])", "expect": "(5, 5)" },
+        { "expr": "min_max([-3, -1, -2])", "expect": "(-3, -1)" },
+        { "expr": "min_max([2, 2, 2])", "expect": "(2, 2)" },
+        { "setup": "lo, hi = min_max([4, 8, 1])", "expr": "hi - lo", "expect": "7" },
+        { "expr": "min_max([10, 3, 7, 3])", "expect": "(3, 10)" }
+      ],
+      "hints": [
+        "You need two answers at once — the smallest and the largest — so return them together as a tuple, smallest first.",
+        "min(xs) and max(xs) each scan the whole list; pair them in order: min(xs), max(xs).",
+        "return min(xs), max(xs) — for a one-element list both are that same element, and the comma is what makes it a tuple."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-divmod-pair",
+      "prompt": "Implement divmod_pair(a, b) so it returns a tuple (quotient, remainder) from dividing a by b — the whole number of times b fits into a, then what is left over. divmod_pair(17, 5) is (3, 2), because 17 = 3 * 5 + 2. Assume a is non-negative and b is a positive integer; the result must be a tuple.",
+      "functionName": "divmod_pair",
+      "starter": "def divmod_pair(a, b):\n    # return (quotient, remainder) as a tuple\n    pass",
+      "solution": "def divmod_pair(a, b):\n    return divmod(a, b)",
+      "tests": [
+        { "expr": "divmod_pair(17, 5)", "expect": "(3, 2)" },
+        { "expr": "divmod_pair(10, 2)", "expect": "(5, 0)" },
+        { "expr": "divmod_pair(7, 3)", "expect": "(2, 1)" },
+        { "expr": "divmod_pair(0, 4)", "expect": "(0, 0)" },
+        { "expr": "divmod_pair(9, 10)", "expect": "(0, 9)" },
+        { "setup": "q, r = divmod_pair(17, 5)", "expr": "q * 5 + r", "expect": "17" }
+      ],
+      "hints": [
+        "Return the quotient and the remainder together, in that order, as a tuple.",
+        "Floor division a // b is the quotient and a % b is the remainder; Python's built-in divmod(a, b) returns exactly that pair.",
+        "return divmod(a, b) — or equivalently return a // b, a % b."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-first-last",
+      "prompt": "Implement first_last(xs) so it returns a tuple (first element, last element) of the non-empty list xs. first_last([1, 2, 3, 4]) is (1, 4). A single-element list returns that element twice, and the result must be a tuple, not a list.",
+      "functionName": "first_last",
+      "starter": "def first_last(xs):\n    # return (first, last) as a tuple\n    pass",
+      "solution": "def first_last(xs):\n    return xs[0], xs[-1]",
+      "tests": [
+        { "expr": "first_last([1, 2, 3, 4])", "expect": "(1, 4)" },
+        { "expr": "first_last([9])", "expect": "(9, 9)" },
+        { "expr": "first_last([7, 0, 3])", "expect": "(7, 3)" },
+        { "expr": "first_last(['a', 'b', 'c'])", "expect": "('a', 'c')" },
+        { "setup": "f, l = first_last([10, 20, 30])", "expr": "l - f", "expect": "20" },
+        { "expr": "first_last([5, 5])", "expect": "(5, 5)" }
+      ],
+      "hints": [
+        "Return two values as a tuple: the first element and the last.",
+        "xs[0] is the first element and xs[-1] is the last.",
+        "return xs[0], xs[-1] — for a single-element list both indexes point at the same value."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-count-and-sum",
+      "prompt": "Implement count_and_sum(xs) so it returns a tuple (count, total) — how many numbers are in xs, followed by their sum. count_and_sum([1, 2, 3, 4]) is (4, 10). An empty list returns (0, 0), and the result must be a tuple.",
+      "functionName": "count_and_sum",
+      "starter": "def count_and_sum(xs):\n    # return (how many, total) as a tuple\n    pass",
+      "solution": "def count_and_sum(xs):\n    return len(xs), sum(xs)",
+      "tests": [
+        { "expr": "count_and_sum([1, 2, 3, 4])", "expect": "(4, 10)" },
+        { "expr": "count_and_sum([])", "expect": "(0, 0)" },
+        { "expr": "count_and_sum([5])", "expect": "(1, 5)" },
+        { "expr": "count_and_sum([-1, 1])", "expect": "(2, 0)" },
+        { "expr": "count_and_sum([10, 20, 30])", "expect": "(3, 60)" },
+        { "setup": "n, total = count_and_sum([2, 4, 6])", "expr": "total / n", "expect": "4.0" }
+      ],
+      "hints": [
+        "Return two facts about the list as a tuple: how many numbers it holds and their total, in that order.",
+        "len(xs) counts the elements and sum(xs) adds them; both are 0 for an empty list.",
+        "return len(xs), sum(xs)."
+      ],
+      "xp": 15
+    }
+  ]
+}

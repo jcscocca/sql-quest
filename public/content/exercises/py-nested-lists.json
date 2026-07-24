@@ -1,0 +1,109 @@
+{
+  "skillId": "py-nested-lists",
+  "exercises": [
+    {
+      "id": "py-row-sums",
+      "prompt": "Implement row_sums(matrix), where matrix is a list of rows and each row is a list of numbers, so it returns a list with the sum of each row — row_sums([[1, 2], [3, 4]]) is [3, 7]. Rows may have different lengths, an empty row sums to 0, and an empty matrix returns an empty list.",
+      "functionName": "row_sums",
+      "starter": "def row_sums(matrix):\n    # return a list of each row's sum\n    pass",
+      "solution": "def row_sums(matrix):\n    return [sum(row) for row in matrix]",
+      "tests": [
+        { "expr": "row_sums([[1, 2], [3, 4]])", "expect": "[3, 7]" },
+        { "expr": "row_sums([])", "expect": "[]" },
+        { "expr": "row_sums([[1], [2, 3, 4]])", "expect": "[1, 9]" },
+        { "expr": "row_sums([[], [5]])", "expect": "[0, 5]" },
+        { "expr": "row_sums([[10]])", "expect": "[10]" },
+        { "expr": "row_sums([[-1, 1], [-2, -3]])", "expect": "[0, -5]" }
+      ],
+      "hints": [
+        "You want one number per row, so iterate the outer list and collapse each row to a single value.",
+        "sum(row) totals one row; since a row is itself a list, sum handles it directly, and an empty row sums to 0.",
+        "return [sum(row) for row in matrix]."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-flatten",
+      "prompt": "Implement flatten(matrix) so it merges the rows of matrix into one list, one level deep — flatten([[1, 2], [3], [4, 5]]) is [1, 2, 3, 4, 5]. The elements keep their left-to-right order, an empty row contributes nothing, and an empty matrix returns an empty list.",
+      "functionName": "flatten",
+      "starter": "def flatten(matrix):\n    # merge the rows into a single list\n    pass",
+      "solution": "def flatten(matrix):\n    return [x for row in matrix for x in row]",
+      "tests": [
+        { "expr": "flatten([[1, 2], [3], [4, 5]])", "expect": "[1, 2, 3, 4, 5]" },
+        { "expr": "flatten([])", "expect": "[]" },
+        { "expr": "flatten([[1], [], [2]])", "expect": "[1, 2]" },
+        { "expr": "flatten([[7]])", "expect": "[7]" },
+        { "expr": "flatten([[], []])", "expect": "[]" },
+        { "expr": "flatten([[1, 2, 3]])", "expect": "[1, 2, 3]" }
+      ],
+      "hints": [
+        "Flattening visits every element of every row and drops them into one flat list — two loops, the outer over rows and the inner over each row's items.",
+        "A comprehension can stack both loops in order: [x for row in matrix for x in row], read left to right.",
+        "return [x for row in matrix for x in row] — an empty row contributes nothing, so ragged input is fine."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-pair-up",
+      "prompt": "Implement pair_up(a, b) so it pairs the two lists element-wise into a list of (a_i, b_i) tuples — pair_up([1, 2, 3], [4, 5, 6]) is [(1, 4), (2, 5), (3, 6)]. If the lists differ in length, stop at the shorter one. Two empty lists return an empty list.",
+      "functionName": "pair_up",
+      "starter": "def pair_up(a, b):\n    # pair the two lists element-wise into a list of tuples\n    pass",
+      "solution": "def pair_up(a, b):\n    return list(zip(a, b))",
+      "tests": [
+        { "expr": "pair_up([1, 2, 3], [4, 5, 6])", "expect": "[(1, 4), (2, 5), (3, 6)]" },
+        { "expr": "pair_up([], [])", "expect": "[]" },
+        { "expr": "pair_up([1, 2], [3, 4, 5])", "expect": "[(1, 3), (2, 4)]" },
+        { "expr": "pair_up([1, 2, 3], [9])", "expect": "[(1, 9)]" },
+        { "expr": "pair_up(['a', 'b'], [1, 2])", "expect": "[('a', 1), ('b', 2)]" },
+        { "expr": "pair_up([7], [8])", "expect": "[(7, 8)]" }
+      ],
+      "hints": [
+        "zip walks two lists in lockstep, handing you one element from each at a time.",
+        "list(zip(a, b)) builds the list of pairs, and zip stops as soon as the shorter list runs out.",
+        "return list(zip(a, b)) — each pair comes back as a tuple, like (1, 4)."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-column-at",
+      "prompt": "Implement column_at(matrix, c) so it returns column c of the matrix as a list — the element at index c taken from each row. column_at([[1, 2], [3, 4], [5, 6]], 0) is [1, 3, 5]. Assume every row has an element at index c. An empty matrix returns an empty list.",
+      "functionName": "column_at",
+      "starter": "def column_at(matrix, c):\n    # return the element at index c from every row\n    pass",
+      "solution": "def column_at(matrix, c):\n    return [row[c] for row in matrix]",
+      "tests": [
+        { "expr": "column_at([[1, 2], [3, 4], [5, 6]], 0)", "expect": "[1, 3, 5]" },
+        { "expr": "column_at([[1, 2], [3, 4], [5, 6]], 1)", "expect": "[2, 4, 6]" },
+        { "expr": "column_at([], 0)", "expect": "[]" },
+        { "expr": "column_at([[9, 8, 7]], 2)", "expect": "[7]" },
+        { "expr": "column_at([[1, 2, 3], [4, 5, 6]], 1)", "expect": "[2, 5]" },
+        { "expr": "column_at([[0, -1], [-2, 0]], 0)", "expect": "[0, -2]" }
+      ],
+      "hints": [
+        "A column is one element taken from every row, so produce one value per row.",
+        "Take index c from each row: row[c].",
+        "return [row[c] for row in matrix]."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-transpose",
+      "prompt": "Implement transpose(matrix) so it swaps the rows and columns of a rectangular matrix: the first row of the result gathers the first element of every original row, and so on. transpose([[1, 2, 3], [4, 5, 6]]) is [[1, 4], [2, 5], [3, 6]]. Each new row is a list. Assume the matrix has at least one row, every row has the same length, and that length is at least one.",
+      "functionName": "transpose",
+      "starter": "def transpose(matrix):\n    # swap rows and columns, returning a list of lists\n    pass",
+      "solution": "def transpose(matrix):\n    return [list(col) for col in zip(*matrix)]",
+      "tests": [
+        { "expr": "transpose([[1, 2, 3], [4, 5, 6]])", "expect": "[[1, 4], [2, 5], [3, 6]]" },
+        { "expr": "transpose([[1], [2], [3]])", "expect": "[[1, 2, 3]]" },
+        { "expr": "transpose([[1, 2], [3, 4]])", "expect": "[[1, 3], [2, 4]]" },
+        { "expr": "transpose([[5]])", "expect": "[[5]]" },
+        { "expr": "transpose([[1, 2, 3]])", "expect": "[[1], [2], [3]]" }
+      ],
+      "hints": [
+        "The result has one row per original column, and each new row gathers that column's value from every original row.",
+        "zip(*matrix) feeds each row into zip as a separate argument, so the tuples it yields are the columns; wrap each in list to make it a row.",
+        "return [list(col) for col in zip(*matrix)] — the star unpacks the rows so zip can line up the columns."
+      ],
+      "xp": 15
+    }
+  ]
+}

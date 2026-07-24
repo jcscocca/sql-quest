@@ -495,6 +495,50 @@
             "exampleSql": "",
             "wrapUp": "You can now consume a collection and produce one: a comprehension when you transform or filter into a new list, a generator fed to sum() when you fold down to a single number. The modulo operator classifies numbers, iterating a string walks its characters, and the empty input is always the test that separates a robust function from a fragile one — and Python's comprehensions handle it without a special case. That completes the Python track: you've implemented and tested functions over both single values and whole lists, all running on real CPython in your browser."
           }
+        },
+        {
+          "id": "py-comprehensions",
+          "name": "Comprehensions",
+          "trackId": "python",
+          "requires": ["py-collections"],
+          "lesson": {
+            "intro": "You met the comprehension in the last skill; now you'll push it past the basics. A single comprehension can transform and filter at once — [x * x for x in xs if x % 2 == 0] squares only the even numbers, the trailing if deciding which elements take part while the expression up front reshapes the ones that do. That trailing if is a filter, so the result can come out shorter than the input. When instead you want to keep every element but change some of them, a filter is the wrong tool — reach for a conditional expression in the front slot: [x if x > 0 else 0 for x in xs] walks the whole list and replaces each negative with 0, leaving the length untouched. Keep the two straight — the trailing if drops elements, the a if cond else b up front rewrites them. And the front expression can produce any shape at all: [len(w) for w in words] turns strings into numbers, ['pass' if s >= 60 else 'fail' for s in scores] turns numbers into labels.",
+            "exampleSql": "",
+            "wrapUp": "A comprehension does three jobs from one line: transform every element with the expression up front, filter which elements survive with a trailing if, and — when you must keep them all but change some — decide each value with a conditional expression a if cond else b in that front slot. The trap to remember is that the trailing if shortens the list while the conditional expression preserves its length, so reach for the one that matches what the prompt asks. Next you'll put whole lists in order with sorted and a key= function."
+          }
+        },
+        {
+          "id": "py-sorting",
+          "name": "Sorting with key=",
+          "trackId": "python",
+          "requires": ["py-comprehensions"],
+          "lesson": {
+            "intro": "Sorting in Python is one built-in: sorted(xs) hands back a brand-new list in ascending order and — the habit that saves you — leaves the original list untouched. That is the whole difference between sorted(xs), which returns a fresh list, and the xs.sort() method, which rearranges xs in place and returns None; prefer sorted whenever the caller still needs their data. Add reverse=True to sort largest-first. The real power is the key= argument: hand sorted a function and it orders elements by what that function returns rather than by the elements themselves. sorted(words, key=len) orders strings shortest-first, and sorted(xs, key=abs) orders numbers by distance from zero. For anything else, write a one-line lambda: sorted(xs, key=lambda n: n % 10) sorts by last digit, and a lambda that returns a tuple sorts by several fields at once — key=lambda w: (len(w), w) sorts by length, then breaks ties alphabetically. The sort is stable, so elements equal on the key keep their original relative order.",
+            "exampleSql": "",
+            "wrapUp": "sorted returns a new list in ascending order — reach for it over .sort() whenever the caller's list must survive, since .sort() mutates in place and returns None. reverse=True flips the direction, and key= orders elements by a computed value: len, abs, or a lambda that returns a scalar or a tuple of tie-breaking fields. Because the sort is stable, elements equal on the key hold their original order. Next you'll nest lists inside lists — matrices, columns, and zip."
+          }
+        },
+        {
+          "id": "py-nested-lists",
+          "name": "Nested Lists & zip",
+          "trackId": "python",
+          "requires": ["py-sorting"],
+          "lesson": {
+            "intro": "A list can hold other lists, and that nesting models grids and tables: [[1, 2], [3, 4]] is a matrix of two rows, each row a list of numbers. To work it row by row, iterate the outer list — [sum(row) for row in matrix] collapses each row to its total, and because sum([]) is 0 an empty row falls out correctly. A nested comprehension flattens one level: [x for row in matrix for x in row] reads left to right as two stacked loops, the outer over rows and the inner over each row's elements. Reach one cell with two indexes, matrix[r][c] (row first, then column), and lift a whole column by taking index c from every row: [row[c] for row in matrix]. Two lists line up element-wise with zip: list(zip(a, b)) pairs them into a list of tuples and stops at the shorter one. zip even transposes a rectangle — zip(*matrix) feeds each row in as a separate argument, so the tuples it forms are the columns. Data is often ragged, so lean on sum, len, and the comprehension rather than assuming every row is the same length.",
+            "exampleSql": "",
+            "wrapUp": "A matrix is just a list of row lists: index it [r][c] row-first, iterate the outer list to process each row, and take index c from every row to lift out a column. A nested comprehension [x for row in m for x in row] flattens one level, and zip lines up two lists into pairs or — as zip(*m) — turns a matrix's rows into its columns. Build on sum and len and ragged or empty rows handle themselves. Notice that zip handed you tuples; next you'll make tuples the star — returning several values at once and unpacking them."
+          }
+        },
+        {
+          "id": "py-tuples",
+          "name": "Tuples & Unpacking",
+          "trackId": "python",
+          "requires": ["py-nested-lists"],
+          "lesson": {
+            "intro": "A tuple is an ordered group of values written with commas — (1, 8) — and it is how a function hands back more than one answer at once. return min(xs), max(xs) returns the pair as a single tuple; the parentheses are optional when you build it, but the value is a tuple all the same. On the receiving end you unpack it — lo, hi = min_max(xs) binds lo to the first value and hi to the second in one line, which is exactly why a, b = b, a swaps two variables with no temporary. Tuples resemble lists but differ in two ways that matter here: they are written with commas (often inside ()) rather than [], and a tuple never equals a list with the same contents — (1, 2) == [1, 2] is False — so when a prompt asks for a tuple, a list will not pass. Index one like a list, pair[0] and pair[1], or better, unpack the whole thing. And some built-ins already return tuples: divmod(a, b) hands back (a // b, a % b) in a single call.",
+            "exampleSql": "",
+            "wrapUp": "A tuple groups several values behind one return — return lo, hi — and unpacking pulls them back apart — lo, hi = min_max(xs) — which is also the trick behind a, b = b, a. Written with commas and compared by position, a tuple is never equal to a list with the same contents, so a prompt that asks for a tuple means a tuple. Some built-ins, like divmod, return one ready-made. That completes Lists & Comprehensions: from a single comprehension to sorting keys, nested grids, and now multiple return values, you have Python's core collection toolkit in hand."
+          }
         }
       ]
     }

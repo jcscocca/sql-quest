@@ -1,0 +1,110 @@
+{
+  "skillId": "py-comprehensions",
+  "exercises": [
+    {
+      "id": "py-keep-positives",
+      "prompt": "Implement keep_positives(xs) so it returns a new list containing only the strictly positive numbers of xs, in their original order. Zero is not positive, so it is dropped. An empty list, or one with no positives, returns an empty list.",
+      "functionName": "keep_positives",
+      "starter": "def keep_positives(xs):\n    # return a new list of only the numbers greater than 0\n    pass",
+      "solution": "def keep_positives(xs):\n    return [x for x in xs if x > 0]",
+      "tests": [
+        { "expr": "keep_positives([1, -2, 3, 0, -5])", "expect": "[1, 3]" },
+        { "expr": "keep_positives([])", "expect": "[]" },
+        { "expr": "keep_positives([-1, -2])", "expect": "[]" },
+        { "expr": "keep_positives([0, 0, 0])", "expect": "[]" },
+        { "expr": "keep_positives([5])", "expect": "[5]" },
+        { "expr": "keep_positives([-3, 4, -1, 2])", "expect": "[4, 2]" }
+      ],
+      "hints": [
+        "A trailing if inside a comprehension filters — it decides which elements make it into the new list, so the result can be shorter than the input.",
+        "Keep an element only when it is strictly greater than 0: the test is x > 0, which drops both negatives and 0.",
+        "return [x for x in xs if x > 0] — an empty list already yields [], no special case needed."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-word-lengths",
+      "prompt": "Implement word_lengths(words) so it returns a new list with the character count of each string in words, in order. word_lengths(['a', 'bb', 'ccc']) is [1, 2, 3]. The empty string counts as 0, and an empty list returns an empty list.",
+      "functionName": "word_lengths",
+      "starter": "def word_lengths(words):\n    # return a list of each word's length\n    pass",
+      "solution": "def word_lengths(words):\n    return [len(w) for w in words]",
+      "tests": [
+        { "expr": "word_lengths(['a', 'bb', 'ccc'])", "expect": "[1, 2, 3]" },
+        { "expr": "word_lengths([])", "expect": "[]" },
+        { "expr": "word_lengths([''])", "expect": "[0]" },
+        { "expr": "word_lengths(['hello', 'hi'])", "expect": "[5, 2]" },
+        { "expr": "word_lengths(['x'])", "expect": "[1]" },
+        { "expr": "word_lengths(['ab', '', 'cde'])", "expect": "[2, 0, 3]" }
+      ],
+      "hints": [
+        "You want one number per word, so transform each element with the expression at the front of the comprehension.",
+        "len(w) gives a single word's character count.",
+        "return [len(w) for w in words] — the empty string has length 0, and an empty list yields []."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-even-squares",
+      "prompt": "Implement even_squares(xs) so it returns a new list containing the squares of only the even numbers in xs, in order. even_squares([1, 2, 3, 4]) is [4, 16]. Zero is even (its square is 0), squaring a negative gives a positive, and an empty list — or one with no even numbers — returns an empty list.",
+      "functionName": "even_squares",
+      "starter": "def even_squares(xs):\n    # return a list of the squares of the even numbers\n    pass",
+      "solution": "def even_squares(xs):\n    return [x * x for x in xs if x % 2 == 0]",
+      "tests": [
+        { "expr": "even_squares([1, 2, 3, 4])", "expect": "[4, 16]" },
+        { "expr": "even_squares([])", "expect": "[]" },
+        { "expr": "even_squares([1, 3, 5])", "expect": "[]" },
+        { "expr": "even_squares([0, 2])", "expect": "[0, 4]" },
+        { "expr": "even_squares([-2, -3, 4])", "expect": "[4, 16]" },
+        { "expr": "even_squares([6])", "expect": "[36]" }
+      ],
+      "hints": [
+        "This needs both jobs of a comprehension at once: an expression up front to reshape, and a trailing if to filter.",
+        "Filter to the evens with if x % 2 == 0, and square the survivors with x * x.",
+        "return [x * x for x in xs if x % 2 == 0] — the filter runs first, so only even numbers get squared."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-cap-negatives",
+      "prompt": "Implement cap_negatives(xs) so it returns a new list the same length as xs in which every negative number has been replaced with 0 and every other value is left unchanged. cap_negatives([1, -2, 3, -4]) is [1, 0, 3, 0]. Because you keep every element, the result must be exactly as long as xs; an empty list returns an empty list.",
+      "functionName": "cap_negatives",
+      "starter": "def cap_negatives(xs):\n    # replace each negative with 0, keeping the list the same length\n    pass",
+      "solution": "def cap_negatives(xs):\n    return [x if x > 0 else 0 for x in xs]",
+      "tests": [
+        { "expr": "cap_negatives([1, -2, 3, -4])", "expect": "[1, 0, 3, 0]" },
+        { "expr": "cap_negatives([])", "expect": "[]" },
+        { "expr": "cap_negatives([-1, -2, -3])", "expect": "[0, 0, 0]" },
+        { "expr": "cap_negatives([5, 6, 7])", "expect": "[5, 6, 7]" },
+        { "expr": "cap_negatives([0, -1, 2])", "expect": "[0, 0, 2]" },
+        { "expr": "cap_negatives([-9])", "expect": "[0]" }
+      ],
+      "hints": [
+        "Here you keep every element but change some, so the length must stay the same — a trailing if would wrongly drop elements. Reach for a conditional expression in the front slot instead.",
+        "The conditional expression x if x > 0 else 0 yields x when it is positive and 0 otherwise.",
+        "return [x if x > 0 else 0 for x in xs] — because it maps rather than filters, the result is exactly as long as xs."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-label-scores",
+      "prompt": "Implement label_scores(scores) so it returns a new list of strings — 'pass' for each score that is 60 or above, and 'fail' for each score below 60 — in order. label_scores([59, 60, 100]) is ['fail', 'pass', 'pass']. The result has one label per score; an empty list returns an empty list.",
+      "functionName": "label_scores",
+      "starter": "def label_scores(scores):\n    # turn each score into 'pass' (>= 60) or 'fail'\n    pass",
+      "solution": "def label_scores(scores):\n    return ['pass' if s >= 60 else 'fail' for s in scores]",
+      "tests": [
+        { "expr": "label_scores([59, 60, 100])", "expect": "['fail', 'pass', 'pass']" },
+        { "expr": "label_scores([])", "expect": "[]" },
+        { "expr": "label_scores([0])", "expect": "['fail']" },
+        { "expr": "label_scores([60])", "expect": "['pass']" },
+        { "expr": "label_scores([85, 42, 77])", "expect": "['pass', 'fail', 'pass']" },
+        { "expr": "label_scores([59])", "expect": "['fail']" }
+      ],
+      "hints": [
+        "One label per score, same length as the input, so this is a mapping with a conditional expression — not a filter.",
+        "'pass' if s >= 60 else 'fail' chooses the right word for one score; note that 60 itself passes.",
+        "return ['pass' if s >= 60 else 'fail' for s in scores]."
+      ],
+      "xp": 15
+    }
+  ]
+}
