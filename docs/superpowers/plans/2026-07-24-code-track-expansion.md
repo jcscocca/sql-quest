@@ -924,7 +924,10 @@ These phases add content only — no app-code changes. Each phase adds one **reg
 5. **Every test's `expect` is a source literal in the exercise's language.** Verify by running `npm run validate` — the solution is executed against every test.
 6. **Hints** follow the existing ladder: hint 1 orients, hint 2 narrows, hint 3 essentially gives the line.
 7. **Floats:** there is no tolerance field — round inside the expression when a result is inexact (`{ "expr": "round(mean(xs), 2)", "expect": "3.33" }`). Exact floats (`3.0`) may be asserted directly.
-8. After authoring each bank, run `npm run validate` and fix reds before moving on. Commit per skill or per region as convenient (`feat: <track> <skill> exercises`).
+8. **`raises`:** put the throwing call in `expr` ONLY — never in `setup` or `fixture`. Both runtimes treat errors in code/fixture/setup as harness errors (reported, not matched); only `expr` participates in `raises` matching. Target a specific error type the solution actually raises (`ValueError`, `TypeError`, `RangeError`); `npm run validate` runs the reference solution and confirms the raise fires.
+9. **Booleans:** a boolean result must use `True`/`False` (Python) or `true`/`false` (JS) in `expect`, never `1`/`0` — Python's `1 == True` is true, so a numeric `expect` would not distinguish a real boolean.
+10. **Fixtures:** give the fixture a distinctive variable name (`roster`, `cards`, `requests` — not `data`/`xs`) so it can't collide with a learner's identifiers, and make the `prompt` fully describe the fixture's shape and contents — the editor does not display the fixture. (A read-only fixture panel in `CodeScreen` is a planned pre-Phase-3 UI addition; until it lands, the prompt is the learner's only view of the data.)
+11. After authoring each bank, run `npm run validate` and fix reds before moving on. Commit per skill or per region as convenient (`feat: <track> <skill> exercises`).
 
 ### Prerequisite graph (assign these `requires` edges)
 
