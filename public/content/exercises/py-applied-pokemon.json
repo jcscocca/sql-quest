@@ -1,0 +1,271 @@
+{
+  "skillId": "py-applied-pokemon",
+  "exercises": [
+    {
+      "id": "py-app-count-by-kind",
+      "prompt": "You are given roster, a list of Pokémon records, each a dict {'name', 'kind', 'attack', 'defense'} — for example {'name': 'charmander', 'kind': 'fire', 'attack': 52, 'defense': 43} (kind and name are strings, attack and defense are ints). Implement count_by_kind(roster) so it returns a dict mapping each 'kind' to how many records have it — {kind: count}. count_by_kind(roster) is {'fire': 4, 'water': 4, 'grass': 3, 'electric': 2, 'rock': 2}. An empty roster returns an empty dict {}.",
+      "functionName": "count_by_kind",
+      "starter": "def count_by_kind(roster):\n    # tally the records into a {kind: count} dict\n    pass",
+      "solution": "def count_by_kind(roster):\n    counts = {}\n    for p in roster:\n        counts[p['kind']] = counts.get(p['kind'], 0) + 1\n    return counts",
+      "fixture": "roster = [\n    {'name': 'charmander', 'kind': 'fire', 'attack': 52, 'defense': 43},\n    {'name': 'charizard', 'kind': 'fire', 'attack': 84, 'defense': 78},\n    {'name': 'vulpix', 'kind': 'fire', 'attack': 41, 'defense': 40},\n    {'name': 'growlithe', 'kind': 'fire', 'attack': 70, 'defense': 45},\n    {'name': 'squirtle', 'kind': 'water', 'attack': 48, 'defense': 65},\n    {'name': 'blastoise', 'kind': 'water', 'attack': 83, 'defense': 100},\n    {'name': 'psyduck', 'kind': 'water', 'attack': 52, 'defense': 48},\n    {'name': 'staryu', 'kind': 'water', 'attack': 45, 'defense': 55},\n    {'name': 'bulbasaur', 'kind': 'grass', 'attack': 49, 'defense': 49},\n    {'name': 'oddish', 'kind': 'grass', 'attack': 50, 'defense': 55},\n    {'name': 'bellsprout', 'kind': 'grass', 'attack': 75, 'defense': 35},\n    {'name': 'pikachu', 'kind': 'electric', 'attack': 55, 'defense': 40},\n    {'name': 'magnemite', 'kind': 'electric', 'attack': 35, 'defense': 70},\n    {'name': 'geodude', 'kind': 'rock', 'attack': 80, 'defense': 100},\n    {'name': 'onix', 'kind': 'rock', 'attack': 44, 'defense': 160}\n]",
+      "tests": [
+        {
+          "expr": "count_by_kind(roster)",
+          "expect": "{'fire': 4, 'water': 4, 'grass': 3, 'electric': 2, 'rock': 2}"
+        },
+        {
+          "expr": "count_by_kind([])",
+          "expect": "{}"
+        },
+        {
+          "expr": "count_by_kind([{'name': 'a', 'kind': 'fire', 'attack': 1, 'defense': 1}])",
+          "expect": "{'fire': 1}"
+        },
+        {
+          "expr": "count_by_kind([{'name': 'a', 'kind': 'ghost', 'attack': 1, 'defense': 1}, {'name': 'b', 'kind': 'ghost', 'attack': 2, 'defense': 2}])",
+          "expect": "{'ghost': 2}"
+        },
+        {
+          "setup": "c = count_by_kind(roster)",
+          "expr": "c['grass']",
+          "expect": "3"
+        }
+      ],
+      "hints": [
+        "This is a frequency tally, but the value you count is each record's 'kind' field, not the record itself.",
+        "Walk the records and bump the bucket for p['kind']: counts.get(p['kind'], 0) + 1 seeds a new kind at 0 the first time you meet it.",
+        "Loop the roster updating counts[p['kind']] = counts.get(p['kind'], 0) + 1, then return counts — an empty roster never enters the loop, so you return {}."
+      ],
+      "xp": 20
+    },
+    {
+      "id": "py-app-total-attack-of-kind",
+      "prompt": "You are given roster, a list of Pokémon records of shape {'name', 'kind', 'attack', 'defense'}. Implement total_attack_of_kind(roster, kind) so it returns the sum of the 'attack' fields across only the records whose 'kind' equals the given kind. total_attack_of_kind(roster, 'fire') is 247. A kind no record has, or an empty roster, returns 0.",
+      "functionName": "total_attack_of_kind",
+      "starter": "def total_attack_of_kind(roster, kind):\n    # sum attack across records of the given kind\n    pass",
+      "solution": "def total_attack_of_kind(roster, kind):\n    return sum(p['attack'] for p in roster if p['kind'] == kind)",
+      "fixture": "roster = [\n    {'name': 'charmander', 'kind': 'fire', 'attack': 52, 'defense': 43},\n    {'name': 'charizard', 'kind': 'fire', 'attack': 84, 'defense': 78},\n    {'name': 'vulpix', 'kind': 'fire', 'attack': 41, 'defense': 40},\n    {'name': 'growlithe', 'kind': 'fire', 'attack': 70, 'defense': 45},\n    {'name': 'squirtle', 'kind': 'water', 'attack': 48, 'defense': 65},\n    {'name': 'blastoise', 'kind': 'water', 'attack': 83, 'defense': 100},\n    {'name': 'psyduck', 'kind': 'water', 'attack': 52, 'defense': 48},\n    {'name': 'staryu', 'kind': 'water', 'attack': 45, 'defense': 55},\n    {'name': 'bulbasaur', 'kind': 'grass', 'attack': 49, 'defense': 49},\n    {'name': 'oddish', 'kind': 'grass', 'attack': 50, 'defense': 55},\n    {'name': 'bellsprout', 'kind': 'grass', 'attack': 75, 'defense': 35},\n    {'name': 'pikachu', 'kind': 'electric', 'attack': 55, 'defense': 40},\n    {'name': 'magnemite', 'kind': 'electric', 'attack': 35, 'defense': 70},\n    {'name': 'geodude', 'kind': 'rock', 'attack': 80, 'defense': 100},\n    {'name': 'onix', 'kind': 'rock', 'attack': 44, 'defense': 160}\n]",
+      "tests": [
+        {
+          "expr": "total_attack_of_kind(roster, 'fire')",
+          "expect": "247"
+        },
+        {
+          "expr": "total_attack_of_kind(roster, 'water')",
+          "expect": "228"
+        },
+        {
+          "expr": "total_attack_of_kind(roster, 'rock')",
+          "expect": "124"
+        },
+        {
+          "expr": "total_attack_of_kind(roster, 'electric')",
+          "expect": "90"
+        },
+        {
+          "expr": "total_attack_of_kind(roster, 'dragon')",
+          "expect": "0"
+        },
+        {
+          "expr": "total_attack_of_kind([], 'fire')",
+          "expect": "0"
+        }
+      ],
+      "hints": [
+        "Two jobs at once: keep only the records of the requested kind, and from each add up its 'attack'.",
+        "A generator with a trailing if filters and projects in one line: sum(p['attack'] for p in roster if p['kind'] == kind).",
+        "return sum(p['attack'] for p in roster if p['kind'] == kind) — summing no values gives 0, so a missing kind and an empty roster are already correct."
+      ],
+      "xp": 20
+    },
+    {
+      "id": "py-app-strongest-by-kind",
+      "prompt": "You are given roster, a list of Pokémon records of shape {'name', 'kind', 'attack', 'defense'}. Implement strongest_by_kind(roster) so it returns a dict mapping each 'kind' to the 'name' of its highest-'attack' record — {kind: name}. strongest_by_kind(roster) is {'fire': 'charizard', 'water': 'blastoise', 'grass': 'bellsprout', 'electric': 'pikachu', 'rock': 'geodude'}. If two records of the same kind tie for highest attack, keep the one that appears first in the roster. An empty roster returns an empty dict {}.",
+      "functionName": "strongest_by_kind",
+      "starter": "def strongest_by_kind(roster):\n    # map each kind to the name of its highest-attack record\n    pass",
+      "solution": "def strongest_by_kind(roster):\n    best = {}\n    for p in roster:\n        if p['kind'] not in best or p['attack'] > best[p['kind']]['attack']:\n            best[p['kind']] = p\n    return {k: p['name'] for k, p in best.items()}",
+      "fixture": "roster = [\n    {'name': 'charmander', 'kind': 'fire', 'attack': 52, 'defense': 43},\n    {'name': 'charizard', 'kind': 'fire', 'attack': 84, 'defense': 78},\n    {'name': 'vulpix', 'kind': 'fire', 'attack': 41, 'defense': 40},\n    {'name': 'growlithe', 'kind': 'fire', 'attack': 70, 'defense': 45},\n    {'name': 'squirtle', 'kind': 'water', 'attack': 48, 'defense': 65},\n    {'name': 'blastoise', 'kind': 'water', 'attack': 83, 'defense': 100},\n    {'name': 'psyduck', 'kind': 'water', 'attack': 52, 'defense': 48},\n    {'name': 'staryu', 'kind': 'water', 'attack': 45, 'defense': 55},\n    {'name': 'bulbasaur', 'kind': 'grass', 'attack': 49, 'defense': 49},\n    {'name': 'oddish', 'kind': 'grass', 'attack': 50, 'defense': 55},\n    {'name': 'bellsprout', 'kind': 'grass', 'attack': 75, 'defense': 35},\n    {'name': 'pikachu', 'kind': 'electric', 'attack': 55, 'defense': 40},\n    {'name': 'magnemite', 'kind': 'electric', 'attack': 35, 'defense': 70},\n    {'name': 'geodude', 'kind': 'rock', 'attack': 80, 'defense': 100},\n    {'name': 'onix', 'kind': 'rock', 'attack': 44, 'defense': 160}\n]",
+      "tests": [
+        {
+          "expr": "strongest_by_kind(roster)",
+          "expect": "{'fire': 'charizard', 'water': 'blastoise', 'grass': 'bellsprout', 'electric': 'pikachu', 'rock': 'geodude'}"
+        },
+        {
+          "expr": "strongest_by_kind([])",
+          "expect": "{}"
+        },
+        {
+          "expr": "strongest_by_kind([{'name': 'solo', 'kind': 'ghost', 'attack': 10, 'defense': 5}])",
+          "expect": "{'ghost': 'solo'}"
+        },
+        {
+          "expr": "strongest_by_kind([{'name': 'first', 'kind': 'x', 'attack': 50, 'defense': 1}, {'name': 'second', 'kind': 'x', 'attack': 50, 'defense': 1}])",
+          "expect": "{'x': 'first'}"
+        },
+        {
+          "expr": "strongest_by_kind([{'name': 'a', 'kind': 'fire', 'attack': 30, 'defense': 1}, {'name': 'b', 'kind': 'water', 'attack': 20, 'defense': 1}, {'name': 'c', 'kind': 'fire', 'attack': 90, 'defense': 1}])",
+          "expect": "{'fire': 'c', 'water': 'b'}"
+        }
+      ],
+      "hints": [
+        "Track the best record seen so far for each kind as you walk the roster — one running leader per bucket.",
+        "Replace a kind's leader only when p['attack'] is strictly greater than the stored one, then read each leader's ['name'] at the end.",
+        "Use if p['kind'] not in best or p['attack'] > best[p['kind']]['attack']: best[p['kind']] = p — the strict > keeps the earlier record on a tie, matching the fourth test where 'first' wins over 'second'."
+      ],
+      "xp": 20
+    },
+    {
+      "id": "py-app-average-attack-by-kind",
+      "prompt": "You are given roster, a list of Pokémon records of shape {'name', 'kind', 'attack', 'defense'}. Implement average_attack_by_kind(roster) so it returns a dict mapping each 'kind' to the average attack of its records, rounded to the nearest integer with round — {kind: avg}. average_attack_by_kind(roster) is {'fire': 62, 'water': 57, 'grass': 58, 'electric': 45, 'rock': 62}. An empty roster returns an empty dict {}.",
+      "functionName": "average_attack_by_kind",
+      "starter": "def average_attack_by_kind(roster):\n    # map each kind to its rounded average attack\n    pass",
+      "solution": "def average_attack_by_kind(roster):\n    sums, counts = {}, {}\n    for p in roster:\n        sums[p['kind']] = sums.get(p['kind'], 0) + p['attack']\n        counts[p['kind']] = counts.get(p['kind'], 0) + 1\n    return {k: round(sums[k] / counts[k]) for k in sums}",
+      "fixture": "roster = [\n    {'name': 'charmander', 'kind': 'fire', 'attack': 52, 'defense': 43},\n    {'name': 'charizard', 'kind': 'fire', 'attack': 84, 'defense': 78},\n    {'name': 'vulpix', 'kind': 'fire', 'attack': 41, 'defense': 40},\n    {'name': 'growlithe', 'kind': 'fire', 'attack': 70, 'defense': 45},\n    {'name': 'squirtle', 'kind': 'water', 'attack': 48, 'defense': 65},\n    {'name': 'blastoise', 'kind': 'water', 'attack': 83, 'defense': 100},\n    {'name': 'psyduck', 'kind': 'water', 'attack': 52, 'defense': 48},\n    {'name': 'staryu', 'kind': 'water', 'attack': 45, 'defense': 55},\n    {'name': 'bulbasaur', 'kind': 'grass', 'attack': 49, 'defense': 49},\n    {'name': 'oddish', 'kind': 'grass', 'attack': 50, 'defense': 55},\n    {'name': 'bellsprout', 'kind': 'grass', 'attack': 75, 'defense': 35},\n    {'name': 'pikachu', 'kind': 'electric', 'attack': 55, 'defense': 40},\n    {'name': 'magnemite', 'kind': 'electric', 'attack': 35, 'defense': 70},\n    {'name': 'geodude', 'kind': 'rock', 'attack': 80, 'defense': 100},\n    {'name': 'onix', 'kind': 'rock', 'attack': 44, 'defense': 160}\n]",
+      "tests": [
+        {
+          "expr": "average_attack_by_kind(roster)",
+          "expect": "{'fire': 62, 'water': 57, 'grass': 58, 'electric': 45, 'rock': 62}"
+        },
+        {
+          "expr": "average_attack_by_kind([])",
+          "expect": "{}"
+        },
+        {
+          "expr": "average_attack_by_kind([{'name': 'a', 'kind': 'fire', 'attack': 10, 'defense': 1}, {'name': 'b', 'kind': 'fire', 'attack': 20, 'defense': 1}, {'name': 'c', 'kind': 'fire', 'attack': 23, 'defense': 1}])",
+          "expect": "{'fire': 18}"
+        },
+        {
+          "expr": "average_attack_by_kind([{'name': 'solo', 'kind': 'grass', 'attack': 40, 'defense': 1}])",
+          "expect": "{'grass': 40}"
+        },
+        {
+          "setup": "a = average_attack_by_kind(roster)",
+          "expr": "a['fire']",
+          "expect": "62"
+        }
+      ],
+      "hints": [
+        "You need two tallies per kind as you walk the roster: a running sum of attack and a running count of records.",
+        "Accumulate sums[p['kind']] and counts[p['kind']] together, then in a dict comprehension divide and round: round(sums[k] / counts[k]).",
+        "The fire average is (52 + 84 + 41 + 70) / 4 = 61.75, which round turns into 62 — a floor or int() truncation would wrongly give 61, so round rather than cut."
+      ],
+      "xp": 20
+    },
+    {
+      "id": "py-app-top-by-attack",
+      "prompt": "You are given roster, a list of Pokémon records of shape {'name', 'kind', 'attack', 'defense'}. Implement top_by_attack(roster, n) so it returns a list of the 'name' values of the n highest-attack records, ordered from highest attack to lowest. Records that tie on attack keep their original roster order relative to each other. top_by_attack(roster, 3) is ['charizard', 'blastoise', 'geodude']. If n is 0 the result is empty; if n exceeds the roster length, return every name in sorted order. Do not modify the roster.",
+      "functionName": "top_by_attack",
+      "starter": "def top_by_attack(roster, n):\n    # return the n highest-attack names, strongest first\n    pass",
+      "solution": "def top_by_attack(roster, n):\n    ordered = sorted(roster, key=lambda p: p['attack'], reverse=True)\n    return [p['name'] for p in ordered[:n]]",
+      "fixture": "roster = [\n    {'name': 'charmander', 'kind': 'fire', 'attack': 52, 'defense': 43},\n    {'name': 'charizard', 'kind': 'fire', 'attack': 84, 'defense': 78},\n    {'name': 'vulpix', 'kind': 'fire', 'attack': 41, 'defense': 40},\n    {'name': 'growlithe', 'kind': 'fire', 'attack': 70, 'defense': 45},\n    {'name': 'squirtle', 'kind': 'water', 'attack': 48, 'defense': 65},\n    {'name': 'blastoise', 'kind': 'water', 'attack': 83, 'defense': 100},\n    {'name': 'psyduck', 'kind': 'water', 'attack': 52, 'defense': 48},\n    {'name': 'staryu', 'kind': 'water', 'attack': 45, 'defense': 55},\n    {'name': 'bulbasaur', 'kind': 'grass', 'attack': 49, 'defense': 49},\n    {'name': 'oddish', 'kind': 'grass', 'attack': 50, 'defense': 55},\n    {'name': 'bellsprout', 'kind': 'grass', 'attack': 75, 'defense': 35},\n    {'name': 'pikachu', 'kind': 'electric', 'attack': 55, 'defense': 40},\n    {'name': 'magnemite', 'kind': 'electric', 'attack': 35, 'defense': 70},\n    {'name': 'geodude', 'kind': 'rock', 'attack': 80, 'defense': 100},\n    {'name': 'onix', 'kind': 'rock', 'attack': 44, 'defense': 160}\n]",
+      "tests": [
+        {
+          "expr": "top_by_attack(roster, 3)",
+          "expect": "['charizard', 'blastoise', 'geodude']"
+        },
+        {
+          "expr": "top_by_attack(roster, 5)",
+          "expect": "['charizard', 'blastoise', 'geodude', 'bellsprout', 'growlithe']"
+        },
+        {
+          "expr": "top_by_attack(roster, 0)",
+          "expect": "[]"
+        },
+        {
+          "expr": "top_by_attack(roster, 8)",
+          "expect": "['charizard', 'blastoise', 'geodude', 'bellsprout', 'growlithe', 'pikachu', 'charmander', 'psyduck']"
+        },
+        {
+          "expr": "top_by_attack([{'name': 'only', 'kind': 'x', 'attack': 5, 'defense': 1}], 4)",
+          "expect": "['only']"
+        },
+        {
+          "expr": "top_by_attack([{'name': 'a', 'kind': 'x', 'attack': 50, 'defense': 1}, {'name': 'b', 'kind': 'y', 'attack': 90, 'defense': 1}, {'name': 'c', 'kind': 'z', 'attack': 50, 'defense': 1}], 2)",
+          "expect": "['b', 'a']"
+        }
+      ],
+      "hints": [
+        "Sort the records by attack descending, then take the first n and pull each 'name' out.",
+        "sorted(roster, key=lambda p: p['attack'], reverse=True) orders strongest-first without touching the original; slicing [:n] is safe when n is 0 or larger than the list.",
+        "return [p['name'] for p in sorted(roster, key=lambda p: p['attack'], reverse=True)[:n]] — Python's sort is stable, so charmander (attack 52) stays ahead of psyduck (also 52) as the n=8 test checks."
+      ],
+      "xp": 20
+    },
+    {
+      "id": "py-app-kinds-with-defense-above",
+      "prompt": "You are given roster, a list of Pokémon records of shape {'name', 'kind', 'attack', 'defense'}. Implement kinds_with_defense_above(roster, d) so it returns a list of the distinct 'kind' values that have at least one record whose 'defense' is strictly greater than d, sorted alphabetically. kinds_with_defense_above(roster, 70) is ['fire', 'rock', 'water']. If no kind qualifies, or the roster is empty, return an empty list.",
+      "functionName": "kinds_with_defense_above",
+      "starter": "def kinds_with_defense_above(roster, d):\n    # return the distinct qualifying kinds, sorted\n    pass",
+      "solution": "def kinds_with_defense_above(roster, d):\n    return sorted({p['kind'] for p in roster if p['defense'] > d})",
+      "fixture": "roster = [\n    {'name': 'charmander', 'kind': 'fire', 'attack': 52, 'defense': 43},\n    {'name': 'charizard', 'kind': 'fire', 'attack': 84, 'defense': 78},\n    {'name': 'vulpix', 'kind': 'fire', 'attack': 41, 'defense': 40},\n    {'name': 'growlithe', 'kind': 'fire', 'attack': 70, 'defense': 45},\n    {'name': 'squirtle', 'kind': 'water', 'attack': 48, 'defense': 65},\n    {'name': 'blastoise', 'kind': 'water', 'attack': 83, 'defense': 100},\n    {'name': 'psyduck', 'kind': 'water', 'attack': 52, 'defense': 48},\n    {'name': 'staryu', 'kind': 'water', 'attack': 45, 'defense': 55},\n    {'name': 'bulbasaur', 'kind': 'grass', 'attack': 49, 'defense': 49},\n    {'name': 'oddish', 'kind': 'grass', 'attack': 50, 'defense': 55},\n    {'name': 'bellsprout', 'kind': 'grass', 'attack': 75, 'defense': 35},\n    {'name': 'pikachu', 'kind': 'electric', 'attack': 55, 'defense': 40},\n    {'name': 'magnemite', 'kind': 'electric', 'attack': 35, 'defense': 70},\n    {'name': 'geodude', 'kind': 'rock', 'attack': 80, 'defense': 100},\n    {'name': 'onix', 'kind': 'rock', 'attack': 44, 'defense': 160}\n]",
+      "tests": [
+        {
+          "expr": "kinds_with_defense_above(roster, 70)",
+          "expect": "['fire', 'rock', 'water']"
+        },
+        {
+          "expr": "kinds_with_defense_above(roster, 99)",
+          "expect": "['rock', 'water']"
+        },
+        {
+          "expr": "kinds_with_defense_above(roster, 100)",
+          "expect": "['rock']"
+        },
+        {
+          "expr": "kinds_with_defense_above(roster, 200)",
+          "expect": "[]"
+        },
+        {
+          "expr": "kinds_with_defense_above(roster, 0)",
+          "expect": "['electric', 'fire', 'grass', 'rock', 'water']"
+        },
+        {
+          "expr": "kinds_with_defense_above([], 10)",
+          "expect": "[]"
+        }
+      ],
+      "hints": [
+        "Keep the records whose defense clears the bar, collect their kinds, then drop duplicates and sort.",
+        "A set comprehension {p['kind'] for p in roster if p['defense'] > d} filters and dedupes in one step; wrap it in sorted(...) for the alphabetical list.",
+        "return sorted({p['kind'] for p in roster if p['defense'] > d}) — the strict > means blastoise and geodude (defense 100) do not put their kinds in the d = 100 result, where only onix (160) qualifies."
+      ],
+      "xp": 20
+    },
+    {
+      "id": "py-app-kind-with-highest-average-attack",
+      "prompt": "You are given roster, a list of Pokémon records of shape {'name', 'kind', 'attack', 'defense'}. Implement kind_with_highest_average_attack(roster) so it returns the single 'kind' whose records have the greatest average attack. kind_with_highest_average_attack(roster) is 'rock' (its average, 62.0, edges out fire's 61.75). Compare on the true average, not the total. If several kinds tie for the highest average, return the alphabetically smallest. An empty roster returns None.",
+      "functionName": "kind_with_highest_average_attack",
+      "starter": "def kind_with_highest_average_attack(roster):\n    # return the kind with the greatest average attack\n    pass",
+      "solution": "def kind_with_highest_average_attack(roster):\n    sums, counts = {}, {}\n    for p in roster:\n        sums[p['kind']] = sums.get(p['kind'], 0) + p['attack']\n        counts[p['kind']] = counts.get(p['kind'], 0) + 1\n    best, best_avg = None, float('-inf')\n    for k in sorted(sums):\n        avg = sums[k] / counts[k]\n        if avg > best_avg:\n            best_avg, best = avg, k\n    return best",
+      "fixture": "roster = [\n    {'name': 'charmander', 'kind': 'fire', 'attack': 52, 'defense': 43},\n    {'name': 'charizard', 'kind': 'fire', 'attack': 84, 'defense': 78},\n    {'name': 'vulpix', 'kind': 'fire', 'attack': 41, 'defense': 40},\n    {'name': 'growlithe', 'kind': 'fire', 'attack': 70, 'defense': 45},\n    {'name': 'squirtle', 'kind': 'water', 'attack': 48, 'defense': 65},\n    {'name': 'blastoise', 'kind': 'water', 'attack': 83, 'defense': 100},\n    {'name': 'psyduck', 'kind': 'water', 'attack': 52, 'defense': 48},\n    {'name': 'staryu', 'kind': 'water', 'attack': 45, 'defense': 55},\n    {'name': 'bulbasaur', 'kind': 'grass', 'attack': 49, 'defense': 49},\n    {'name': 'oddish', 'kind': 'grass', 'attack': 50, 'defense': 55},\n    {'name': 'bellsprout', 'kind': 'grass', 'attack': 75, 'defense': 35},\n    {'name': 'pikachu', 'kind': 'electric', 'attack': 55, 'defense': 40},\n    {'name': 'magnemite', 'kind': 'electric', 'attack': 35, 'defense': 70},\n    {'name': 'geodude', 'kind': 'rock', 'attack': 80, 'defense': 100},\n    {'name': 'onix', 'kind': 'rock', 'attack': 44, 'defense': 160}\n]",
+      "tests": [
+        {
+          "expr": "kind_with_highest_average_attack(roster)",
+          "expect": "'rock'"
+        },
+        {
+          "expr": "kind_with_highest_average_attack([])",
+          "expect": "None"
+        },
+        {
+          "expr": "kind_with_highest_average_attack([{'name': 'x', 'kind': 'ghost', 'attack': 5, 'defense': 1}])",
+          "expect": "'ghost'"
+        },
+        {
+          "expr": "kind_with_highest_average_attack([{'name': 'a', 'kind': 'zeta', 'attack': 10, 'defense': 1}, {'name': 'b', 'kind': 'alpha', 'attack': 10, 'defense': 1}])",
+          "expect": "'alpha'"
+        },
+        {
+          "expr": "kind_with_highest_average_attack([{'name': 'a', 'kind': 'low', 'attack': 30, 'defense': 1}, {'name': 'b', 'kind': 'low', 'attack': 30, 'defense': 1}, {'name': 'c', 'kind': 'low', 'attack': 30, 'defense': 1}, {'name': 'd', 'kind': 'high', 'attack': 80, 'defense': 1}])",
+          "expect": "'high'"
+        }
+      ],
+      "hints": [
+        "Build per-kind sum and count tallies first, then scan the kinds comparing sums[k] / counts[k] — the average, not the raw sum.",
+        "Comparing totals would answer 'fire' (247 beats rock's 124); you must divide by the count so rock's 62.0 average edges out fire's 61.75.",
+        "Iterate sorted(sums) tracking the largest average with a strict >, so on a tie the alphabetically earlier kind is kept and an empty roster leaves best as None."
+      ],
+      "xp": 20
+    }
+  ]
+}

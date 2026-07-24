@@ -1,0 +1,263 @@
+{
+  "skillId": "py-applied-seattle",
+  "exercises": [
+    {
+      "id": "py-app-count-by-neighborhood",
+      "prompt": "You are given requests, a list of Seattle 311 service-request records, each a dict {'type', 'neighborhood', 'days_open', 'status'} — for example {'type': 'Pothole', 'neighborhood': 'Ballard', 'days_open': 6, 'status': 'open'} (type, neighborhood, and status are strings, days_open is an int, and status is always 'open' or 'closed'). Implement count_by_neighborhood(requests) so it returns a dict mapping each 'neighborhood' to how many requests it has — {neighborhood: count}. count_by_neighborhood(requests) is {'Ballard': 3, 'Fremont': 4, 'Downtown': 3, 'Capitol Hill': 2, 'Georgetown': 3}. An empty list returns an empty dict {}.",
+      "functionName": "count_by_neighborhood",
+      "starter": "def count_by_neighborhood(requests):\n    # tally the requests into a {neighborhood: count} dict\n    pass",
+      "solution": "def count_by_neighborhood(requests):\n    counts = {}\n    for r in requests:\n        counts[r['neighborhood']] = counts.get(r['neighborhood'], 0) + 1\n    return counts",
+      "fixture": "requests = [\n    {'type': 'Pothole', 'neighborhood': 'Ballard', 'days_open': 6, 'status': 'open'},\n    {'type': 'Pothole', 'neighborhood': 'Fremont', 'days_open': 8, 'status': 'closed'},\n    {'type': 'Pothole', 'neighborhood': 'Downtown', 'days_open': 50, 'status': 'open'},\n    {'type': 'Graffiti', 'neighborhood': 'Capitol Hill', 'days_open': 40, 'status': 'closed'},\n    {'type': 'Graffiti', 'neighborhood': 'Ballard', 'days_open': 18, 'status': 'open'},\n    {'type': 'Graffiti', 'neighborhood': 'Downtown', 'days_open': 30, 'status': 'closed'},\n    {'type': 'Streetlight', 'neighborhood': 'Fremont', 'days_open': 12, 'status': 'open'},\n    {'type': 'Streetlight', 'neighborhood': 'Georgetown', 'days_open': 20, 'status': 'open'},\n    {'type': 'Illegal Dumping', 'neighborhood': 'Georgetown', 'days_open': 25, 'status': 'open'},\n    {'type': 'Illegal Dumping', 'neighborhood': 'Ballard', 'days_open': 9, 'status': 'closed'},\n    {'type': 'Abandoned Vehicle', 'neighborhood': 'Capitol Hill', 'days_open': 44, 'status': 'closed'},\n    {'type': 'Abandoned Vehicle', 'neighborhood': 'Downtown', 'days_open': 10, 'status': 'open'},\n    {'type': 'Abandoned Vehicle', 'neighborhood': 'Fremont', 'days_open': 4, 'status': 'closed'},\n    {'type': 'Pothole', 'neighborhood': 'Georgetown', 'days_open': 15, 'status': 'open'},\n    {'type': 'Graffiti', 'neighborhood': 'Fremont', 'days_open': 16, 'status': 'closed'}\n]",
+      "tests": [
+        {
+          "expr": "count_by_neighborhood(requests)",
+          "expect": "{'Ballard': 3, 'Fremont': 4, 'Downtown': 3, 'Capitol Hill': 2, 'Georgetown': 3}"
+        },
+        {
+          "expr": "count_by_neighborhood([])",
+          "expect": "{}"
+        },
+        {
+          "expr": "count_by_neighborhood([{'type': 'Pothole', 'neighborhood': 'SoDo', 'days_open': 1, 'status': 'open'}])",
+          "expect": "{'SoDo': 1}"
+        },
+        {
+          "expr": "count_by_neighborhood([{'type': 'a', 'neighborhood': 'Fremont', 'days_open': 1, 'status': 'open'}, {'type': 'b', 'neighborhood': 'Fremont', 'days_open': 2, 'status': 'closed'}])",
+          "expect": "{'Fremont': 2}"
+        },
+        {
+          "setup": "c = count_by_neighborhood(requests)",
+          "expr": "c['Fremont']",
+          "expect": "4"
+        }
+      ],
+      "hints": [
+        "This is a frequency tally keyed by each request's 'neighborhood' field.",
+        "Walk the requests bumping counts.get(r['neighborhood'], 0) + 1, which seeds a new neighborhood at 0 the first time it appears.",
+        "Loop the requests updating counts[r['neighborhood']] = counts.get(r['neighborhood'], 0) + 1, then return counts — an empty list returns {}."
+      ],
+      "xp": 20
+    },
+    {
+      "id": "py-app-closed-count",
+      "prompt": "You are given requests, a list of service-request records of shape {'type', 'neighborhood', 'days_open', 'status'}, where 'status' is 'open' or 'closed'. Implement closed_count(requests) so it returns the number of requests whose 'status' is 'closed'. closed_count(requests) is 7. An empty list returns 0.",
+      "functionName": "closed_count",
+      "starter": "def closed_count(requests):\n    # count the requests whose status is 'closed'\n    pass",
+      "solution": "def closed_count(requests):\n    return sum(1 for r in requests if r['status'] == 'closed')",
+      "fixture": "requests = [\n    {'type': 'Pothole', 'neighborhood': 'Ballard', 'days_open': 6, 'status': 'open'},\n    {'type': 'Pothole', 'neighborhood': 'Fremont', 'days_open': 8, 'status': 'closed'},\n    {'type': 'Pothole', 'neighborhood': 'Downtown', 'days_open': 50, 'status': 'open'},\n    {'type': 'Graffiti', 'neighborhood': 'Capitol Hill', 'days_open': 40, 'status': 'closed'},\n    {'type': 'Graffiti', 'neighborhood': 'Ballard', 'days_open': 18, 'status': 'open'},\n    {'type': 'Graffiti', 'neighborhood': 'Downtown', 'days_open': 30, 'status': 'closed'},\n    {'type': 'Streetlight', 'neighborhood': 'Fremont', 'days_open': 12, 'status': 'open'},\n    {'type': 'Streetlight', 'neighborhood': 'Georgetown', 'days_open': 20, 'status': 'open'},\n    {'type': 'Illegal Dumping', 'neighborhood': 'Georgetown', 'days_open': 25, 'status': 'open'},\n    {'type': 'Illegal Dumping', 'neighborhood': 'Ballard', 'days_open': 9, 'status': 'closed'},\n    {'type': 'Abandoned Vehicle', 'neighborhood': 'Capitol Hill', 'days_open': 44, 'status': 'closed'},\n    {'type': 'Abandoned Vehicle', 'neighborhood': 'Downtown', 'days_open': 10, 'status': 'open'},\n    {'type': 'Abandoned Vehicle', 'neighborhood': 'Fremont', 'days_open': 4, 'status': 'closed'},\n    {'type': 'Pothole', 'neighborhood': 'Georgetown', 'days_open': 15, 'status': 'open'},\n    {'type': 'Graffiti', 'neighborhood': 'Fremont', 'days_open': 16, 'status': 'closed'}\n]",
+      "tests": [
+        {
+          "expr": "closed_count(requests)",
+          "expect": "7"
+        },
+        {
+          "expr": "closed_count([])",
+          "expect": "0"
+        },
+        {
+          "expr": "closed_count([{'type': 'a', 'neighborhood': 'x', 'days_open': 1, 'status': 'closed'}, {'type': 'b', 'neighborhood': 'y', 'days_open': 2, 'status': 'closed'}])",
+          "expect": "2"
+        },
+        {
+          "expr": "closed_count([{'type': 'a', 'neighborhood': 'x', 'days_open': 1, 'status': 'open'}, {'type': 'b', 'neighborhood': 'y', 'days_open': 2, 'status': 'open'}])",
+          "expect": "0"
+        },
+        {
+          "expr": "closed_count([{'type': 'a', 'neighborhood': 'x', 'days_open': 1, 'status': 'open'}, {'type': 'b', 'neighborhood': 'y', 'days_open': 2, 'status': 'closed'}])",
+          "expect": "1"
+        }
+      ],
+      "hints": [
+        "You are counting only the records that pass a test — status equals 'closed'.",
+        "A generator of 1s over the matching records, folded by sum, counts them: sum(1 for r in requests if r['status'] == 'closed').",
+        "return sum(1 for r in requests if r['status'] == 'closed') — an empty list sums no ones and returns 0."
+      ],
+      "xp": 20
+    },
+    {
+      "id": "py-app-requests-of-type",
+      "prompt": "You are given requests, a list of service-request records of shape {'type', 'neighborhood', 'days_open', 'status'}. Implement requests_of_type(requests, t) so it returns a list of the 'neighborhood' values of every request whose 'type' equals t, in the list's original order (repeats are kept — one entry per matching request). requests_of_type(requests, 'Pothole') is ['Ballard', 'Fremont', 'Downtown', 'Georgetown']. A type with no requests, or an empty list, returns an empty list.",
+      "functionName": "requests_of_type",
+      "starter": "def requests_of_type(requests, t):\n    # return the neighborhoods of matching requests, in order\n    pass",
+      "solution": "def requests_of_type(requests, t):\n    return [r['neighborhood'] for r in requests if r['type'] == t]",
+      "fixture": "requests = [\n    {'type': 'Pothole', 'neighborhood': 'Ballard', 'days_open': 6, 'status': 'open'},\n    {'type': 'Pothole', 'neighborhood': 'Fremont', 'days_open': 8, 'status': 'closed'},\n    {'type': 'Pothole', 'neighborhood': 'Downtown', 'days_open': 50, 'status': 'open'},\n    {'type': 'Graffiti', 'neighborhood': 'Capitol Hill', 'days_open': 40, 'status': 'closed'},\n    {'type': 'Graffiti', 'neighborhood': 'Ballard', 'days_open': 18, 'status': 'open'},\n    {'type': 'Graffiti', 'neighborhood': 'Downtown', 'days_open': 30, 'status': 'closed'},\n    {'type': 'Streetlight', 'neighborhood': 'Fremont', 'days_open': 12, 'status': 'open'},\n    {'type': 'Streetlight', 'neighborhood': 'Georgetown', 'days_open': 20, 'status': 'open'},\n    {'type': 'Illegal Dumping', 'neighborhood': 'Georgetown', 'days_open': 25, 'status': 'open'},\n    {'type': 'Illegal Dumping', 'neighborhood': 'Ballard', 'days_open': 9, 'status': 'closed'},\n    {'type': 'Abandoned Vehicle', 'neighborhood': 'Capitol Hill', 'days_open': 44, 'status': 'closed'},\n    {'type': 'Abandoned Vehicle', 'neighborhood': 'Downtown', 'days_open': 10, 'status': 'open'},\n    {'type': 'Abandoned Vehicle', 'neighborhood': 'Fremont', 'days_open': 4, 'status': 'closed'},\n    {'type': 'Pothole', 'neighborhood': 'Georgetown', 'days_open': 15, 'status': 'open'},\n    {'type': 'Graffiti', 'neighborhood': 'Fremont', 'days_open': 16, 'status': 'closed'}\n]",
+      "tests": [
+        {
+          "expr": "requests_of_type(requests, 'Pothole')",
+          "expect": "['Ballard', 'Fremont', 'Downtown', 'Georgetown']"
+        },
+        {
+          "expr": "requests_of_type(requests, 'Graffiti')",
+          "expect": "['Capitol Hill', 'Ballard', 'Downtown', 'Fremont']"
+        },
+        {
+          "expr": "requests_of_type(requests, 'Streetlight')",
+          "expect": "['Fremont', 'Georgetown']"
+        },
+        {
+          "expr": "requests_of_type(requests, 'Abandoned Vehicle')",
+          "expect": "['Capitol Hill', 'Downtown', 'Fremont']"
+        },
+        {
+          "expr": "requests_of_type(requests, 'Earthquake')",
+          "expect": "[]"
+        },
+        {
+          "expr": "requests_of_type([], 'Pothole')",
+          "expect": "[]"
+        }
+      ],
+      "hints": [
+        "Keep the requests of the requested type, then project each to its 'neighborhood'.",
+        "A comprehension with a trailing if filters and projects: [r['neighborhood'] for r in requests if r['type'] == t].",
+        "return [r['neighborhood'] for r in requests if r['type'] == t] — filtering before projecting keeps the neighborhoods in original order, duplicates and all."
+      ],
+      "xp": 20
+    },
+    {
+      "id": "py-app-open-requests",
+      "prompt": "You are given requests, a list of service-request records of shape {'type', 'neighborhood', 'days_open', 'status'}, where 'status' is 'open' or 'closed'. Implement open_requests(requests) so it returns a list of the 'type' values of every request whose 'status' is 'open', in the list's original order (one entry per open request, repeats kept). open_requests(requests) is ['Pothole', 'Pothole', 'Graffiti', 'Streetlight', 'Streetlight', 'Illegal Dumping', 'Abandoned Vehicle', 'Pothole']. If no request is open, or the list is empty, return an empty list.",
+      "functionName": "open_requests",
+      "starter": "def open_requests(requests):\n    # return the types of the open requests, in order\n    pass",
+      "solution": "def open_requests(requests):\n    return [r['type'] for r in requests if r['status'] == 'open']",
+      "fixture": "requests = [\n    {'type': 'Pothole', 'neighborhood': 'Ballard', 'days_open': 6, 'status': 'open'},\n    {'type': 'Pothole', 'neighborhood': 'Fremont', 'days_open': 8, 'status': 'closed'},\n    {'type': 'Pothole', 'neighborhood': 'Downtown', 'days_open': 50, 'status': 'open'},\n    {'type': 'Graffiti', 'neighborhood': 'Capitol Hill', 'days_open': 40, 'status': 'closed'},\n    {'type': 'Graffiti', 'neighborhood': 'Ballard', 'days_open': 18, 'status': 'open'},\n    {'type': 'Graffiti', 'neighborhood': 'Downtown', 'days_open': 30, 'status': 'closed'},\n    {'type': 'Streetlight', 'neighborhood': 'Fremont', 'days_open': 12, 'status': 'open'},\n    {'type': 'Streetlight', 'neighborhood': 'Georgetown', 'days_open': 20, 'status': 'open'},\n    {'type': 'Illegal Dumping', 'neighborhood': 'Georgetown', 'days_open': 25, 'status': 'open'},\n    {'type': 'Illegal Dumping', 'neighborhood': 'Ballard', 'days_open': 9, 'status': 'closed'},\n    {'type': 'Abandoned Vehicle', 'neighborhood': 'Capitol Hill', 'days_open': 44, 'status': 'closed'},\n    {'type': 'Abandoned Vehicle', 'neighborhood': 'Downtown', 'days_open': 10, 'status': 'open'},\n    {'type': 'Abandoned Vehicle', 'neighborhood': 'Fremont', 'days_open': 4, 'status': 'closed'},\n    {'type': 'Pothole', 'neighborhood': 'Georgetown', 'days_open': 15, 'status': 'open'},\n    {'type': 'Graffiti', 'neighborhood': 'Fremont', 'days_open': 16, 'status': 'closed'}\n]",
+      "tests": [
+        {
+          "expr": "open_requests(requests)",
+          "expect": "['Pothole', 'Pothole', 'Graffiti', 'Streetlight', 'Streetlight', 'Illegal Dumping', 'Abandoned Vehicle', 'Pothole']"
+        },
+        {
+          "expr": "open_requests([])",
+          "expect": "[]"
+        },
+        {
+          "expr": "open_requests([{'type': 'a', 'neighborhood': 'x', 'days_open': 1, 'status': 'closed'}, {'type': 'b', 'neighborhood': 'y', 'days_open': 2, 'status': 'closed'}])",
+          "expect": "[]"
+        },
+        {
+          "expr": "open_requests([{'type': 'a', 'neighborhood': 'x', 'days_open': 1, 'status': 'open'}, {'type': 'b', 'neighborhood': 'y', 'days_open': 2, 'status': 'closed'}])",
+          "expect": "['a']"
+        },
+        {
+          "expr": "open_requests([{'type': 'a', 'neighborhood': 'x', 'days_open': 1, 'status': 'open'}, {'type': 'b', 'neighborhood': 'y', 'days_open': 2, 'status': 'open'}])",
+          "expect": "['a', 'b']"
+        }
+      ],
+      "hints": [
+        "Keep the requests whose 'status' is 'open', then project each to its 'type'.",
+        "A comprehension with a trailing if does both: [r['type'] for r in requests if r['status'] == 'open'].",
+        "return [r['type'] for r in requests if r['status'] == 'open'] — an all-closed list filters to nothing and returns []."
+      ],
+      "xp": 20
+    },
+    {
+      "id": "py-app-avg-days-open-by-type",
+      "prompt": "You are given requests, a list of service-request records of shape {'type', 'neighborhood', 'days_open', 'status'}. Implement avg_days_open_by_type(requests) so it returns a dict mapping each 'type' to the average days_open of its requests, rounded to the nearest integer with round — {type: avg}. avg_days_open_by_type(requests) is {'Pothole': 20, 'Graffiti': 26, 'Streetlight': 16, 'Illegal Dumping': 17, 'Abandoned Vehicle': 19}. An empty list returns an empty dict {}.",
+      "functionName": "avg_days_open_by_type",
+      "starter": "def avg_days_open_by_type(requests):\n    # map each type to its rounded average days_open\n    pass",
+      "solution": "def avg_days_open_by_type(requests):\n    sums, counts = {}, {}\n    for r in requests:\n        sums[r['type']] = sums.get(r['type'], 0) + r['days_open']\n        counts[r['type']] = counts.get(r['type'], 0) + 1\n    return {t: round(sums[t] / counts[t]) for t in sums}",
+      "fixture": "requests = [\n    {'type': 'Pothole', 'neighborhood': 'Ballard', 'days_open': 6, 'status': 'open'},\n    {'type': 'Pothole', 'neighborhood': 'Fremont', 'days_open': 8, 'status': 'closed'},\n    {'type': 'Pothole', 'neighborhood': 'Downtown', 'days_open': 50, 'status': 'open'},\n    {'type': 'Graffiti', 'neighborhood': 'Capitol Hill', 'days_open': 40, 'status': 'closed'},\n    {'type': 'Graffiti', 'neighborhood': 'Ballard', 'days_open': 18, 'status': 'open'},\n    {'type': 'Graffiti', 'neighborhood': 'Downtown', 'days_open': 30, 'status': 'closed'},\n    {'type': 'Streetlight', 'neighborhood': 'Fremont', 'days_open': 12, 'status': 'open'},\n    {'type': 'Streetlight', 'neighborhood': 'Georgetown', 'days_open': 20, 'status': 'open'},\n    {'type': 'Illegal Dumping', 'neighborhood': 'Georgetown', 'days_open': 25, 'status': 'open'},\n    {'type': 'Illegal Dumping', 'neighborhood': 'Ballard', 'days_open': 9, 'status': 'closed'},\n    {'type': 'Abandoned Vehicle', 'neighborhood': 'Capitol Hill', 'days_open': 44, 'status': 'closed'},\n    {'type': 'Abandoned Vehicle', 'neighborhood': 'Downtown', 'days_open': 10, 'status': 'open'},\n    {'type': 'Abandoned Vehicle', 'neighborhood': 'Fremont', 'days_open': 4, 'status': 'closed'},\n    {'type': 'Pothole', 'neighborhood': 'Georgetown', 'days_open': 15, 'status': 'open'},\n    {'type': 'Graffiti', 'neighborhood': 'Fremont', 'days_open': 16, 'status': 'closed'}\n]",
+      "tests": [
+        {
+          "expr": "avg_days_open_by_type(requests)",
+          "expect": "{'Pothole': 20, 'Graffiti': 26, 'Streetlight': 16, 'Illegal Dumping': 17, 'Abandoned Vehicle': 19}"
+        },
+        {
+          "expr": "avg_days_open_by_type([])",
+          "expect": "{}"
+        },
+        {
+          "expr": "avg_days_open_by_type([{'type': 'Pothole', 'neighborhood': 'x', 'days_open': 10, 'status': 'open'}, {'type': 'Pothole', 'neighborhood': 'y', 'days_open': 20, 'status': 'open'}, {'type': 'Pothole', 'neighborhood': 'z', 'days_open': 23, 'status': 'closed'}])",
+          "expect": "{'Pothole': 18}"
+        },
+        {
+          "expr": "avg_days_open_by_type([{'type': 'Graffiti', 'neighborhood': 'x', 'days_open': 7, 'status': 'open'}])",
+          "expect": "{'Graffiti': 7}"
+        },
+        {
+          "setup": "a = avg_days_open_by_type(requests)",
+          "expr": "a['Pothole']",
+          "expect": "20"
+        }
+      ],
+      "hints": [
+        "Accumulate a running sum of days_open and a running count of requests per type as you walk the list.",
+        "In a dict comprehension, divide each type's sum by its count and round the result.",
+        "The Pothole average is (6 + 8 + 50 + 15) / 4 = 19.75, which round lifts to 20 — a floor or int() truncation would wrongly give 19, so round rather than cut."
+      ],
+      "xp": 20
+    },
+    {
+      "id": "py-app-slowest-neighborhood",
+      "prompt": "You are given requests, a list of service-request records of shape {'type', 'neighborhood', 'days_open', 'status'}. Implement slowest_neighborhood(requests) so it returns the 'neighborhood' with the greatest average days_open across its requests. Compare on the true average, not the total. slowest_neighborhood(requests) is 'Capitol Hill' (its two requests average 42.0 days, beating every busier neighborhood's average). If several neighborhoods tie for the highest average, return the alphabetically smallest. An empty list returns None.",
+      "functionName": "slowest_neighborhood",
+      "starter": "def slowest_neighborhood(requests):\n    # return the neighborhood with the greatest average days_open\n    pass",
+      "solution": "def slowest_neighborhood(requests):\n    sums, counts = {}, {}\n    for r in requests:\n        sums[r['neighborhood']] = sums.get(r['neighborhood'], 0) + r['days_open']\n        counts[r['neighborhood']] = counts.get(r['neighborhood'], 0) + 1\n    best, best_avg = None, float('-inf')\n    for nb in sorted(sums):\n        avg = sums[nb] / counts[nb]\n        if avg > best_avg:\n            best_avg, best = avg, nb\n    return best",
+      "fixture": "requests = [\n    {'type': 'Pothole', 'neighborhood': 'Ballard', 'days_open': 6, 'status': 'open'},\n    {'type': 'Pothole', 'neighborhood': 'Fremont', 'days_open': 8, 'status': 'closed'},\n    {'type': 'Pothole', 'neighborhood': 'Downtown', 'days_open': 50, 'status': 'open'},\n    {'type': 'Graffiti', 'neighborhood': 'Capitol Hill', 'days_open': 40, 'status': 'closed'},\n    {'type': 'Graffiti', 'neighborhood': 'Ballard', 'days_open': 18, 'status': 'open'},\n    {'type': 'Graffiti', 'neighborhood': 'Downtown', 'days_open': 30, 'status': 'closed'},\n    {'type': 'Streetlight', 'neighborhood': 'Fremont', 'days_open': 12, 'status': 'open'},\n    {'type': 'Streetlight', 'neighborhood': 'Georgetown', 'days_open': 20, 'status': 'open'},\n    {'type': 'Illegal Dumping', 'neighborhood': 'Georgetown', 'days_open': 25, 'status': 'open'},\n    {'type': 'Illegal Dumping', 'neighborhood': 'Ballard', 'days_open': 9, 'status': 'closed'},\n    {'type': 'Abandoned Vehicle', 'neighborhood': 'Capitol Hill', 'days_open': 44, 'status': 'closed'},\n    {'type': 'Abandoned Vehicle', 'neighborhood': 'Downtown', 'days_open': 10, 'status': 'open'},\n    {'type': 'Abandoned Vehicle', 'neighborhood': 'Fremont', 'days_open': 4, 'status': 'closed'},\n    {'type': 'Pothole', 'neighborhood': 'Georgetown', 'days_open': 15, 'status': 'open'},\n    {'type': 'Graffiti', 'neighborhood': 'Fremont', 'days_open': 16, 'status': 'closed'}\n]",
+      "tests": [
+        {
+          "expr": "slowest_neighborhood(requests)",
+          "expect": "'Capitol Hill'"
+        },
+        {
+          "expr": "slowest_neighborhood([])",
+          "expect": "None"
+        },
+        {
+          "expr": "slowest_neighborhood([{'type': 't', 'neighborhood': 'Ravenna', 'days_open': 12, 'status': 'open'}])",
+          "expect": "'Ravenna'"
+        },
+        {
+          "expr": "slowest_neighborhood([{'type': 't', 'neighborhood': 'Zed', 'days_open': 5, 'status': 'open'}, {'type': 't', 'neighborhood': 'Ann', 'days_open': 5, 'status': 'open'}])",
+          "expect": "'Ann'"
+        },
+        {
+          "expr": "slowest_neighborhood([{'type': 't', 'neighborhood': 'High', 'days_open': 100, 'status': 'open'}, {'type': 't', 'neighborhood': 'Low', 'days_open': 30, 'status': 'open'}, {'type': 't', 'neighborhood': 'Low', 'days_open': 30, 'status': 'open'}, {'type': 't', 'neighborhood': 'Low', 'days_open': 30, 'status': 'open'}, {'type': 't', 'neighborhood': 'Low', 'days_open': 30, 'status': 'open'}])",
+          "expect": "'High'"
+        }
+      ],
+      "hints": [
+        "Build per-neighborhood sum and count tallies of days_open, then scan for the largest sum / count — the average, not the raw total.",
+        "The last test proves why: 'Low' has the bigger total (120 over 4 requests) but 'High' has the bigger average (100 over 1), and the average must win.",
+        "After tallying, iterate sorted(sums) tracking the max average with a strict >, so ties resolve alphabetically and an empty list leaves best as None."
+      ],
+      "xp": 20
+    },
+    {
+      "id": "py-app-busiest-type",
+      "prompt": "You are given requests, a list of service-request records of shape {'type', 'neighborhood', 'days_open', 'status'}. Implement busiest_type(requests) so it returns the request 'type' that appears most often. busiest_type(requests) is 'Graffiti' — it ties Pothole at 4 requests each, and Graffiti wins the tie alphabetically. If several types tie for the most requests, return the alphabetically smallest. An empty list returns None.",
+      "functionName": "busiest_type",
+      "starter": "def busiest_type(requests):\n    # return the most common request type\n    pass",
+      "solution": "def busiest_type(requests):\n    counts = {}\n    for r in requests:\n        counts[r['type']] = counts.get(r['type'], 0) + 1\n    best, best_count = None, 0\n    for t in sorted(counts):\n        if counts[t] > best_count:\n            best_count, best = counts[t], t\n    return best",
+      "fixture": "requests = [\n    {'type': 'Pothole', 'neighborhood': 'Ballard', 'days_open': 6, 'status': 'open'},\n    {'type': 'Pothole', 'neighborhood': 'Fremont', 'days_open': 8, 'status': 'closed'},\n    {'type': 'Pothole', 'neighborhood': 'Downtown', 'days_open': 50, 'status': 'open'},\n    {'type': 'Graffiti', 'neighborhood': 'Capitol Hill', 'days_open': 40, 'status': 'closed'},\n    {'type': 'Graffiti', 'neighborhood': 'Ballard', 'days_open': 18, 'status': 'open'},\n    {'type': 'Graffiti', 'neighborhood': 'Downtown', 'days_open': 30, 'status': 'closed'},\n    {'type': 'Streetlight', 'neighborhood': 'Fremont', 'days_open': 12, 'status': 'open'},\n    {'type': 'Streetlight', 'neighborhood': 'Georgetown', 'days_open': 20, 'status': 'open'},\n    {'type': 'Illegal Dumping', 'neighborhood': 'Georgetown', 'days_open': 25, 'status': 'open'},\n    {'type': 'Illegal Dumping', 'neighborhood': 'Ballard', 'days_open': 9, 'status': 'closed'},\n    {'type': 'Abandoned Vehicle', 'neighborhood': 'Capitol Hill', 'days_open': 44, 'status': 'closed'},\n    {'type': 'Abandoned Vehicle', 'neighborhood': 'Downtown', 'days_open': 10, 'status': 'open'},\n    {'type': 'Abandoned Vehicle', 'neighborhood': 'Fremont', 'days_open': 4, 'status': 'closed'},\n    {'type': 'Pothole', 'neighborhood': 'Georgetown', 'days_open': 15, 'status': 'open'},\n    {'type': 'Graffiti', 'neighborhood': 'Fremont', 'days_open': 16, 'status': 'closed'}\n]",
+      "tests": [
+        {
+          "expr": "busiest_type(requests)",
+          "expect": "'Graffiti'"
+        },
+        {
+          "expr": "busiest_type([])",
+          "expect": "None"
+        },
+        {
+          "expr": "busiest_type([{'type': 'Pothole', 'neighborhood': 'x', 'days_open': 1, 'status': 'open'}])",
+          "expect": "'Pothole'"
+        },
+        {
+          "expr": "busiest_type([{'type': 'Zed', 'neighborhood': 'x', 'days_open': 1, 'status': 'open'}, {'type': 'Ann', 'neighborhood': 'y', 'days_open': 2, 'status': 'open'}])",
+          "expect": "'Ann'"
+        },
+        {
+          "expr": "busiest_type([{'type': 'Rare', 'neighborhood': 'x', 'days_open': 1, 'status': 'open'}, {'type': 'Common', 'neighborhood': 'y', 'days_open': 2, 'status': 'open'}, {'type': 'Common', 'neighborhood': 'z', 'days_open': 3, 'status': 'closed'}])",
+          "expect": "'Common'"
+        }
+      ],
+      "hints": [
+        "First tally the requests per type, then scan the tally for the type with the largest count.",
+        "Iterating the keys in sorted order with a strict > comparison makes a tie resolve to the alphabetically earlier type.",
+        "Build counts, then loop sorted(counts) tracking the max — Pothole and Graffiti both reach 4, but scanning alphabetically with a strict > keeps 'Graffiti'."
+      ],
+      "xp": 20
+    }
+  ]
+}

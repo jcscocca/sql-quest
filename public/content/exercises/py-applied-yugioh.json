@@ -1,0 +1,267 @@
+{
+  "skillId": "py-applied-yugioh",
+  "exercises": [
+    {
+      "id": "py-app-count-by-archetype",
+      "prompt": "You are given cards, a list of Yu-Gi-Oh! card records, each a dict {'name', 'archetype', 'atk', 'def', 'level'} — for example {'name': 'Dark Magician', 'archetype': 'Dark Magician', 'atk': 2500, 'def': 2100, 'level': 7} (name and archetype are strings; atk, def, and level are ints). Implement count_by_archetype(cards) so it returns a dict mapping each 'archetype' to how many cards belong to it — {archetype: count}. count_by_archetype(cards) is {'Blue-Eyes': 2, 'Dark Magician': 3, 'Red-Eyes': 2, 'Elemental HERO': 4, 'Kuriboh': 2, 'Archfiend': 2}. An empty list returns an empty dict {}.",
+      "functionName": "count_by_archetype",
+      "starter": "def count_by_archetype(cards):\n    # tally the cards into a {archetype: count} dict\n    pass",
+      "solution": "def count_by_archetype(cards):\n    counts = {}\n    for c in cards:\n        counts[c['archetype']] = counts.get(c['archetype'], 0) + 1\n    return counts",
+      "fixture": "cards = [\n    {'name': 'Blue-Eyes White Dragon', 'archetype': 'Blue-Eyes', 'atk': 3000, 'def': 2500, 'level': 8},\n    {'name': 'Blue-Eyes Alternative Dragon', 'archetype': 'Blue-Eyes', 'atk': 3000, 'def': 2500, 'level': 8},\n    {'name': 'Dark Magician', 'archetype': 'Dark Magician', 'atk': 2500, 'def': 2100, 'level': 7},\n    {'name': 'Dark Magician Girl', 'archetype': 'Dark Magician', 'atk': 2000, 'def': 1700, 'level': 6},\n    {'name': 'Dark Magician of Chaos', 'archetype': 'Dark Magician', 'atk': 2800, 'def': 2600, 'level': 8},\n    {'name': 'Red-Eyes Black Dragon', 'archetype': 'Red-Eyes', 'atk': 2400, 'def': 2000, 'level': 7},\n    {'name': 'Red-Eyes Darkness Dragon', 'archetype': 'Red-Eyes', 'atk': 2800, 'def': 2400, 'level': 9},\n    {'name': 'Elemental HERO Neos', 'archetype': 'Elemental HERO', 'atk': 2500, 'def': 2000, 'level': 7},\n    {'name': 'Elemental HERO Sparkman', 'archetype': 'Elemental HERO', 'atk': 1600, 'def': 1400, 'level': 4},\n    {'name': 'Elemental HERO Avian', 'archetype': 'Elemental HERO', 'atk': 1000, 'def': 1000, 'level': 3},\n    {'name': 'Elemental HERO Burstinatrix', 'archetype': 'Elemental HERO', 'atk': 1250, 'def': 800, 'level': 3},\n    {'name': 'Kuriboh', 'archetype': 'Kuriboh', 'atk': 300, 'def': 200, 'level': 1},\n    {'name': 'Winged Kuriboh', 'archetype': 'Kuriboh', 'atk': 300, 'def': 200, 'level': 1},\n    {'name': 'Summoned Skull', 'archetype': 'Archfiend', 'atk': 2500, 'def': 1200, 'level': 6},\n    {'name': 'Jinzo', 'archetype': 'Archfiend', 'atk': 2400, 'def': 1500, 'level': 6}\n]",
+      "tests": [
+        {
+          "expr": "count_by_archetype(cards)",
+          "expect": "{'Blue-Eyes': 2, 'Dark Magician': 3, 'Red-Eyes': 2, 'Elemental HERO': 4, 'Kuriboh': 2, 'Archfiend': 2}"
+        },
+        {
+          "expr": "count_by_archetype([])",
+          "expect": "{}"
+        },
+        {
+          "expr": "count_by_archetype([{'name': 'X', 'archetype': 'Solo', 'atk': 1, 'def': 1, 'level': 1}])",
+          "expect": "{'Solo': 1}"
+        },
+        {
+          "expr": "count_by_archetype([{'name': 'A', 'archetype': 'Ojama', 'atk': 0, 'def': 1000, 'level': 2}, {'name': 'B', 'archetype': 'Ojama', 'atk': 0, 'def': 1000, 'level': 2}])",
+          "expect": "{'Ojama': 2}"
+        },
+        {
+          "setup": "c = count_by_archetype(cards)",
+          "expr": "c['Elemental HERO']",
+          "expect": "4"
+        }
+      ],
+      "hints": [
+        "This is a frequency tally keyed by each card's 'archetype' field.",
+        "Walk the cards bumping counts.get(c['archetype'], 0) + 1, which seeds a new archetype at 0 the first time it appears.",
+        "Loop the cards updating counts[c['archetype']] = counts.get(c['archetype'], 0) + 1, then return counts — an empty list returns {}."
+      ],
+      "xp": 20
+    },
+    {
+      "id": "py-app-cards-at-level",
+      "prompt": "You are given cards, a list of card records of shape {'name', 'archetype', 'atk', 'def', 'level'}. Implement cards_at_level(cards, level) so it returns a list of the 'name' values of every card whose 'level' equals the given level, in the list's original order. cards_at_level(cards, 8) is ['Blue-Eyes White Dragon', 'Blue-Eyes Alternative Dragon', 'Dark Magician of Chaos']. A level no card has, or an empty list, returns an empty list.",
+      "functionName": "cards_at_level",
+      "starter": "def cards_at_level(cards, level):\n    # return the names of cards at the given level, in order\n    pass",
+      "solution": "def cards_at_level(cards, level):\n    return [c['name'] for c in cards if c['level'] == level]",
+      "fixture": "cards = [\n    {'name': 'Blue-Eyes White Dragon', 'archetype': 'Blue-Eyes', 'atk': 3000, 'def': 2500, 'level': 8},\n    {'name': 'Blue-Eyes Alternative Dragon', 'archetype': 'Blue-Eyes', 'atk': 3000, 'def': 2500, 'level': 8},\n    {'name': 'Dark Magician', 'archetype': 'Dark Magician', 'atk': 2500, 'def': 2100, 'level': 7},\n    {'name': 'Dark Magician Girl', 'archetype': 'Dark Magician', 'atk': 2000, 'def': 1700, 'level': 6},\n    {'name': 'Dark Magician of Chaos', 'archetype': 'Dark Magician', 'atk': 2800, 'def': 2600, 'level': 8},\n    {'name': 'Red-Eyes Black Dragon', 'archetype': 'Red-Eyes', 'atk': 2400, 'def': 2000, 'level': 7},\n    {'name': 'Red-Eyes Darkness Dragon', 'archetype': 'Red-Eyes', 'atk': 2800, 'def': 2400, 'level': 9},\n    {'name': 'Elemental HERO Neos', 'archetype': 'Elemental HERO', 'atk': 2500, 'def': 2000, 'level': 7},\n    {'name': 'Elemental HERO Sparkman', 'archetype': 'Elemental HERO', 'atk': 1600, 'def': 1400, 'level': 4},\n    {'name': 'Elemental HERO Avian', 'archetype': 'Elemental HERO', 'atk': 1000, 'def': 1000, 'level': 3},\n    {'name': 'Elemental HERO Burstinatrix', 'archetype': 'Elemental HERO', 'atk': 1250, 'def': 800, 'level': 3},\n    {'name': 'Kuriboh', 'archetype': 'Kuriboh', 'atk': 300, 'def': 200, 'level': 1},\n    {'name': 'Winged Kuriboh', 'archetype': 'Kuriboh', 'atk': 300, 'def': 200, 'level': 1},\n    {'name': 'Summoned Skull', 'archetype': 'Archfiend', 'atk': 2500, 'def': 1200, 'level': 6},\n    {'name': 'Jinzo', 'archetype': 'Archfiend', 'atk': 2400, 'def': 1500, 'level': 6}\n]",
+      "tests": [
+        {
+          "expr": "cards_at_level(cards, 8)",
+          "expect": "['Blue-Eyes White Dragon', 'Blue-Eyes Alternative Dragon', 'Dark Magician of Chaos']"
+        },
+        {
+          "expr": "cards_at_level(cards, 7)",
+          "expect": "['Dark Magician', 'Red-Eyes Black Dragon', 'Elemental HERO Neos']"
+        },
+        {
+          "expr": "cards_at_level(cards, 1)",
+          "expect": "['Kuriboh', 'Winged Kuriboh']"
+        },
+        {
+          "expr": "cards_at_level(cards, 6)",
+          "expect": "['Dark Magician Girl', 'Summoned Skull', 'Jinzo']"
+        },
+        {
+          "expr": "cards_at_level(cards, 12)",
+          "expect": "[]"
+        },
+        {
+          "expr": "cards_at_level([], 8)",
+          "expect": "[]"
+        }
+      ],
+      "hints": [
+        "Keep only the cards whose 'level' matches, then project each survivor down to its 'name'.",
+        "A comprehension with a trailing if does both: [c['name'] for c in cards if c['level'] == level].",
+        "return [c['name'] for c in cards if c['level'] == level] — filtering as you go preserves the original order, and a level nobody has yields []."
+      ],
+      "xp": 20
+    },
+    {
+      "id": "py-app-high-atk-cards",
+      "prompt": "You are given cards, a list of card records of shape {'name', 'archetype', 'atk', 'def', 'level'}. Implement high_atk_cards(cards, threshold) so it returns a list of the 'name' values of every card whose 'atk' is greater than or equal to threshold, in the list's original order. high_atk_cards(cards, 2500) is ['Blue-Eyes White Dragon', 'Blue-Eyes Alternative Dragon', 'Dark Magician', 'Dark Magician of Chaos', 'Red-Eyes Darkness Dragon', 'Elemental HERO Neos', 'Summoned Skull']. A threshold no card reaches returns an empty list; a threshold of 0 returns every name.",
+      "functionName": "high_atk_cards",
+      "starter": "def high_atk_cards(cards, threshold):\n    # return names of cards with atk >= threshold, in order\n    pass",
+      "solution": "def high_atk_cards(cards, threshold):\n    return [c['name'] for c in cards if c['atk'] >= threshold]",
+      "fixture": "cards = [\n    {'name': 'Blue-Eyes White Dragon', 'archetype': 'Blue-Eyes', 'atk': 3000, 'def': 2500, 'level': 8},\n    {'name': 'Blue-Eyes Alternative Dragon', 'archetype': 'Blue-Eyes', 'atk': 3000, 'def': 2500, 'level': 8},\n    {'name': 'Dark Magician', 'archetype': 'Dark Magician', 'atk': 2500, 'def': 2100, 'level': 7},\n    {'name': 'Dark Magician Girl', 'archetype': 'Dark Magician', 'atk': 2000, 'def': 1700, 'level': 6},\n    {'name': 'Dark Magician of Chaos', 'archetype': 'Dark Magician', 'atk': 2800, 'def': 2600, 'level': 8},\n    {'name': 'Red-Eyes Black Dragon', 'archetype': 'Red-Eyes', 'atk': 2400, 'def': 2000, 'level': 7},\n    {'name': 'Red-Eyes Darkness Dragon', 'archetype': 'Red-Eyes', 'atk': 2800, 'def': 2400, 'level': 9},\n    {'name': 'Elemental HERO Neos', 'archetype': 'Elemental HERO', 'atk': 2500, 'def': 2000, 'level': 7},\n    {'name': 'Elemental HERO Sparkman', 'archetype': 'Elemental HERO', 'atk': 1600, 'def': 1400, 'level': 4},\n    {'name': 'Elemental HERO Avian', 'archetype': 'Elemental HERO', 'atk': 1000, 'def': 1000, 'level': 3},\n    {'name': 'Elemental HERO Burstinatrix', 'archetype': 'Elemental HERO', 'atk': 1250, 'def': 800, 'level': 3},\n    {'name': 'Kuriboh', 'archetype': 'Kuriboh', 'atk': 300, 'def': 200, 'level': 1},\n    {'name': 'Winged Kuriboh', 'archetype': 'Kuriboh', 'atk': 300, 'def': 200, 'level': 1},\n    {'name': 'Summoned Skull', 'archetype': 'Archfiend', 'atk': 2500, 'def': 1200, 'level': 6},\n    {'name': 'Jinzo', 'archetype': 'Archfiend', 'atk': 2400, 'def': 1500, 'level': 6}\n]",
+      "tests": [
+        {
+          "expr": "high_atk_cards(cards, 2500)",
+          "expect": "['Blue-Eyes White Dragon', 'Blue-Eyes Alternative Dragon', 'Dark Magician', 'Dark Magician of Chaos', 'Red-Eyes Darkness Dragon', 'Elemental HERO Neos', 'Summoned Skull']"
+        },
+        {
+          "expr": "high_atk_cards(cards, 2800)",
+          "expect": "['Blue-Eyes White Dragon', 'Blue-Eyes Alternative Dragon', 'Dark Magician of Chaos', 'Red-Eyes Darkness Dragon']"
+        },
+        {
+          "expr": "high_atk_cards(cards, 3001)",
+          "expect": "[]"
+        },
+        {
+          "expr": "high_atk_cards(cards, 3000)",
+          "expect": "['Blue-Eyes White Dragon', 'Blue-Eyes Alternative Dragon']"
+        },
+        {
+          "expr": "high_atk_cards(cards, 0)",
+          "expect": "['Blue-Eyes White Dragon', 'Blue-Eyes Alternative Dragon', 'Dark Magician', 'Dark Magician Girl', 'Dark Magician of Chaos', 'Red-Eyes Black Dragon', 'Red-Eyes Darkness Dragon', 'Elemental HERO Neos', 'Elemental HERO Sparkman', 'Elemental HERO Avian', 'Elemental HERO Burstinatrix', 'Kuriboh', 'Winged Kuriboh', 'Summoned Skull', 'Jinzo']"
+        },
+        {
+          "expr": "high_atk_cards([], 1000)",
+          "expect": "[]"
+        }
+      ],
+      "hints": [
+        "Keep the cards that meet or beat the threshold, then project each to its 'name'.",
+        "The test is c['atk'] >= threshold — greater-than-or-equal, so a card exactly at the threshold is included.",
+        "return [c['name'] for c in cards if c['atk'] >= threshold] — using >= is why the three 2500-atk cards appear when threshold is 2500, where a strict > would drop them."
+      ],
+      "xp": 20
+    },
+    {
+      "id": "py-app-strongest-card",
+      "prompt": "You are given cards, a list of card records of shape {'name', 'archetype', 'atk', 'def', 'level'}. Implement strongest_card(cards) so it returns the 'name' of the card with the highest 'atk'. If several cards tie for the highest atk, return the one that appears first in the list. strongest_card(cards) is 'Blue-Eyes White Dragon'. Assume the list has at least one card.",
+      "functionName": "strongest_card",
+      "starter": "def strongest_card(cards):\n    # return the name of the highest-atk card\n    pass",
+      "solution": "def strongest_card(cards):\n    return max(cards, key=lambda c: c['atk'])['name']",
+      "fixture": "cards = [\n    {'name': 'Blue-Eyes White Dragon', 'archetype': 'Blue-Eyes', 'atk': 3000, 'def': 2500, 'level': 8},\n    {'name': 'Blue-Eyes Alternative Dragon', 'archetype': 'Blue-Eyes', 'atk': 3000, 'def': 2500, 'level': 8},\n    {'name': 'Dark Magician', 'archetype': 'Dark Magician', 'atk': 2500, 'def': 2100, 'level': 7},\n    {'name': 'Dark Magician Girl', 'archetype': 'Dark Magician', 'atk': 2000, 'def': 1700, 'level': 6},\n    {'name': 'Dark Magician of Chaos', 'archetype': 'Dark Magician', 'atk': 2800, 'def': 2600, 'level': 8},\n    {'name': 'Red-Eyes Black Dragon', 'archetype': 'Red-Eyes', 'atk': 2400, 'def': 2000, 'level': 7},\n    {'name': 'Red-Eyes Darkness Dragon', 'archetype': 'Red-Eyes', 'atk': 2800, 'def': 2400, 'level': 9},\n    {'name': 'Elemental HERO Neos', 'archetype': 'Elemental HERO', 'atk': 2500, 'def': 2000, 'level': 7},\n    {'name': 'Elemental HERO Sparkman', 'archetype': 'Elemental HERO', 'atk': 1600, 'def': 1400, 'level': 4},\n    {'name': 'Elemental HERO Avian', 'archetype': 'Elemental HERO', 'atk': 1000, 'def': 1000, 'level': 3},\n    {'name': 'Elemental HERO Burstinatrix', 'archetype': 'Elemental HERO', 'atk': 1250, 'def': 800, 'level': 3},\n    {'name': 'Kuriboh', 'archetype': 'Kuriboh', 'atk': 300, 'def': 200, 'level': 1},\n    {'name': 'Winged Kuriboh', 'archetype': 'Kuriboh', 'atk': 300, 'def': 200, 'level': 1},\n    {'name': 'Summoned Skull', 'archetype': 'Archfiend', 'atk': 2500, 'def': 1200, 'level': 6},\n    {'name': 'Jinzo', 'archetype': 'Archfiend', 'atk': 2400, 'def': 1500, 'level': 6}\n]",
+      "tests": [
+        {
+          "expr": "strongest_card(cards)",
+          "expect": "'Blue-Eyes White Dragon'"
+        },
+        {
+          "expr": "strongest_card([{'name': 'Solo', 'archetype': 'z', 'atk': 500, 'def': 0, 'level': 2}])",
+          "expect": "'Solo'"
+        },
+        {
+          "expr": "strongest_card([{'name': 'A', 'archetype': 'x', 'atk': 100, 'def': 0, 'level': 1}, {'name': 'B', 'archetype': 'y', 'atk': 100, 'def': 0, 'level': 1}])",
+          "expect": "'A'"
+        },
+        {
+          "expr": "strongest_card([{'name': 'lo', 'archetype': 'a', 'atk': 100, 'def': 0, 'level': 1}, {'name': 'hi', 'archetype': 'b', 'atk': 900, 'def': 0, 'level': 1}, {'name': 'mid', 'archetype': 'c', 'atk': 500, 'def': 0, 'level': 1}])",
+          "expect": "'hi'"
+        },
+        {
+          "expr": "strongest_card([{'name': 'weak', 'archetype': 'a', 'atk': 1, 'def': 0, 'level': 1}, {'name': 'strong', 'archetype': 'b', 'atk': 5, 'def': 0, 'level': 1}])",
+          "expect": "'strong'"
+        }
+      ],
+      "hints": [
+        "You want the card whose 'atk' is largest, then that card's 'name' — find the record first, read the name second.",
+        "max with a key= picks the record scoring highest on that key: max(cards, key=lambda c: c['atk']).",
+        "return max(cards, key=lambda c: c['atk'])['name'] — on a tie max returns the first record it saw, so the first 3000-atk Blue-Eyes wins."
+      ],
+      "xp": 20
+    },
+    {
+      "id": "py-app-avg-atk-by-archetype",
+      "prompt": "You are given cards, a list of card records of shape {'name', 'archetype', 'atk', 'def', 'level'}. Implement avg_atk_by_archetype(cards) so it returns a dict mapping each 'archetype' to the average atk of its cards, rounded to the nearest integer with round — {archetype: avg}. avg_atk_by_archetype(cards) is {'Blue-Eyes': 3000, 'Dark Magician': 2433, 'Red-Eyes': 2600, 'Elemental HERO': 1588, 'Kuriboh': 300, 'Archfiend': 2450}. An empty list returns an empty dict {}.",
+      "functionName": "avg_atk_by_archetype",
+      "starter": "def avg_atk_by_archetype(cards):\n    # map each archetype to its rounded average atk\n    pass",
+      "solution": "def avg_atk_by_archetype(cards):\n    sums, counts = {}, {}\n    for c in cards:\n        sums[c['archetype']] = sums.get(c['archetype'], 0) + c['atk']\n        counts[c['archetype']] = counts.get(c['archetype'], 0) + 1\n    return {a: round(sums[a] / counts[a]) for a in sums}",
+      "fixture": "cards = [\n    {'name': 'Blue-Eyes White Dragon', 'archetype': 'Blue-Eyes', 'atk': 3000, 'def': 2500, 'level': 8},\n    {'name': 'Blue-Eyes Alternative Dragon', 'archetype': 'Blue-Eyes', 'atk': 3000, 'def': 2500, 'level': 8},\n    {'name': 'Dark Magician', 'archetype': 'Dark Magician', 'atk': 2500, 'def': 2100, 'level': 7},\n    {'name': 'Dark Magician Girl', 'archetype': 'Dark Magician', 'atk': 2000, 'def': 1700, 'level': 6},\n    {'name': 'Dark Magician of Chaos', 'archetype': 'Dark Magician', 'atk': 2800, 'def': 2600, 'level': 8},\n    {'name': 'Red-Eyes Black Dragon', 'archetype': 'Red-Eyes', 'atk': 2400, 'def': 2000, 'level': 7},\n    {'name': 'Red-Eyes Darkness Dragon', 'archetype': 'Red-Eyes', 'atk': 2800, 'def': 2400, 'level': 9},\n    {'name': 'Elemental HERO Neos', 'archetype': 'Elemental HERO', 'atk': 2500, 'def': 2000, 'level': 7},\n    {'name': 'Elemental HERO Sparkman', 'archetype': 'Elemental HERO', 'atk': 1600, 'def': 1400, 'level': 4},\n    {'name': 'Elemental HERO Avian', 'archetype': 'Elemental HERO', 'atk': 1000, 'def': 1000, 'level': 3},\n    {'name': 'Elemental HERO Burstinatrix', 'archetype': 'Elemental HERO', 'atk': 1250, 'def': 800, 'level': 3},\n    {'name': 'Kuriboh', 'archetype': 'Kuriboh', 'atk': 300, 'def': 200, 'level': 1},\n    {'name': 'Winged Kuriboh', 'archetype': 'Kuriboh', 'atk': 300, 'def': 200, 'level': 1},\n    {'name': 'Summoned Skull', 'archetype': 'Archfiend', 'atk': 2500, 'def': 1200, 'level': 6},\n    {'name': 'Jinzo', 'archetype': 'Archfiend', 'atk': 2400, 'def': 1500, 'level': 6}\n]",
+      "tests": [
+        {
+          "expr": "avg_atk_by_archetype(cards)",
+          "expect": "{'Blue-Eyes': 3000, 'Dark Magician': 2433, 'Red-Eyes': 2600, 'Elemental HERO': 1588, 'Kuriboh': 300, 'Archfiend': 2450}"
+        },
+        {
+          "expr": "avg_atk_by_archetype([])",
+          "expect": "{}"
+        },
+        {
+          "expr": "avg_atk_by_archetype([{'name': 'A', 'archetype': 'Ojama', 'atk': 10, 'def': 1, 'level': 1}, {'name': 'B', 'archetype': 'Ojama', 'atk': 10, 'def': 1, 'level': 1}, {'name': 'C', 'archetype': 'Ojama', 'atk': 15, 'def': 1, 'level': 1}])",
+          "expect": "{'Ojama': 12}"
+        },
+        {
+          "expr": "avg_atk_by_archetype([{'name': 'Solo', 'archetype': 'Toon', 'atk': 1200, 'def': 0, 'level': 4}])",
+          "expect": "{'Toon': 1200}"
+        },
+        {
+          "setup": "a = avg_atk_by_archetype(cards)",
+          "expr": "a['Elemental HERO']",
+          "expect": "1588"
+        }
+      ],
+      "hints": [
+        "Accumulate a running sum of atk and a running count of cards per archetype as you walk the list.",
+        "In a dict comprehension, divide each archetype's sum by its count and round the result.",
+        "The Elemental HERO average is (2500 + 1600 + 1000 + 1250) / 4 = 1587.5, which round lifts to 1588 — a floor or int() truncation would wrongly give 1587."
+      ],
+      "xp": 20
+    },
+    {
+      "id": "py-app-archetype-with-most-cards",
+      "prompt": "You are given cards, a list of card records of shape {'name', 'archetype', 'atk', 'def', 'level'}. Implement archetype_with_most_cards(cards) so it returns the 'archetype' that appears on the most cards. archetype_with_most_cards(cards) is 'Elemental HERO'. If several archetypes tie for the most cards, return the alphabetically smallest. An empty list returns None.",
+      "functionName": "archetype_with_most_cards",
+      "starter": "def archetype_with_most_cards(cards):\n    # return the archetype with the most cards\n    pass",
+      "solution": "def archetype_with_most_cards(cards):\n    counts = {}\n    for c in cards:\n        counts[c['archetype']] = counts.get(c['archetype'], 0) + 1\n    best, best_count = None, 0\n    for a in sorted(counts):\n        if counts[a] > best_count:\n            best_count, best = counts[a], a\n    return best",
+      "fixture": "cards = [\n    {'name': 'Blue-Eyes White Dragon', 'archetype': 'Blue-Eyes', 'atk': 3000, 'def': 2500, 'level': 8},\n    {'name': 'Blue-Eyes Alternative Dragon', 'archetype': 'Blue-Eyes', 'atk': 3000, 'def': 2500, 'level': 8},\n    {'name': 'Dark Magician', 'archetype': 'Dark Magician', 'atk': 2500, 'def': 2100, 'level': 7},\n    {'name': 'Dark Magician Girl', 'archetype': 'Dark Magician', 'atk': 2000, 'def': 1700, 'level': 6},\n    {'name': 'Dark Magician of Chaos', 'archetype': 'Dark Magician', 'atk': 2800, 'def': 2600, 'level': 8},\n    {'name': 'Red-Eyes Black Dragon', 'archetype': 'Red-Eyes', 'atk': 2400, 'def': 2000, 'level': 7},\n    {'name': 'Red-Eyes Darkness Dragon', 'archetype': 'Red-Eyes', 'atk': 2800, 'def': 2400, 'level': 9},\n    {'name': 'Elemental HERO Neos', 'archetype': 'Elemental HERO', 'atk': 2500, 'def': 2000, 'level': 7},\n    {'name': 'Elemental HERO Sparkman', 'archetype': 'Elemental HERO', 'atk': 1600, 'def': 1400, 'level': 4},\n    {'name': 'Elemental HERO Avian', 'archetype': 'Elemental HERO', 'atk': 1000, 'def': 1000, 'level': 3},\n    {'name': 'Elemental HERO Burstinatrix', 'archetype': 'Elemental HERO', 'atk': 1250, 'def': 800, 'level': 3},\n    {'name': 'Kuriboh', 'archetype': 'Kuriboh', 'atk': 300, 'def': 200, 'level': 1},\n    {'name': 'Winged Kuriboh', 'archetype': 'Kuriboh', 'atk': 300, 'def': 200, 'level': 1},\n    {'name': 'Summoned Skull', 'archetype': 'Archfiend', 'atk': 2500, 'def': 1200, 'level': 6},\n    {'name': 'Jinzo', 'archetype': 'Archfiend', 'atk': 2400, 'def': 1500, 'level': 6}\n]",
+      "tests": [
+        {
+          "expr": "archetype_with_most_cards(cards)",
+          "expect": "'Elemental HERO'"
+        },
+        {
+          "expr": "archetype_with_most_cards([])",
+          "expect": "None"
+        },
+        {
+          "expr": "archetype_with_most_cards([{'name': 'X', 'archetype': 'Solo', 'atk': 1, 'def': 1, 'level': 1}])",
+          "expect": "'Solo'"
+        },
+        {
+          "expr": "archetype_with_most_cards([{'name': 'a', 'archetype': 'Zeta', 'atk': 1, 'def': 1, 'level': 1}, {'name': 'b', 'archetype': 'Alpha', 'atk': 1, 'def': 1, 'level': 1}])",
+          "expect": "'Alpha'"
+        },
+        {
+          "expr": "archetype_with_most_cards([{'name': 'a', 'archetype': 'Small', 'atk': 1, 'def': 1, 'level': 1}, {'name': 'b', 'archetype': 'Big', 'atk': 1, 'def': 1, 'level': 1}, {'name': 'c', 'archetype': 'Big', 'atk': 1, 'def': 1, 'level': 1}])",
+          "expect": "'Big'"
+        }
+      ],
+      "hints": [
+        "First tally the cards per archetype, then scan the tally for the archetype with the largest count.",
+        "Iterating the keys in sorted order with a strict > comparison makes a tie resolve to the alphabetically earlier archetype.",
+        "Build counts, then loop sorted(counts) tracking the max with if counts[a] > best_count — best stays None for an empty list, and on a tie 'Alpha' beats 'Zeta'."
+      ],
+      "xp": 20
+    },
+    {
+      "id": "py-app-strongest-per-archetype",
+      "prompt": "You are given cards, a list of card records of shape {'name', 'archetype', 'atk', 'def', 'level'}. Implement strongest_per_archetype(cards) so it returns a dict mapping each 'archetype' to the 'name' of its highest-atk card — {archetype: name}. strongest_per_archetype(cards) is {'Blue-Eyes': 'Blue-Eyes White Dragon', 'Dark Magician': 'Dark Magician of Chaos', 'Red-Eyes': 'Red-Eyes Darkness Dragon', 'Elemental HERO': 'Elemental HERO Neos', 'Kuriboh': 'Kuriboh', 'Archfiend': 'Summoned Skull'}. If two cards of the same archetype tie for highest atk, keep the one that appears first. An empty list returns an empty dict {}.",
+      "functionName": "strongest_per_archetype",
+      "starter": "def strongest_per_archetype(cards):\n    # map each archetype to the name of its highest-atk card\n    pass",
+      "solution": "def strongest_per_archetype(cards):\n    best = {}\n    for c in cards:\n        if c['archetype'] not in best or c['atk'] > best[c['archetype']]['atk']:\n            best[c['archetype']] = c\n    return {a: c['name'] for a, c in best.items()}",
+      "fixture": "cards = [\n    {'name': 'Blue-Eyes White Dragon', 'archetype': 'Blue-Eyes', 'atk': 3000, 'def': 2500, 'level': 8},\n    {'name': 'Blue-Eyes Alternative Dragon', 'archetype': 'Blue-Eyes', 'atk': 3000, 'def': 2500, 'level': 8},\n    {'name': 'Dark Magician', 'archetype': 'Dark Magician', 'atk': 2500, 'def': 2100, 'level': 7},\n    {'name': 'Dark Magician Girl', 'archetype': 'Dark Magician', 'atk': 2000, 'def': 1700, 'level': 6},\n    {'name': 'Dark Magician of Chaos', 'archetype': 'Dark Magician', 'atk': 2800, 'def': 2600, 'level': 8},\n    {'name': 'Red-Eyes Black Dragon', 'archetype': 'Red-Eyes', 'atk': 2400, 'def': 2000, 'level': 7},\n    {'name': 'Red-Eyes Darkness Dragon', 'archetype': 'Red-Eyes', 'atk': 2800, 'def': 2400, 'level': 9},\n    {'name': 'Elemental HERO Neos', 'archetype': 'Elemental HERO', 'atk': 2500, 'def': 2000, 'level': 7},\n    {'name': 'Elemental HERO Sparkman', 'archetype': 'Elemental HERO', 'atk': 1600, 'def': 1400, 'level': 4},\n    {'name': 'Elemental HERO Avian', 'archetype': 'Elemental HERO', 'atk': 1000, 'def': 1000, 'level': 3},\n    {'name': 'Elemental HERO Burstinatrix', 'archetype': 'Elemental HERO', 'atk': 1250, 'def': 800, 'level': 3},\n    {'name': 'Kuriboh', 'archetype': 'Kuriboh', 'atk': 300, 'def': 200, 'level': 1},\n    {'name': 'Winged Kuriboh', 'archetype': 'Kuriboh', 'atk': 300, 'def': 200, 'level': 1},\n    {'name': 'Summoned Skull', 'archetype': 'Archfiend', 'atk': 2500, 'def': 1200, 'level': 6},\n    {'name': 'Jinzo', 'archetype': 'Archfiend', 'atk': 2400, 'def': 1500, 'level': 6}\n]",
+      "tests": [
+        {
+          "expr": "strongest_per_archetype(cards)",
+          "expect": "{'Blue-Eyes': 'Blue-Eyes White Dragon', 'Dark Magician': 'Dark Magician of Chaos', 'Red-Eyes': 'Red-Eyes Darkness Dragon', 'Elemental HERO': 'Elemental HERO Neos', 'Kuriboh': 'Kuriboh', 'Archfiend': 'Summoned Skull'}"
+        },
+        {
+          "expr": "strongest_per_archetype([])",
+          "expect": "{}"
+        },
+        {
+          "expr": "strongest_per_archetype([{'name': 'solo', 'archetype': 'Toon', 'atk': 9, 'def': 0, 'level': 1}])",
+          "expect": "{'Toon': 'solo'}"
+        },
+        {
+          "expr": "strongest_per_archetype([{'name': 'first', 'archetype': 'X', 'atk': 50, 'def': 0, 'level': 1}, {'name': 'second', 'archetype': 'X', 'atk': 50, 'def': 0, 'level': 1}])",
+          "expect": "{'X': 'first'}"
+        },
+        {
+          "expr": "strongest_per_archetype([{'name': 'a', 'archetype': 'A', 'atk': 30, 'def': 0, 'level': 1}, {'name': 'b', 'archetype': 'B', 'atk': 20, 'def': 0, 'level': 1}, {'name': 'c', 'archetype': 'A', 'atk': 90, 'def': 0, 'level': 1}])",
+          "expect": "{'A': 'c', 'B': 'b'}"
+        }
+      ],
+      "hints": [
+        "Carry a running strongest card per archetype as you walk the list, one leader per bucket, then read each leader's 'name'.",
+        "Replace an archetype's leader only when c['atk'] is strictly greater than the stored card, so a tie keeps the earlier one.",
+        "if c['archetype'] not in best or c['atk'] > best[c['archetype']]['atk']: best[c['archetype']] = c, then map each leader to its ['name'] — the strict > makes the first Blue-Eyes win its 3000-atk tie."
+      ],
+      "xp": 20
+    }
+  ]
+}
