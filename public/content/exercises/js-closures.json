@@ -1,0 +1,105 @@
+{
+  "skillId": "js-closures",
+  "exercises": [
+    {
+      "id": "js-make-counter",
+      "prompt": "Implement makeCounter() so it returns a counter function. Each time the returned function is called it increases an internal count by 1 and returns the new value, so the first call returns 1, the second returns 2, and so on. const c = makeCounter(); c(); c(); c() returns 1, then 2, then 3. Two counters built by separate makeCounter() calls keep independent counts.",
+      "functionName": "makeCounter",
+      "starter": "function makeCounter() {\n  // return a function that returns 1, then 2, then 3, ... on successive calls\n}",
+      "solution": "function makeCounter() {\n  let count = 0\n  return () => ++count\n}",
+      "tests": [
+        { "setup": "const c = makeCounter()", "expr": "c()", "expect": "1" },
+        { "setup": "const c = makeCounter()\nc()", "expr": "c()", "expect": "2" },
+        { "setup": "const c = makeCounter()\nc()\nc()", "expr": "c()", "expect": "3" },
+        { "setup": "const a = makeCounter()\nconst b = makeCounter()\na()\na()", "expr": "b()", "expect": "1" },
+        { "setup": "const a = makeCounter()\nconst b = makeCounter()\na()\na()\na()", "expr": "a() + b()", "expect": "5" }
+      ],
+      "hints": [
+        "The count has to survive between calls, so it lives in makeCounter's scope — not inside the returned function, where it would reset to 0 every call.",
+        "Declare let count = 0 in makeCounter, then return a function that increments and returns it.",
+        "let count = 0; return () => ++count — the returned function closes over count, so it keeps climbing; because each makeCounter() call makes its own count, b stays at 1 while a advances."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-make-multiplier",
+      "prompt": "Implement makeMultiplier(n) so it returns a NEW function that multiplies its argument by n. const triple = makeMultiplier(3); triple(5) is 15. Multipliers built from different n values are independent of each other.",
+      "functionName": "makeMultiplier",
+      "starter": "function makeMultiplier(n) {\n  // return a function that multiplies its argument by n\n}",
+      "solution": "function makeMultiplier(n) {\n  return x => x * n\n}",
+      "tests": [
+        { "setup": "const triple = makeMultiplier(3)", "expr": "triple(5)", "expect": "15" },
+        { "setup": "const double = makeMultiplier(2)", "expr": "double(0)", "expect": "0" },
+        { "expr": "makeMultiplier(10)(4)", "expect": "40" },
+        { "setup": "const double = makeMultiplier(2)\nconst triple = makeMultiplier(3)", "expr": "double(5) + triple(5)", "expect": "25" },
+        { "setup": "const neg = makeMultiplier(-1)", "expr": "neg(7)", "expect": "-7" }
+      ],
+      "hints": [
+        "makeMultiplier does not multiply anything by itself — it returns a function that will, remembering the n it was built with.",
+        "Return a one-argument function that captures n and returns x * n.",
+        "return x => x * n — the captured n stays with each returned function, so double and triple compute different products from the same input."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-make-accumulator",
+      "prompt": "Implement makeAccumulator(start) so it returns a function that keeps a running total. The returned function takes a number, adds it to the total (which begins at start), and returns the new total. const acc = makeAccumulator(10); acc(5) is 15, and a following acc(3) is 18. Separate accumulators keep separate totals.",
+      "functionName": "makeAccumulator",
+      "starter": "function makeAccumulator(start) {\n  // return a function that adds its argument to a running total and returns it\n}",
+      "solution": "function makeAccumulator(start) {\n  let total = start\n  return n => {\n    total += n\n    return total\n  }\n}",
+      "tests": [
+        { "setup": "const acc = makeAccumulator(0)", "expr": "acc(5)", "expect": "5" },
+        { "setup": "const acc = makeAccumulator(10)\nacc(5)", "expr": "acc(3)", "expect": "18" },
+        { "setup": "const acc = makeAccumulator(100)", "expr": "acc(-40)", "expect": "60" },
+        { "setup": "const acc = makeAccumulator(0)\nacc(1)\nacc(2)", "expr": "acc(3)", "expect": "6" },
+        { "setup": "const a = makeAccumulator(0)\nconst b = makeAccumulator(50)\na(5)", "expr": "b(1)", "expect": "51" }
+      ],
+      "hints": [
+        "The running total must persist across calls, so declare it in makeAccumulator's scope, seeded with start.",
+        "Return a function that does total += n and then returns the updated total.",
+        "let total = start; return n => { total += n; return total } — the returned function mutates the captured total each call, and b (starting at 50) is untouched by calls to a."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-make-tally",
+      "prompt": "Implement makeTally() so it returns a tally function. Each call passes a label (a string); the tally increments a private per-label count and returns that label's new count. const t = makeTally(); t('a') is 1, a second t('a') is 2, and t('b') is 1 — each label counts separately. Two tallies from separate makeTally() calls do not share counts.",
+      "functionName": "makeTally",
+      "starter": "function makeTally() {\n  // return a function that counts how many times each label has been seen\n}",
+      "solution": "function makeTally() {\n  const counts = {}\n  return label => {\n    counts[label] = (counts[label] || 0) + 1\n    return counts[label]\n  }\n}",
+      "tests": [
+        { "setup": "const t = makeTally()", "expr": "t('a')", "expect": "1" },
+        { "setup": "const t = makeTally()\nt('a')", "expr": "t('a')", "expect": "2" },
+        { "setup": "const t = makeTally()\nt('a')\nt('b')", "expr": "t('a')", "expect": "2" },
+        { "setup": "const t = makeTally()\nt('x')\nt('x')\nt('x')", "expr": "t('y')", "expect": "1" },
+        { "setup": "const t1 = makeTally()\nconst t2 = makeTally()\nt1('a')\nt1('a')", "expr": "t2('a')", "expect": "1" }
+      ],
+      "hints": [
+        "You need memory that survives between calls and can hold many labels at once — an object kept in makeTally's scope.",
+        "For each label, bump its entry: counts[label] = (counts[label] || 0) + 1, then return that entry — || 0 covers a label's first appearance.",
+        "const counts = {}; return label => { counts[label] = (counts[label] || 0) + 1; return counts[label] } — the object is captured, so counts accumulate per label, and a fresh makeTally() gets its own empty object."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-once",
+      "prompt": "Implement once(f) so it returns a NEW function that runs f only the first time it is called and remembers f's result. Every later call returns that first result WITHOUT calling f again. const g = once(() => 42); g() is 42, and any further g() is still 42. If f increments a counter, that counter rises only once no matter how many times the wrapped function is called.",
+      "functionName": "once",
+      "starter": "function once(f) {\n  // return a function that calls f only on its first invocation, then reuses the result\n}",
+      "solution": "function once(f) {\n  let called = false\n  let result\n  return (...args) => {\n    if (!called) {\n      called = true\n      result = f(...args)\n    }\n    return result\n  }\n}",
+      "tests": [
+        { "setup": "const g = once(() => 42)", "expr": "g()", "expect": "42" },
+        { "setup": "const first = once(x => x * 2)\nfirst(5)", "expr": "first(9)", "expect": "10" },
+        { "setup": "let calls = 0\nconst f = once(() => { calls++ })\nf()\nf()\nf()", "expr": "calls", "expect": "1" },
+        { "setup": "let n = 0\nconst inc = once(() => ++n)\ninc()", "expr": "inc()", "expect": "1" },
+        { "setup": "const a = once(() => 'a')\nconst b = once(() => 'b')\na()", "expr": "b()", "expect": "'b'" }
+      ],
+      "hints": [
+        "The wrapper needs to remember two things between calls: whether f has run yet, and what it returned.",
+        "Keep a called flag and a result in once's scope. On the first call set the flag and store f's result; afterward just return the stored result.",
+        "let called = false, result; return (...args) => { if (!called) { called = true; result = f(...args) } return result } — guarding on called means f fires exactly once, so the counter test stays at 1 and later arguments are ignored."
+      ],
+      "xp": 15
+    }
+  ]
+}

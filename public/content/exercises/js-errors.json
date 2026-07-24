@@ -1,0 +1,109 @@
+{
+  "skillId": "js-errors",
+  "exercises": [
+    {
+      "id": "js-safe-divide",
+      "prompt": "Implement safeDivide(a, b) so it returns a / b, EXCEPT that when b is 0 it throws a RangeError instead of returning Infinity or NaN. safeDivide(6, 2) is 3. safeDivide(1, 0) throws a RangeError. Only a zero divisor is an error — a zero numerator like safeDivide(0, 5) is fine and returns 0.",
+      "functionName": "safeDivide",
+      "starter": "function safeDivide(a, b) {\n  // throw a RangeError when b is 0; otherwise return a / b\n}",
+      "solution": "function safeDivide(a, b) {\n  if (b === 0) throw new RangeError('cannot divide by zero')\n  return a / b\n}",
+      "tests": [
+        { "expr": "safeDivide(6, 2)", "expect": "3" },
+        { "expr": "safeDivide(9, 3)", "expect": "3" },
+        { "expr": "safeDivide(7, 2)", "expect": "3.5" },
+        { "expr": "safeDivide(0, 5)", "expect": "0" },
+        { "expr": "safeDivide(1, 0)", "raises": "RangeError" },
+        { "expr": "safeDivide(-10, 0)", "raises": "RangeError" }
+      ],
+      "hints": [
+        "Guard the bad case first: check the divisor before you divide, and throw when it is 0.",
+        "throw new RangeError('...') stops the function with an error; put it inside if (b === 0), and let return a / b sit below it for every valid case.",
+        "if (b === 0) throw new RangeError('cannot divide by zero'); return a / b — testing only b (not a) means safeDivide(0, 5) still returns 0, while safeDivide(1, 0) throws."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-checked-sqrt",
+      "prompt": "Implement checkedSqrt(x) so it returns the square root of x, but throws a RangeError when x is negative (a real square root is undefined there). checkedSqrt(9) is 3. checkedSqrt(0) is 0. checkedSqrt(-1) throws a RangeError. Use Math.sqrt for the valid case.",
+      "functionName": "checkedSqrt",
+      "starter": "function checkedSqrt(x) {\n  // throw a RangeError when x is negative; otherwise return its square root\n}",
+      "solution": "function checkedSqrt(x) {\n  if (x < 0) throw new RangeError('cannot take the square root of a negative number')\n  return Math.sqrt(x)\n}",
+      "tests": [
+        { "expr": "checkedSqrt(9)", "expect": "3" },
+        { "expr": "checkedSqrt(0)", "expect": "0" },
+        { "expr": "checkedSqrt(144)", "expect": "12" },
+        { "expr": "checkedSqrt(0.25)", "expect": "0.5" },
+        { "expr": "checkedSqrt(-1)", "raises": "RangeError" },
+        { "expr": "checkedSqrt(-100)", "raises": "RangeError" }
+      ],
+      "hints": [
+        "Only negative inputs are the problem — zero and positives all have a valid square root.",
+        "Check if (x < 0) and throw a RangeError there; otherwise return Math.sqrt(x).",
+        "if (x < 0) throw new RangeError('...'); return Math.sqrt(x) — the guard is x < 0, not x <= 0, so checkedSqrt(0) correctly returns 0 instead of throwing."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-get-at",
+      "prompt": "Implement getAt(arr, i) so it returns the element arr[i], but throws a RangeError when i is out of bounds — that is, when i is negative or i is greater than or equal to arr.length. getAt([10, 20, 30], 0) is 10. getAt([10, 20, 30], 3) throws a RangeError, and so does getAt([], 0). Any valid in-range index returns its element.",
+      "functionName": "getAt",
+      "starter": "function getAt(arr, i) {\n  // throw a RangeError when i is out of bounds; otherwise return arr[i]\n}",
+      "solution": "function getAt(arr, i) {\n  if (i < 0 || i >= arr.length) throw new RangeError('index out of range')\n  return arr[i]\n}",
+      "tests": [
+        { "expr": "getAt([10, 20, 30], 0)", "expect": "10" },
+        { "expr": "getAt([10, 20, 30], 2)", "expect": "30" },
+        { "expr": "getAt(['a', 'b'], 1)", "expect": "'b'" },
+        { "expr": "getAt([10, 20, 30], 3)", "raises": "RangeError" },
+        { "expr": "getAt([10, 20, 30], -1)", "raises": "RangeError" },
+        { "expr": "getAt([], 0)", "raises": "RangeError" }
+      ],
+      "hints": [
+        "A valid index runs from 0 up to arr.length − 1; anything outside that — negative, or too big — is an error.",
+        "Combine both bad cases in one guard: if (i < 0 || i >= arr.length) throw a RangeError.",
+        "if (i < 0 || i >= arr.length) throw new RangeError('index out of range'); return arr[i] — using >= length catches i equal to the length (index 3 on a length-3 array), where plain arr[i] would silently return undefined."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-parse-positive",
+      "prompt": "Implement parsePositive(n) so it returns n when n is a positive number, but throws a TypeError when n is 0 or negative. parsePositive(5) is 5. parsePositive(0) throws a TypeError, and parsePositive(-3) throws a TypeError. Note the error type here is TypeError, not RangeError.",
+      "functionName": "parsePositive",
+      "starter": "function parsePositive(n) {\n  // throw a TypeError when n is not positive; otherwise return n\n}",
+      "solution": "function parsePositive(n) {\n  if (n <= 0) throw new TypeError('expected a positive number')\n  return n\n}",
+      "tests": [
+        { "expr": "parsePositive(5)", "expect": "5" },
+        { "expr": "parsePositive(0.5)", "expect": "0.5" },
+        { "expr": "parsePositive(100)", "expect": "100" },
+        { "expr": "parsePositive(0)", "raises": "TypeError" },
+        { "expr": "parsePositive(-3)", "raises": "TypeError" }
+      ],
+      "hints": [
+        "Positive means strictly greater than 0, so 0 itself is not positive and must be rejected.",
+        "Guard with if (n <= 0) and throw new TypeError there — the constructor you choose sets the error's name, which the tests check.",
+        "if (n <= 0) throw new TypeError('expected a positive number'); return n — throwing a RangeError instead would fail, because the test asks specifically for a TypeError."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-withdraw",
+      "prompt": "Implement withdraw(balance, amount) so it returns the balance remaining after taking amount out — balance − amount — but throws a RangeError for an invalid withdrawal: when amount is negative, or when amount is greater than balance (an overdraft). withdraw(100, 30) is 70. Withdrawing the exact balance is allowed: withdraw(50, 50) is 0. withdraw(100, 150) throws a RangeError, and so does withdraw(100, -5).",
+      "functionName": "withdraw",
+      "starter": "function withdraw(balance, amount) {\n  // throw a RangeError for a negative amount or an overdraft; otherwise return balance - amount\n}",
+      "solution": "function withdraw(balance, amount) {\n  if (amount < 0 || amount > balance) throw new RangeError('invalid withdrawal')\n  return balance - amount\n}",
+      "tests": [
+        { "expr": "withdraw(100, 30)", "expect": "70" },
+        { "expr": "withdraw(50, 50)", "expect": "0" },
+        { "expr": "withdraw(0, 0)", "expect": "0" },
+        { "expr": "withdraw(100, 150)", "raises": "RangeError" },
+        { "expr": "withdraw(100, -5)", "raises": "RangeError" },
+        { "expr": "withdraw(20, 25)", "raises": "RangeError" }
+      ],
+      "hints": [
+        "Two things make a withdrawal invalid: a negative amount, or an amount larger than the balance — either one should throw.",
+        "Combine them: if (amount < 0 || amount > balance) throw a RangeError; otherwise return balance − amount.",
+        "if (amount < 0 || amount > balance) throw new RangeError('invalid withdrawal'); return balance - amount — the test is amount > balance, not >=, so withdrawing the exact balance (50 from 50) returns 0 rather than throwing."
+      ],
+      "xp": 15
+    }
+  ]
+}

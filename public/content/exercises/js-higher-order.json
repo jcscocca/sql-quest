@@ -1,0 +1,105 @@
+{
+  "skillId": "js-higher-order",
+  "exercises": [
+    {
+      "id": "js-apply-twice",
+      "prompt": "Implement applyTwice(f, x) so it returns the result of applying the function f to x twice — that is, f(f(x)). applyTwice(n => n + 1, 5) is 7, because f turns 5 into 6 and then 6 into 7. applyTwice(n => n - 1, 10) is 8. The function f is passed in as an argument, so call it rather than writing the operation yourself.",
+      "functionName": "applyTwice",
+      "starter": "function applyTwice(f, x) {\n  // apply f to x, then apply f to that result\n}",
+      "solution": "function applyTwice(f, x) {\n  return f(f(x))\n}",
+      "tests": [
+        { "expr": "applyTwice(n => n + 1, 5)", "expect": "7" },
+        { "expr": "applyTwice(n => n - 1, 10)", "expect": "8" },
+        { "expr": "applyTwice(n => n * 2, 3)", "expect": "12" },
+        { "expr": "applyTwice(s => s + '!', 'hi')", "expect": "'hi!!'" },
+        { "expr": "applyTwice(n => n, 9)", "expect": "9" }
+      ],
+      "hints": [
+        "f is an ordinary function you were handed — call it like any other, f(x), to run it on a value.",
+        "You need f applied twice: feed x through once, then feed that result through f again.",
+        "return f(f(x)) — the inner f(x) runs first, and its result becomes the argument to the outer f. Applying f only once would return 6, not 7, for n => n + 1 on 5."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-map-values",
+      "prompt": "Implement mapValues(obj, f) so it returns a NEW object with the same keys as obj but each value replaced by f(value). mapValues({a: 1, b: 2}, n => n * 10) is {a: 10, b: 20}. An empty object returns an empty object. Do not modify the input object.",
+      "functionName": "mapValues",
+      "starter": "function mapValues(obj, f) {\n  // return a new object with each value transformed by f\n}",
+      "solution": "function mapValues(obj, f) {\n  const out = {}\n  for (const [k, v] of Object.entries(obj)) {\n    out[k] = f(v)\n  }\n  return out\n}",
+      "tests": [
+        { "expr": "mapValues({a: 1, b: 2}, n => n * 10)", "expect": "{a: 10, b: 20}" },
+        { "expr": "mapValues({}, n => n)", "expect": "{}" },
+        { "expr": "mapValues({x: 3}, n => n + 1)", "expect": "{x: 4}" },
+        { "expr": "mapValues({a: 'hi', b: 'yo'}, s => s.toUpperCase())", "expect": "{a: 'HI', b: 'YO'}" },
+        { "setup": "const src = {a: 1}\nmapValues(src, n => n + 1)", "expr": "src", "expect": "{a: 1}" }
+      ],
+      "hints": [
+        "Object.entries(obj) hands you the [key, value] pairs, which you can walk to build a fresh object.",
+        "Start from an empty object {}, and for each [k, v] assign out[k] = f(v) — the key is copied unchanged, the value is transformed.",
+        "const out = {}; for (const [k, v] of Object.entries(obj)) out[k] = f(v); return out — building a new object leaves the caller's obj untouched, which the last test checks."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-make-adder",
+      "prompt": "Implement makeAdder(n) so it returns a NEW function that adds n to whatever it is given. makeAdder is called once to build the adder, then that adder is called with a number: const add5 = makeAdder(5); add5(10) is 15. Two adders built from different n values are independent of each other.",
+      "functionName": "makeAdder",
+      "starter": "function makeAdder(n) {\n  // return a function that adds n to its argument\n}",
+      "solution": "function makeAdder(n) {\n  return x => x + n\n}",
+      "tests": [
+        { "setup": "const add5 = makeAdder(5)", "expr": "add5(10)", "expect": "15" },
+        { "setup": "const add0 = makeAdder(0)", "expr": "add0(7)", "expect": "7" },
+        { "setup": "const addNeg = makeAdder(-3)", "expr": "addNeg(10)", "expect": "7" },
+        { "expr": "makeAdder(3)(4)", "expect": "7" },
+        { "setup": "const a = makeAdder(1)\nconst b = makeAdder(100)", "expr": "a(1) + b(1)", "expect": "103" }
+      ],
+      "hints": [
+        "makeAdder does not add anything itself — it builds and hands back a function that will do the adding later.",
+        "Return a one-argument function that remembers n: given x, it produces x + n.",
+        "return x => x + n — each call to makeAdder creates a fresh function holding its own n, so add5 and the adder built from 100 never interfere."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-compose",
+      "prompt": "Implement compose(f, g) so it returns a NEW function that feeds its input through g first and then through f — the result is f(g(x)). const h = compose(x => x + 1, x => x * 2); h(5) is 11, because g doubles 5 to 10 and then f adds 1. Order matters here: g runs before f.",
+      "functionName": "compose",
+      "starter": "function compose(f, g) {\n  // return a function that computes f(g(x))\n}",
+      "solution": "function compose(f, g) {\n  return x => f(g(x))\n}",
+      "tests": [
+        { "setup": "const h = compose(x => x + 1, x => x * 2)", "expr": "h(5)", "expect": "11" },
+        { "setup": "const h = compose(x => x * 2, x => x + 1)", "expr": "h(5)", "expect": "12" },
+        { "setup": "const h = compose(x => x - 3, x => x - 1)", "expr": "h(10)", "expect": "6" },
+        { "expr": "compose(x => x + 1, x => x + 1)(0)", "expect": "2" },
+        { "setup": "const same = compose(x => x, x => x)", "expr": "same(42)", "expect": "42" }
+      ],
+      "hints": [
+        "compose returns a function; inside it, you have two functions to run in a specific order on the input.",
+        "g is the inner step and f the outer: apply g to x, then apply f to whatever g returned.",
+        "return x => f(g(x)) — g runs first. Flipping to g(f(x)) would give 12 instead of 11 for the first test, which is exactly why another test swaps the two functions."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-hof-count-matching",
+      "prompt": "Implement countMatching(arr, pred) so it returns how many elements of arr satisfy the predicate function pred — that is, how many elements x make pred(x) return true. countMatching([1, 2, 3, 4, 5], n => n > 2) is 3. An empty array returns 0. pred is supplied by the caller, so apply it rather than hard-coding a test.",
+      "functionName": "countMatching",
+      "starter": "function countMatching(arr, pred) {\n  // count how many elements satisfy pred\n}",
+      "solution": "function countMatching(arr, pred) {\n  return arr.filter(pred).length\n}",
+      "tests": [
+        { "expr": "countMatching([1, 2, 3, 4, 5], n => n > 2)", "expect": "3" },
+        { "expr": "countMatching([], x => true)", "expect": "0" },
+        { "expr": "countMatching([1, 3, 5], n => n % 2 === 0)", "expect": "0" },
+        { "expr": "countMatching(['a', 'bb', 'ccc'], s => s.length >= 2)", "expect": "2" },
+        { "expr": "countMatching([10, 20, 30], n => n === 20)", "expect": "1" }
+      ],
+      "hints": [
+        "pred is a test you can hand to the array methods that expect a callback — you do not write the condition yourself.",
+        "filter keeps only the elements that pass pred; the count you want is how many survived.",
+        "return arr.filter(pred).length — filter builds the array of matches and .length counts them; returning the filtered array itself, instead of its length, would fail."
+      ],
+      "xp": 15
+    }
+  ]
+}

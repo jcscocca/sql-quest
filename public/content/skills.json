@@ -482,6 +482,67 @@
       ]
     },
     {
+      "id": "js-functions",
+      "name": "JavaScript · Functions & Classes",
+      "skills": [
+        {
+          "id": "js-higher-order",
+          "name": "Higher-Order Functions",
+          "trackId": "javascript",
+          "requires": ["js-records"],
+          "lesson": {
+            "intro": "Until now a function has taken values and returned a value. A higher-order function breaks that ceiling: it takes another function as an argument, returns a new function, or both — and that one idea is what map, filter, and reduce were quietly built on. Passing a function is routine — arr.filter(pred) hands filter the test to run — and writing one that accepts a callback is the same in reverse: applyTwice(f, x) simply calls f(f(x)), running whatever function it was given. The other direction is a function factory: makeAdder(n) returns a brand-new function, so const add5 = makeAdder(5) builds an adder you call later with add5(10). A returned function remembers the values that were in scope when it was created — makeAdder's returned function still knows n — which is the closure you'll study next. compose(f, g) does both jobs at once: it takes two functions and returns a third, x => f(g(x)), and here order is everything, since g runs before f. Because the function you pass or return is just a value, you can name it, store it, and hand it around like any number or string.",
+            "exampleSql": "",
+            "wrapUp": "A higher-order function treats other functions as data — accepting them as callbacks (applyTwice, mapValues, countMatching), returning them from a factory (makeAdder, compose), or both. That is the machinery under every array method you already use, and the same move scales from one-liners to whole libraries. The functions you just returned quietly captured the variables around them; next you'll make that capture the whole point — closures that hold private state between calls."
+          }
+        },
+        {
+          "id": "js-closures",
+          "name": "Closures",
+          "trackId": "javascript",
+          "requires": ["js-higher-order"],
+          "lesson": {
+            "intro": "A closure is a function bundled with the variables it captured from the scope where it was born, and those variables live on between calls, giving a function private, persistent memory. makeCounter() declares let count = 0 and returns () => ++count; the returned function keeps seeing that same count long after makeCounter has finished, so successive calls yield 1, 2, 3. The captured variable is private — nothing outside can reach count except through the function you returned — which is how closures model encapsulated state without a class in sight. Two properties recur throughout this skill. State persists across calls: an accumulator built on let total = start updates and returns that total every time it is invoked. And each call to the outer function makes a fresh, independent binding: two counters from two makeCounter() calls count separately, because each closed over its own count. The captured store can be richer than a number — an object kept in scope lets a tally remember a count per label — and a boolean flag plus a saved result is all once(f) needs to run f a single time and hand back that first answer forever after. The recipe is always the same: declare the state in the outer function, mutate it inside the inner one, and return the inner function.",
+            "exampleSql": "",
+            "wrapUp": "A closure gives a returned function private memory: declare state in the outer function, and the inner function you return keeps reading and updating it across calls — a counter that climbs, an accumulator that sums, a tally that remembers each label, a once wrapper that fires a function a single time. Because every call to the outer function creates its own binding, separate instances never collide. This is encapsulated, stateful behavior built from nothing but functions — and next you'll watch a function call itself, solving a problem in terms of smaller copies of itself."
+          }
+        },
+        {
+          "id": "js-recursion",
+          "name": "Recursion",
+          "trackId": "javascript",
+          "requires": ["js-closures"],
+          "lesson": {
+            "intro": "A recursive function solves a problem by calling itself on a smaller version of that problem, until it reaches a case small enough to answer outright. Every recursion needs two parts, and getting both right is the whole skill: a base case that returns directly without recursing — factorial(0) is 1, the sum of an empty array is 0 — and a recursive case that does a little work and defers the rest to a call on smaller input. factorial(n) is n * factorial(n - 1); the multiplications stack up until n reaches the base case, then unwind into the answer. The shrinking argument is what guarantees you reach the base case — count n down toward 0, or peel the first element off an array and recurse on arr.slice(1) — and forgetting to shrink, or forgetting the base case, is an infinite recursion that never returns. The pattern generalizes past single numbers: sumArray adds arr[0] to the sum of the rest, and when the data is nested — arrays inside arrays — an element can branch into two recursive calls, one descending into the nested array and one across the remaining elements, so the function naturally follows the data's own shape to any depth. Model each solution as 'the answer for this equals one step combined with the answer for something smaller,' and let the base case stop it.",
+            "exampleSql": "",
+            "wrapUp": "Recursion expresses an answer in terms of smaller copies of the same question: a base case ends it (0, 1, or the empty collection), and a recursive case does one step and hands the rest to itself on a shrunken input. Keep the input shrinking toward the base case and the calls stack up and then unwind into the result — factorials, running sums, powers, and arbitrarily nested arrays all fall to the same shape. Sometimes, though, an input is simply wrong for the function; next you'll handle that deliberately, throwing and recognizing errors instead of returning a bad answer."
+          }
+        },
+        {
+          "id": "js-errors",
+          "name": "Error Handling",
+          "trackId": "javascript",
+          "requires": ["js-recursion"],
+          "lesson": {
+            "intro": "Not every input deserves an answer — some deserve an error. When a value falls outside the range a function can handle, the right move is not to return NaN or undefined and hope the caller notices, but to throw, which stops the function immediately and hands a labeled error object up to whoever called it. You throw with throw new RangeError('message'): RangeError signals a value outside the allowed range (a zero divisor, a negative under a square root, an index past the end of an array), TypeError signals a value of the wrong kind or shape, and a plain Error is the generic fallback. Each error carries a name — 'RangeError', 'TypeError' — and that name is exactly what a caller, and the tests here, check to tell one failure from another, so choosing the right constructor is part of the contract. The shape of these functions is a guard clause up front: test the bad case first, throw if it holds, and let the normal return sit below for every valid input — if (b === 0) throw new RangeError('cannot divide by zero'), then return a / b. Get the boundary exactly right, since it decides which side of the line throws: withdrawing the exact balance is allowed, but a penny more overdraws. You'll validate the error cases and the valid cases side by side, because a function that always threw would be as broken as one that never did.",
+            "exampleSql": "",
+            "wrapUp": "Throwing turns a bad input into a loud, catchable failure instead of a silently wrong answer: guard the invalid case at the top of the function, throw new RangeError or TypeError with a clear message, and return normally for everything valid. The error's name is the signal the caller keys on, so the constructor you pick matters, and the boundary — > versus >=, < versus <= — decides exactly which inputs cross the line. You now write functions that police their own inputs. Next you'll gather state and the methods that guard and change it into a single unit: a class."
+          }
+        },
+        {
+          "id": "js-classes",
+          "name": "Classes & Methods",
+          "trackId": "javascript",
+          "requires": ["js-errors"],
+          "lesson": {
+            "intro": "A class is a blueprint for objects that bundle data together with the methods that operate on it — the same encapsulation a closure gives, in the shape most JavaScript code reaches for. You define it once with class Counter { ... } and create instances with new Counter(): the constructor runs at creation, receiving any arguments and setting up the instance's state as properties on this — this.count = start. Methods are functions written inside the class body, and they reach the instance's own data through this: inc() { this.count++ } changes this specific counter, value() { return this.count } reports it. The pivotal idea is that each instance carries its own state — two counters from two new Counter() calls have separate this.count, so incrementing one never touches the other, the same independence you saw across separate closures. Methods can do more than read and write a field; they can enforce rules, folding in the error handling you just learned — a bank account's withdraw throws a RangeError rather than let the balance go negative — and a constructor parameter can carry a default, constructor(start = 0), for the common case. Model a class as a little machine: the constructor builds it, the methods are the buttons, and a sequence of calls drives it from one state to the next.",
+            "exampleSql": "",
+            "wrapUp": "A class packages state and behavior: the constructor initializes each instance's own properties on this, and methods read, update, and guard that state — a counter that steps, a stack and a queue that order their elements, an account that refuses to overdraw, a rectangle that measures itself. Because every instance owns its data, many objects of the same class run independently, and a method can enforce an invariant by throwing just as your standalone validators did. That completes Functions & Classes — from higher-order functions and closures through recursion, error handling, and now the objects that tie state and methods together, you hold the tools to structure real JavaScript programs, not just single expressions."
+          }
+        }
+      ]
+    },
+    {
       "id": "py-foundations",
       "name": "Python · Foundations",
       "skills": [
