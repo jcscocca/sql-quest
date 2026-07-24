@@ -53,11 +53,6 @@ export interface CodeTest {
   raises?: string  // instead of expect: the error-type name expr must throw
 }
 
-export interface JsTest {
-  input: unknown[]
-  expected: unknown
-}
-
 export interface JsExercise {
   id: string
   prompt: string
@@ -66,7 +61,7 @@ export interface JsExercise {
   /** Reference implementation, used only by validate — never shown in the UI. */
   solution: string
   fixture?: string   // statements prepended to every test's setup in this exercise
-  tests: JsTest[]
+  tests: CodeTest[]
   hints: string[]
   xp: number
 }
@@ -84,7 +79,7 @@ export interface PyExercise {
   /** Reference implementation, used only by validate — never shown in the UI. */
   solution: string
   fixture?: string   // statements prepended to every test's setup in this exercise
-  tests: JsTest[]
+  tests: CodeTest[]
   hints: string[]
   xp: number
 }

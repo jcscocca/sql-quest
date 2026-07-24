@@ -4,11 +4,11 @@ import { CodeEditor } from './CodeEditor'
 import { createJavascriptTrack } from '../lib/tracks/javascript'
 import { type TestResult } from '../lib/js-runtime'
 import { useProgress } from '../lib/progress'
-import type { JsBank, JsTest, PyBank, Region, Skill } from '../lib/content'
+import type { JsBank, CodeTest, PyBank, Region, Skill } from '../lib/content'
 
 type RunResult = { results: TestResult[]; error?: string }
 interface CodeTrack {
-  run: (code: string, ex: { functionName: string; tests: JsTest[] }) => Promise<RunResult>
+  run: (code: string, ex: { tests: CodeTest[]; fixture?: string }) => Promise<RunResult>
   check: (r: RunResult) => { correct: boolean; reason?: string }
 }
 
@@ -185,7 +185,7 @@ export function CodeScreen({ skill, bank, region, onBack, createTrack = createJa
                     <span className="test-detail">
                       {t.error
                         ? `error: ${t.error}`
-                        : `expected ${JSON.stringify(t.expected)}, got ${JSON.stringify(t.actual)}`}
+                        : `expected ${t.expected}, got ${t.actual}`}
                     </span>
                   )}
                 </div>

@@ -1,5 +1,5 @@
 import type { TestResult } from './js-runtime'
-import type { JsTest } from './content'
+import type { CodeTest } from './content'
 
 type RunResult = { results: TestResult[]; error?: string }
 
@@ -8,7 +8,7 @@ let worker: Worker | null = null
 
 export async function runPy(
   code: string,
-  ex: { functionName: string; tests: JsTest[] },
+  ex: { tests: CodeTest[]; fixture?: string },
 ): Promise<RunResult> {
   try {
     if (!worker) worker = new Worker(new URL('./py-worker.ts', import.meta.url), { type: 'module' })
@@ -29,7 +29,7 @@ export async function runPy(
         worker = null
         resolve({ results: [], error: e.message || 'worker error' })
       }
-      w.postMessage({ code, functionName: ex.functionName, tests: ex.tests })
+      w.postMessage({ code, tests: ex.tests, fixture: ex.fixture })
     })
   } catch (e) {
     return { results: [], error: String(e) }

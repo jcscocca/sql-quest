@@ -1,11 +1,10 @@
-import { runTests } from './js-runtime'
-import type { JsTest } from './content'
+import { runCodeTests } from './js-runtime'
+import type { CodeTest } from './content'
 
-self.onmessage = (e: MessageEvent<{ code: string; functionName: string; tests: JsTest[] }>) => {
-  const { code, functionName, tests } = e.data
+self.onmessage = (e: MessageEvent<{ code: string; tests: CodeTest[]; fixture?: string }>) => {
+  const { code, tests, fixture } = e.data
   try {
-    const fn = (0, eval)(code + '\n;' + functionName)
-    self.postMessage({ results: runTests(fn, tests) })
+    self.postMessage({ results: runCodeTests(code, tests, fixture) })
   } catch (err) {
     self.postMessage({ results: [], error: String(err) })
   }

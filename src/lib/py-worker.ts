@@ -1,5 +1,6 @@
-import { deepEqual, type TestResult } from './js-runtime'
-import type { JsTest } from './content'
+import { PY_RUNNER } from './py-runner-src'
+import { withFixtureSetup, type TestResult } from './js-runtime'
+import type { CodeTest } from './content'
 
 interface Pyodide {
   runPython(code: string): unknown
@@ -19,31 +20,26 @@ function loadPyodideOnce(): Promise<Pyodide> {
   return ready
 }
 
-// JSON bridges args/results so integers stay integers (Python int, not float) and
-// lists/strings round-trip losslessly, independent of JS↔Python number heuristics.
-const RUNNER = `
-import json as _json
-def _run_case(_name, _args_json):
-    _args = _json.loads(_args_json)
-    return _json.dumps(globals()[_name](*_args))
-`
-
-self.onmessage = async (e: MessageEvent<{ code: string; functionName: string; tests: JsTest[] }>) => {
-  const { code, functionName, tests } = e.data
+self.onmessage = async (e: MessageEvent<{ code: string; tests: CodeTest[]; fixture?: string }>) => {
+  const { code, tests, fixture } = e.data
   try {
     const py = await loadPyodideOnce()
-    py.runPython(code)
-    py.runPython(RUNNER)
-    const runCase = py.globals.get('_run_case')
-    const results: TestResult[] = tests.map(t => {
-      try {
-        const actual = JSON.parse(runCase(functionName, JSON.stringify(t.input)) as string)
-        return { pass: deepEqual(actual, t.expected), expected: t.expected, actual }
-      } catch (err) {
-        return { pass: false, expected: t.expected, actual: undefined, error: String(err) }
-      }
-    })
-    runCase.destroy?.()
+    py.runPython(PY_RUNNER)
+    const folded = tests.map(t => ({ ...t, setup: withFixtureSetup(fixture, t.setup) }))
+    const runExercise = py.globals.get('_run_exercise')
+    const rows = JSON.parse(runExercise(code, JSON.stringify(folded)) as string) as [
+      boolean,
+      string,
+      string,
+      string | null,
+    ][]
+    runExercise.destroy?.()
+    const results: TestResult[] = rows.map(([pass, expected, actual, error]) => ({
+      pass,
+      expected,
+      actual,
+      error: error ?? undefined,
+    }))
     self.postMessage({ results })
   } catch (err) {
     self.postMessage({ results: [], error: String(err) })
