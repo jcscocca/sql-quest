@@ -1,0 +1,107 @@
+{
+  "skillId": "js-destructuring",
+  "exercises": [
+    {
+      "id": "js-merge-objects",
+      "prompt": "Implement mergeObjects(a, b) so it returns a new object holding all the properties of a and b, without modifying either input. When both objects have the same key, b's value wins. mergeObjects({a: 1}, {a: 2}) is {a: 2}. Two empty objects return an empty object.",
+      "functionName": "mergeObjects",
+      "starter": "function mergeObjects(a, b) {\n  // return a new merged object; b wins on conflicts\n}",
+      "solution": "function mergeObjects(a, b) {\n  return { ...a, ...b }\n}",
+      "tests": [
+        { "expr": "mergeObjects({a: 1}, {b: 2})", "expect": "{a: 1, b: 2}" },
+        { "expr": "mergeObjects({a: 1}, {a: 2})", "expect": "{a: 2}" },
+        { "expr": "mergeObjects({}, {})", "expect": "{}" },
+        { "expr": "mergeObjects({x: 1, y: 2}, {y: 3, z: 4})", "expect": "{x: 1, y: 3, z: 4}" },
+        { "expr": "mergeObjects({}, {a: 1})", "expect": "{a: 1}" },
+        { "setup": "const base = {a: 1}; mergeObjects(base, {b: 2})", "expr": "base", "expect": "{a: 1}" }
+      ],
+      "hints": [
+        "Spreading an object into a new object literal copies its properties out: { ...a } is a shallow copy of a.",
+        "Spread both, in order — the later spread overwrites keys the earlier one set, which is exactly why b should come second.",
+        "return { ...a, ...b } — building a fresh literal means the caller's base object is never touched, as the last test checks."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-head-and-rest",
+      "prompt": "Implement headAndRest(arr) so it returns a two-element array [first, rest]: first is arr's first element, and rest is a new array of all the remaining elements. headAndRest([1, 2, 3]) is [1, [2, 3]]. For a single-element array the rest is []. For an empty array, first is undefined and rest is [].",
+      "functionName": "headAndRest",
+      "starter": "function headAndRest(arr) {\n  // return [first element, array of the rest]\n}",
+      "solution": "function headAndRest(arr) {\n  const [first, ...rest] = arr\n  return [first, rest]\n}",
+      "tests": [
+        { "expr": "headAndRest([1, 2, 3])", "expect": "[1, [2, 3]]" },
+        { "expr": "headAndRest([5])", "expect": "[5, []]" },
+        { "expr": "headAndRest([])", "expect": "[undefined, []]" },
+        { "expr": "headAndRest(['a', 'b'])", "expect": "['a', ['b']]" },
+        { "expr": "headAndRest([1, 2, 3, 4])", "expect": "[1, [2, 3, 4]]" }
+      ],
+      "hints": [
+        "Array destructuring can name the first element and gather everything after it in one line.",
+        "A rest element in the pattern collects the leftovers into a real array: const [first, ...rest] = arr.",
+        "const [first, ...rest] = arr; return [first, rest] — on an empty array first is undefined and rest is [] with no extra handling."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-with-defaults",
+      "prompt": "Implement withDefaults(opts) so it returns a complete settings object, filling in any field that opts omits from these defaults: {color: 'black', size: 'M', qty: 1}. Any field opts provides overrides the default — including a provided 0 or '' — and withDefaults({}) returns exactly the defaults. Do not modify opts.",
+      "functionName": "withDefaults",
+      "starter": "function withDefaults(opts) {\n  // return the defaults with opts merged over them\n}",
+      "solution": "function withDefaults(opts) {\n  return { color: 'black', size: 'M', qty: 1, ...opts }\n}",
+      "tests": [
+        { "expr": "withDefaults({})", "expect": "{color: 'black', size: 'M', qty: 1}" },
+        { "expr": "withDefaults({size: 'L'})", "expect": "{color: 'black', size: 'L', qty: 1}" },
+        { "expr": "withDefaults({color: 'red', qty: 5})", "expect": "{color: 'red', size: 'M', qty: 5}" },
+        { "expr": "withDefaults({color: 'blue', size: 'S', qty: 2})", "expect": "{color: 'blue', size: 'S', qty: 2}" },
+        { "expr": "withDefaults({qty: 0})", "expect": "{color: 'black', size: 'M', qty: 0}" }
+      ],
+      "hints": [
+        "Lay the defaults down first, then spread opts on top so anything the caller supplied replaces the matching default.",
+        "Order is everything: the defaults must appear before ...opts, or the defaults would overwrite the caller's values.",
+        "return { color: 'black', size: 'M', qty: 1, ...opts } — because ...opts overrides by key, a provided qty of 0 correctly replaces the default 1, where qty || 1 would not."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-greet",
+      "prompt": "Implement greet(opts), where opts is an object with a name and an optional greeting, so it returns the string `${greeting}, ${name}`. When greeting is missing, default it to 'Hello'. greet({name: 'Sam'}) is 'Hello, Sam' and greet({name: 'Sam', greeting: 'Hi'}) is 'Hi, Sam'. Use object destructuring with a default value.",
+      "functionName": "greet",
+      "starter": "function greet(opts) {\n  // pull out name and greeting (default 'Hello'), then build the string\n}",
+      "solution": "function greet(opts) {\n  const { name, greeting = 'Hello' } = opts\n  return `${greeting}, ${name}`\n}",
+      "tests": [
+        { "expr": "greet({name: 'Sam'})", "expect": "'Hello, Sam'" },
+        { "expr": "greet({name: 'Sam', greeting: 'Hi'})", "expect": "'Hi, Sam'" },
+        { "expr": "greet({name: 'Ada', greeting: 'Hey'})", "expect": "'Hey, Ada'" },
+        { "expr": "greet({name: 'Bo'})", "expect": "'Hello, Bo'" },
+        { "expr": "greet({name: 'Max', greeting: 'Yo'})", "expect": "'Yo, Max'" }
+      ],
+      "hints": [
+        "Object destructuring can name the fields you want and supply a fallback for a missing one in the same pattern.",
+        "A default in the pattern kicks in only when the property is absent: const { name, greeting = 'Hello' } = opts.",
+        "const { name, greeting = 'Hello' } = opts; return `${greeting}, ${name}` — the default fills greeting whenever opts leaves it out."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-concat-all",
+      "prompt": "Implement concatAll(...arrays) so it accepts any number of array arguments and returns a single new array with all their elements in order. concatAll([1, 2], [3], [4, 5]) is [1, 2, 3, 4, 5]. Called with no arguments it returns []. Use a rest parameter to gather the arrays.",
+      "functionName": "concatAll",
+      "starter": "function concatAll(...arrays) {\n  // merge every passed array into one\n}",
+      "solution": "function concatAll(...arrays) {\n  return [].concat(...arrays)\n}",
+      "tests": [
+        { "expr": "concatAll([1, 2], [3, 4])", "expect": "[1, 2, 3, 4]" },
+        { "expr": "concatAll([1], [2], [3])", "expect": "[1, 2, 3]" },
+        { "expr": "concatAll([])", "expect": "[]" },
+        { "expr": "concatAll()", "expect": "[]" },
+        { "expr": "concatAll([1, 2])", "expect": "[1, 2]" },
+        { "expr": "concatAll([], [1], [])", "expect": "[1]" }
+      ],
+      "hints": [
+        "A rest parameter ...arrays gathers however many arguments were passed into one array of arrays.",
+        "concat joins arrays end to end, and spreading your gathered arrays feeds them all in as separate arguments: [].concat(...arrays).",
+        "return [].concat(...arrays) — with no arguments, arrays is [] and the spread contributes nothing, so you get []."
+      ],
+      "xp": 15
+    }
+  ]
+}

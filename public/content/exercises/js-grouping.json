@@ -1,0 +1,108 @@
+{
+  "skillId": "js-grouping",
+  "exercises": [
+    {
+      "id": "js-frequency",
+      "prompt": "Implement frequency(arr), where arr is an array of numbers, so it returns an object counting how many times each number appears — frequency([1, 2, 2, 3, 3, 3]) is {1: 1, 2: 2, 3: 3}. Repeated values need not be adjacent. An empty array returns an empty object {}.",
+      "functionName": "frequency",
+      "starter": "function frequency(arr) {\n  // build a {value: count} object\n}",
+      "solution": "function frequency(arr) {\n  const counts = {}\n  for (const x of arr) {\n    counts[x] = (counts[x] || 0) + 1\n  }\n  return counts\n}",
+      "tests": [
+        { "expr": "frequency([1, 2, 2, 3, 3, 3])", "expect": "{1: 1, 2: 2, 3: 3}" },
+        { "expr": "frequency([])", "expect": "{}" },
+        { "expr": "frequency([7])", "expect": "{7: 1}" },
+        { "expr": "frequency([4, 4, 4, 4])", "expect": "{4: 4}" },
+        { "expr": "frequency([1, 2, 3])", "expect": "{1: 1, 2: 1, 3: 1}" },
+        { "expr": "frequency([5, 5, 9, 5])", "expect": "{5: 3, 9: 1}" }
+      ],
+      "hints": [
+        "Keep a running tally object and walk the array, bumping one key each step.",
+        "The first time you see a value there is no count yet, so counts[x] = (counts[x] || 0) + 1 starts it at 0 before adding 1.",
+        "Loop the array updating counts[x] = (counts[x] || 0) + 1, then return counts — the last test proves non-adjacent repeats still land in the same bucket."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-group-by-parity",
+      "prompt": "Implement groupByParity(arr) so it splits arr's numbers into two buckets and returns {even: [...], odd: [...]}, each bucket holding the matching numbers in their original order. groupByParity([1, 2, 3, 4]) is {even: [2, 4], odd: [1, 3]}. Both keys are always present: an empty array returns {even: [], odd: []}.",
+      "functionName": "groupByParity",
+      "starter": "function groupByParity(arr) {\n  // sort each number into the even or odd bucket\n}",
+      "solution": "function groupByParity(arr) {\n  const groups = { even: [], odd: [] }\n  for (const x of arr) {\n    if (x % 2 === 0) groups.even.push(x)\n    else groups.odd.push(x)\n  }\n  return groups\n}",
+      "tests": [
+        { "expr": "groupByParity([1, 2, 3, 4])", "expect": "{even: [2, 4], odd: [1, 3]}" },
+        { "expr": "groupByParity([])", "expect": "{even: [], odd: []}" },
+        { "expr": "groupByParity([2, 4, 6])", "expect": "{even: [2, 4, 6], odd: []}" },
+        { "expr": "groupByParity([1, 3, 5])", "expect": "{even: [], odd: [1, 3, 5]}" },
+        { "expr": "groupByParity([4, 1, 2, 3])", "expect": "{even: [4, 2], odd: [1, 3]}" },
+        { "expr": "groupByParity([-2, -3])", "expect": "{even: [-2], odd: [-3]}" }
+      ],
+      "hints": [
+        "Start the result with both buckets already in place — { even: [], odd: [] } — so empty and all-one-parity inputs still return both keys.",
+        "Walk the numbers and push each into the right array: x % 2 === 0 chooses even, otherwise odd.",
+        "for (const x of arr) { if (x % 2 === 0) groups.even.push(x); else groups.odd.push(x) } then return groups — pushing preserves original order within each bucket."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-tally-chars",
+      "prompt": "Implement tallyChars(str) so it returns an object counting how many times each character appears in str — tallyChars('hello') is {h: 1, e: 1, l: 2, o: 1}. An empty string returns an empty object {}.",
+      "functionName": "tallyChars",
+      "starter": "function tallyChars(str) {\n  // count each character into a {char: count} object\n}",
+      "solution": "function tallyChars(str) {\n  const counts = {}\n  for (const ch of str) {\n    counts[ch] = (counts[ch] || 0) + 1\n  }\n  return counts\n}",
+      "tests": [
+        { "expr": "tallyChars('hello')", "expect": "{h: 1, e: 1, l: 2, o: 1}" },
+        { "expr": "tallyChars('')", "expect": "{}" },
+        { "expr": "tallyChars('aaa')", "expect": "{a: 3}" },
+        { "expr": "tallyChars('abc')", "expect": "{a: 1, b: 1, c: 1}" },
+        { "expr": "tallyChars('banana')", "expect": "{b: 1, a: 3, n: 2}" },
+        { "expr": "tallyChars('aba')", "expect": "{a: 2, b: 1}" }
+      ],
+      "hints": [
+        "A string can be walked one character at a time with for (const ch of str), just like an array.",
+        "It is the same frequency tally as counting numbers — the key is now a character: counts[ch] = (counts[ch] || 0) + 1.",
+        "Loop the characters updating counts[ch] = (counts[ch] || 0) + 1, then return counts; the empty string simply never enters the loop and returns {}."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-group-by-first-letter",
+      "prompt": "Implement groupByFirstLetter(words), where words is an array of non-empty strings, so it groups the words into buckets keyed by their first letter, returning {letter: [words]}. groupByFirstLetter(['apple', 'ant', 'bee']) is {a: ['apple', 'ant'], b: ['bee']}. Only letters that actually occur become keys, and words keep their original order within each bucket. An empty array returns an empty object {}.",
+      "functionName": "groupByFirstLetter",
+      "starter": "function groupByFirstLetter(words) {\n  // group words into buckets by their first letter\n}",
+      "solution": "function groupByFirstLetter(words) {\n  const groups = {}\n  for (const word of words) {\n    const key = word[0]\n    if (!(key in groups)) groups[key] = []\n    groups[key].push(word)\n  }\n  return groups\n}",
+      "tests": [
+        { "expr": "groupByFirstLetter(['apple', 'ant', 'bee'])", "expect": "{a: ['apple', 'ant'], b: ['bee']}" },
+        { "expr": "groupByFirstLetter([])", "expect": "{}" },
+        { "expr": "groupByFirstLetter(['sql'])", "expect": "{s: ['sql']}" },
+        { "expr": "groupByFirstLetter(['cat', 'car', 'cup'])", "expect": "{c: ['cat', 'car', 'cup']}" },
+        { "expr": "groupByFirstLetter(['dog', 'deer', 'ant', 'apple'])", "expect": "{d: ['dog', 'deer'], a: ['ant', 'apple']}" }
+      ],
+      "hints": [
+        "The key for each word is its first character, word[0]; several words can share one bucket.",
+        "The first time a letter shows up its bucket does not exist yet — create it with an empty array, then push into it.",
+        "if (!(key in groups)) groups[key] = []  then  groups[key].push(word) — create-then-push is what lets a bucket hold more than one word."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-group-by-length",
+      "prompt": "Implement groupByLength(words), where words is an array of strings, so it groups the words into buckets keyed by their length, returning {length: [words]}. groupByLength(['a', 'bb', 'cc', 'ddd']) is {1: ['a'], 2: ['bb', 'cc'], 3: ['ddd']}. Only lengths that actually occur become keys, and words keep their original order within each bucket. An empty array returns an empty object {}.",
+      "functionName": "groupByLength",
+      "starter": "function groupByLength(words) {\n  // group words into buckets by their length\n}",
+      "solution": "function groupByLength(words) {\n  const groups = {}\n  for (const word of words) {\n    const key = word.length\n    if (!(key in groups)) groups[key] = []\n    groups[key].push(word)\n  }\n  return groups\n}",
+      "tests": [
+        { "expr": "groupByLength(['a', 'bb', 'cc', 'ddd'])", "expect": "{1: ['a'], 2: ['bb', 'cc'], 3: ['ddd']}" },
+        { "expr": "groupByLength([])", "expect": "{}" },
+        { "expr": "groupByLength(['hi'])", "expect": "{2: ['hi']}" },
+        { "expr": "groupByLength(['x', 'y', 'z'])", "expect": "{1: ['x', 'y', 'z']}" },
+        { "expr": "groupByLength(['cat', 'dog', 'be', 'go', 'a'])", "expect": "{3: ['cat', 'dog'], 2: ['be', 'go'], 1: ['a']}" }
+      ],
+      "hints": [
+        "Same bucketing move as grouping by first letter, but the key is now a number: word.length.",
+        "Create the bucket the first time a length appears, then push the word into it.",
+        "const key = word.length; if (!(key in groups)) groups[key] = []; groups[key].push(word) — then return groups."
+      ],
+      "xp": 15
+    }
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "skillId": "js-objects",
+  "exercises": [
+    {
+      "id": "js-get-or-default",
+      "prompt": "Implement getOrDefault(obj, key, fallback) so it returns obj[key] when key is actually a property of obj, and fallback when it is not. The stored value might be falsy — 0, '', or false — and those count as present, so a key that maps to 0 returns 0, not the fallback. Test membership with the in operator rather than truthiness.",
+      "functionName": "getOrDefault",
+      "starter": "function getOrDefault(obj, key, fallback) {\n  // return the stored value if the key exists, else fallback\n}",
+      "solution": "function getOrDefault(obj, key, fallback) {\n  return key in obj ? obj[key] : fallback\n}",
+      "tests": [
+        { "expr": "getOrDefault({a: 1}, 'a', 0)", "expect": "1" },
+        { "expr": "getOrDefault({a: 1}, 'b', 0)", "expect": "0" },
+        { "expr": "getOrDefault({a: 0}, 'a', 99)", "expect": "0" },
+        { "expr": "getOrDefault({flag: false}, 'flag', true)", "expect": "false" },
+        { "expr": "getOrDefault({}, 'x', 'none')", "expect": "'none'" },
+        { "expr": "getOrDefault({a: 1, b: 2}, 'b', 0)", "expect": "2" }
+      ],
+      "hints": [
+        "The trap is that obj[key] || fallback returns the fallback whenever the stored value is falsy — but a stored 0 or false should be returned as-is.",
+        "Ask whether the key is present at all, separately from its value: key in obj is true even when the value is 0, '', or false.",
+        "return key in obj ? obj[key] : fallback — read the property only once you know the key exists."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-sum-values",
+      "prompt": "Implement sumValues(obj) so it returns the sum of all the numeric values in obj. sumValues({a: 1, b: 2, c: 3}) is 6. The keys don't matter, only the values. An empty object returns 0.",
+      "functionName": "sumValues",
+      "starter": "function sumValues(obj) {\n  // add up every value in the object\n}",
+      "solution": "function sumValues(obj) {\n  return Object.values(obj).reduce((sum, x) => sum + x, 0)\n}",
+      "tests": [
+        { "expr": "sumValues({a: 1, b: 2, c: 3})", "expect": "6" },
+        { "expr": "sumValues({})", "expect": "0" },
+        { "expr": "sumValues({x: 10})", "expect": "10" },
+        { "expr": "sumValues({a: -5, b: 5})", "expect": "0" },
+        { "expr": "sumValues({a: 2, b: 2, c: 2})", "expect": "6" },
+        { "expr": "sumValues({neg: -3, pos: 3, zero: 0})", "expect": "0" }
+      ],
+      "hints": [
+        "You only need the values, and Object.values(obj) hands them to you as an array.",
+        "Once you have the array of values, this is the same fold you used to sum any array.",
+        "return Object.values(obj).reduce((sum, x) => sum + x, 0) — the 0 seed is the empty-object answer."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-invert",
+      "prompt": "Implement invert(obj) so it returns a new object with keys and values swapped: each value becomes a key and its original key becomes the value. invert({a: 1, b: 2}) is {1: 'a', 2: 'b'}. Assume the values are unique strings or numbers. An empty object returns an empty object.",
+      "functionName": "invert",
+      "starter": "function invert(obj) {\n  // return a new object with keys and values swapped\n}",
+      "solution": "function invert(obj) {\n  const result = {}\n  for (const [key, value] of Object.entries(obj)) {\n    result[value] = key\n  }\n  return result\n}",
+      "tests": [
+        { "expr": "invert({a: 1, b: 2})", "expect": "{1: 'a', 2: 'b'}" },
+        { "expr": "invert({})", "expect": "{}" },
+        { "expr": "invert({x: 'y'})", "expect": "{y: 'x'}" },
+        { "expr": "invert({name: 'sql', level: 'hard'})", "expect": "{sql: 'name', hard: 'level'}" },
+        { "expr": "invert({a: 'x', b: 'y', c: 'z'})", "expect": "{x: 'a', y: 'b', z: 'c'}" }
+      ],
+      "hints": [
+        "Object.entries(obj) gives you each [key, value] pair, which is exactly what you need to flip.",
+        "Build a fresh result object and, for each pair, store result[value] = key — the old value is the new key.",
+        "for (const [key, value] of Object.entries(obj)) result[value] = key, then return result — the keys of the result come from the original values."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-keys-where",
+      "prompt": "Implement keysWhere(obj, min) so it returns an array of the keys whose value is greater than or equal to min, in the object's own key order. keysWhere({a: 1, b: 5, c: 3}, 3) is ['b', 'c']. An empty object, or one where no value reaches min, returns an empty array.",
+      "functionName": "keysWhere",
+      "starter": "function keysWhere(obj, min) {\n  // return the keys whose value is at least min\n}",
+      "solution": "function keysWhere(obj, min) {\n  return Object.keys(obj).filter(key => obj[key] >= min)\n}",
+      "tests": [
+        { "expr": "keysWhere({a: 1, b: 5, c: 3}, 3)", "expect": "['b', 'c']" },
+        { "expr": "keysWhere({}, 0)", "expect": "[]" },
+        { "expr": "keysWhere({a: 1, b: 2}, 10)", "expect": "[]" },
+        { "expr": "keysWhere({x: 5, y: 5}, 5)", "expect": "['x', 'y']" },
+        { "expr": "keysWhere({a: 10, b: 2, c: 8}, 8)", "expect": "['a', 'c']" },
+        { "expr": "keysWhere({only: 100}, 50)", "expect": "['only']" }
+      ],
+      "hints": [
+        "Start from the keys — Object.keys(obj) — then decide which ones to keep by looking up each value.",
+        "filter keeps the keys that pass a test; the test reads the value with obj[key] and compares it to min.",
+        "return Object.keys(obj).filter(key => obj[key] >= min) — use >= so a value exactly equal to min is kept."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-pick-defined",
+      "prompt": "Implement pickDefined(obj, keys) so it returns a new object containing only the entries of obj whose key appears in the keys array AND actually exists on obj. pickDefined({a: 1, b: 2, c: 3}, ['a', 'c']) is {a: 1, c: 3}. A requested key that obj does not have is skipped. A stored value of 0 or false still counts as existing and is kept. An empty keys array, or keys none of which exist, returns an empty object.",
+      "functionName": "pickDefined",
+      "starter": "function pickDefined(obj, keys) {\n  // copy over only the requested keys that exist on obj\n}",
+      "solution": "function pickDefined(obj, keys) {\n  const result = {}\n  for (const key of keys) {\n    if (Object.prototype.hasOwnProperty.call(obj, key)) {\n      result[key] = obj[key]\n    }\n  }\n  return result\n}",
+      "tests": [
+        { "expr": "pickDefined({a: 1, b: 2, c: 3}, ['a', 'c'])", "expect": "{a: 1, c: 3}" },
+        { "expr": "pickDefined({a: 1}, ['a', 'x'])", "expect": "{a: 1}" },
+        { "expr": "pickDefined({a: 0}, ['a'])", "expect": "{a: 0}" },
+        { "expr": "pickDefined({}, ['a'])", "expect": "{}" },
+        { "expr": "pickDefined({a: 1, b: 2}, [])", "expect": "{}" },
+        { "expr": "pickDefined({x: 5}, ['x', 'y', 'z'])", "expect": "{x: 5}" }
+      ],
+      "hints": [
+        "Walk the requested keys and, for each, decide whether obj really has it before copying it across.",
+        "Checking obj[key] for truthiness would drop a stored 0 or false — instead ask whether the property exists with obj.hasOwnProperty(key).",
+        "Loop the keys, and inside guard with Object.prototype.hasOwnProperty.call(obj, key) before setting result[key] = obj[key]; return result."
+      ],
+      "xp": 15
+    }
+  ]
+}

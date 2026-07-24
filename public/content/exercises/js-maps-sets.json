@@ -1,0 +1,131 @@
+{
+  "skillId": "js-maps-sets",
+  "exercises": [
+    {
+      "id": "js-unique",
+      "prompt": "Implement unique(arr) so it returns a Set of arr's distinct values, with duplicates collapsed. unique([1, 2, 2, 3, 3, 3]) is a Set containing 1, 2, and 3. An empty array returns an empty Set.",
+      "functionName": "unique",
+      "starter": "function unique(arr) {\n  // return a Set of the distinct values\n}",
+      "solution": "function unique(arr) {\n  return new Set(arr)\n}",
+      "tests": [
+        { "expr": "unique([1, 2, 2, 3, 3, 3])", "expect": "new Set([1, 2, 3])" },
+        { "expr": "unique([])", "expect": "new Set([])" },
+        { "expr": "unique([5, 5, 5])", "expect": "new Set([5])" },
+        { "expr": "unique(['a', 'b', 'a'])", "expect": "new Set(['a', 'b'])" },
+        { "setup": "const s = unique([1, 1, 2, 3, 3])", "expr": "s.size", "expect": "3" },
+        { "setup": "const s = unique([7, 8, 7])", "expr": "s.has(8)", "expect": "true" }
+      ],
+      "hints": [
+        "A Set stores each value at most once, so it dedupes for free — the question is how to get your array's values into one.",
+        "The Set constructor takes any iterable and keeps only distinct values: new Set([1, 1, 2]) already holds just 1 and 2.",
+        "return new Set(arr) — returning a plain array instead would fail, because a Set is compared by size and membership, not by order."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-union",
+      "prompt": "Implement union(a, b), where a and b are arrays, so it returns a Set of every value that appears in either array, with duplicates collapsed. union([1, 2], [2, 3]) is a Set containing 1, 2, and 3. Two empty arrays return an empty Set.",
+      "functionName": "union",
+      "starter": "function union(a, b) {\n  // return a Set of all values from both arrays\n}",
+      "solution": "function union(a, b) {\n  return new Set([...a, ...b])\n}",
+      "tests": [
+        { "expr": "union([1, 2], [2, 3])", "expect": "new Set([1, 2, 3])" },
+        { "expr": "union([], [])", "expect": "new Set([])" },
+        { "expr": "union([1, 1], [1])", "expect": "new Set([1])" },
+        { "expr": "union(['x'], ['y', 'x'])", "expect": "new Set(['x', 'y'])" },
+        { "setup": "const s = union([1, 2, 3], [3, 4])", "expr": "s.size", "expect": "4" },
+        { "setup": "const s = union([1, 2], [3])", "expr": "s.has(3)", "expect": "true" }
+      ],
+      "hints": [
+        "If you had a single array holding everything from both a and b, a Set would remove the overlap automatically.",
+        "Spread both arrays into one: [...a, ...b] concatenates them, then hand that to the Set constructor.",
+        "return new Set([...a, ...b]) — the size test proves the value shared by both arrays is counted only once."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-intersection",
+      "prompt": "Implement intersection(a, b), where a and b are arrays, so it returns a Set of the values that appear in BOTH arrays, with duplicates collapsed. intersection([1, 2, 3], [2, 3, 4]) is a Set containing 2 and 3. If the arrays share nothing, or either is empty, the result is an empty Set.",
+      "functionName": "intersection",
+      "starter": "function intersection(a, b) {\n  // return a Set of the values found in both arrays\n}",
+      "solution": "function intersection(a, b) {\n  const setB = new Set(b)\n  return new Set(a.filter(x => setB.has(x)))\n}",
+      "tests": [
+        { "expr": "intersection([1, 2, 3], [2, 3, 4])", "expect": "new Set([2, 3])" },
+        { "expr": "intersection([1, 2], [3, 4])", "expect": "new Set([])" },
+        { "expr": "intersection([], [1, 2])", "expect": "new Set([])" },
+        { "expr": "intersection([1, 1, 2], [1, 2, 2])", "expect": "new Set([1, 2])" },
+        { "setup": "const s = intersection([1, 2, 3, 4], [2, 4, 6])", "expr": "s.size", "expect": "2" },
+        { "setup": "const s = intersection([5, 6], [6, 7])", "expr": "s.has(6)", "expect": "true" }
+      ],
+      "hints": [
+        "To keep a value from a, you need a fast way to ask 'is this also in b?' — a Set of b answers that in one call.",
+        "Turn b into a Set, then filter a down to the values that Set contains: a.filter(x => setB.has(x)).",
+        "const setB = new Set(b); return new Set(a.filter(x => setB.has(x))) — wrapping the filtered result in a Set collapses any duplicates that a carried."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-difference",
+      "prompt": "Implement difference(a, b), where a and b are arrays, so it returns a Set of the values that appear in a but NOT in b, with duplicates collapsed. difference([1, 2, 3], [2]) is a Set containing 1 and 3. If every value of a is also in b, or a is empty, the result is an empty Set.",
+      "functionName": "difference",
+      "starter": "function difference(a, b) {\n  // return a Set of the values in a that are not in b\n}",
+      "solution": "function difference(a, b) {\n  const setB = new Set(b)\n  return new Set(a.filter(x => !setB.has(x)))\n}",
+      "tests": [
+        { "expr": "difference([1, 2, 3], [2])", "expect": "new Set([1, 3])" },
+        { "expr": "difference([1, 2], [1, 2])", "expect": "new Set([])" },
+        { "expr": "difference([], [1])", "expect": "new Set([])" },
+        { "expr": "difference([1, 1, 2, 3], [2])", "expect": "new Set([1, 3])" },
+        { "setup": "const s = difference([1, 2, 3, 4], [1, 3])", "expr": "s.size", "expect": "2" },
+        { "setup": "const s = difference([5, 6, 7], [6])", "expr": "s.has(6)", "expect": "false" }
+      ],
+      "hints": [
+        "This is the intersection move with the test flipped: keep the values of a that are NOT in b.",
+        "Make a Set of b for quick lookups, then filter a with the negated check: a.filter(x => !setB.has(x)).",
+        "const setB = new Set(b); return new Set(a.filter(x => !setB.has(x))) — the membership test confirms a value present in b is absent from the result."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-word-counts",
+      "prompt": "Implement wordCounts(words), where words is an array of strings, so it returns a Map from each word to how many times it appears. wordCounts(['a', 'b', 'a']) is a Map with 'a' → 2 and 'b' → 1. An empty array returns an empty Map. Return a Map, not a plain object.",
+      "functionName": "wordCounts",
+      "starter": "function wordCounts(words) {\n  // return a Map from each word to its count\n}",
+      "solution": "function wordCounts(words) {\n  const counts = new Map()\n  for (const w of words) {\n    counts.set(w, (counts.get(w) || 0) + 1)\n  }\n  return counts\n}",
+      "tests": [
+        { "expr": "wordCounts(['a', 'b', 'a'])", "expect": "new Map([['a', 2], ['b', 1]])" },
+        { "expr": "wordCounts([])", "expect": "new Map([])" },
+        { "expr": "wordCounts(['x'])", "expect": "new Map([['x', 1]])" },
+        { "expr": "wordCounts(['go', 'go', 'go'])", "expect": "new Map([['go', 3]])" },
+        { "setup": "const m = wordCounts(['a', 'b', 'a', 'c'])", "expr": "m.get('a')", "expect": "2" },
+        { "setup": "const m = wordCounts(['a', 'a'])", "expr": "m.size", "expect": "1" }
+      ],
+      "hints": [
+        "A Map reads and writes keyed values with .get(key) and .set(key, value), the same tally idea as an object but with method calls.",
+        "For each word, set its count to the previous count plus one: counts.set(w, (counts.get(w) || 0) + 1), where || 0 covers the first sighting.",
+        "Build a new Map(), loop the words updating counts.set(w, (counts.get(w) || 0) + 1), then return counts — a plain object would fail, since the tests check .get and .size."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-first-duplicate",
+      "prompt": "Implement firstDuplicate(arr) so it returns the first value that has already been seen earlier in arr — that is, the value whose second occurrence comes soonest. firstDuplicate([1, 2, 3, 2, 1]) is 2, because 2 repeats before 1 does. If every value is distinct, or arr is empty, return null. Track what you have seen with a Set.",
+      "functionName": "firstDuplicate",
+      "starter": "function firstDuplicate(arr) {\n  // return the first value seen twice, or null\n}",
+      "solution": "function firstDuplicate(arr) {\n  const seen = new Set()\n  for (const x of arr) {\n    if (seen.has(x)) return x\n    seen.add(x)\n  }\n  return null\n}",
+      "tests": [
+        { "expr": "firstDuplicate([1, 2, 3, 2, 1])", "expect": "2" },
+        { "expr": "firstDuplicate([1, 2, 3])", "expect": "null" },
+        { "expr": "firstDuplicate([])", "expect": "null" },
+        { "expr": "firstDuplicate([5, 5])", "expect": "5" },
+        { "expr": "firstDuplicate(['a', 'b', 'a'])", "expect": "'a'" },
+        { "expr": "firstDuplicate([1, 2, 2, 1])", "expect": "2" }
+      ],
+      "hints": [
+        "Walk the array once, remembering every value you have passed so you can recognize a repeat the instant it arrives.",
+        "A Set is the memory: before recording the current value, check whether it is already there — if so, that is your answer.",
+        "for (const x of arr) { if (seen.has(x)) return x; seen.add(x) }  then return null — returning inside the loop catches the earliest second occurrence, not the first-appearing value."
+      ],
+      "xp": 15
+    }
+  ]
+}

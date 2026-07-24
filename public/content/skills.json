@@ -421,6 +421,67 @@
       ]
     },
     {
+      "id": "js-objects-sets",
+      "name": "JavaScript · Objects, Maps & Sets",
+      "skills": [
+        {
+          "id": "js-objects",
+          "name": "Objects & Properties",
+          "trackId": "javascript",
+          "requires": ["js-nested-arrays"],
+          "lesson": {
+            "intro": "Arrays index by position; an object indexes by name, pairing string keys with values — { name: 'pikachu', hp: 35 } — which makes it the natural shape for a record or a lookup table. Read a property two ways: obj.hp when you know the key literally, or obj[key] when the key lives in a variable. The trap is the missing key: obj[key] is undefined when the key is absent, but also when the value stored there is genuinely 0, '', or false, so obj[key] || fallback quietly discards real falsy values — ask key in obj (or obj.hasOwnProperty(key)) to test presence separately from truthiness. Three built-ins turn an object back into arrays you already know how to walk: Object.keys(obj) lists its keys, Object.values(obj) its values, and Object.entries(obj) the [key, value] pairs — feed any of them to map, filter, or reduce. To build an object, start from {} and assign result[key] = value as you go, iterating with for (const [k, v] of Object.entries(obj)) when you need both sides at once.",
+            "exampleSql": "",
+            "wrapUp": "An object pairs named keys with values: reach one with obj.key or obj[key], and test presence with key in obj rather than truthiness so a stored 0 or false survives. Object.keys, Object.values, and Object.entries hand the object back as arrays you can map, filter, and reduce, and you build a new object by assigning into {} one key at a time. Next you'll put these to work counting and bucketing — turning a list into a frequency map or a set of labeled groups."
+          }
+        },
+        {
+          "id": "js-grouping",
+          "name": "Grouping & Counting",
+          "trackId": "javascript",
+          "requires": ["js-objects"],
+          "lesson": {
+            "intro": "Two object shapes answer most 'how many' and 'which ones' questions. A frequency map counts occurrences — {value: count} — and a bucket map collects items into groups — {key: [items]}. Both are built the same way: start from an empty object and, for each element, find its key and update that key's entry. For a count you write counts[key] = (counts[key] || 0) + 1, where || 0 seeds a key the first time it appears. For a bucket you must create the array before pushing: if (!(key in groups)) groups[key] = [], then groups[key].push(item) — skip that guard and the first item of each group has nowhere to land. The key can be the element itself (counting exact values), a character of a string, or something derived like a word's first letter or its length. When a prompt fixes the groups in advance — even and odd, say — seed the result with both keys ({ even: [], odd: [] }) so an empty or lopsided input still returns every bucket.",
+            "exampleSql": "",
+            "wrapUp": "Grouping is one move with two payloads: a frequency map tallies counts, a bucket map collects items — both built by keying each element and updating that entry, creating it the first time you reach it. Seed fixed groups up front so empty inputs still return every key. These plain objects work well until you need non-string keys or set-style membership, which is exactly where the Map and Set you meet next take over."
+          }
+        },
+        {
+          "id": "js-maps-sets",
+          "name": "Map & Set",
+          "trackId": "javascript",
+          "requires": ["js-grouping"],
+          "lesson": {
+            "intro": "An object's keys are always strings, and it answers 'is this present?' only indirectly. Two purpose-built collections do better. A Set is a bag of unique values: new Set(arr) drops every duplicate, set.has(x) tests membership in one call, and set.size counts the distinct values — which makes dedup, union, intersection, and difference short and clear. A Map is a lookup keyed by anything, with methods instead of bracket syntax: map.set(key, value), map.get(key), map.has(key), and map.size, so a keyed tally becomes counts.set(w, (counts.get(w) || 0) + 1). Reach for a Set when you care only whether values are present, and a Map when you associate each key with data. Two habits matter here: build a Set from an array to dedup, wrapping a filtered result in new Set(...) to collapse leftovers; and use a Set as a running memory of what you have already seen, checking has before add to catch the first repeat. Both compare by value here, so a returned Set or Map is judged by its members and size, never its insertion order.",
+            "exampleSql": "",
+            "wrapUp": "A Set holds unique values and answers membership, size, and the set operations — union, intersection, difference — while a Map associates any key with a value through get, set, has, and size. Choose the Set when presence is the whole question and the Map when each key carries data, and lean on a Set as the 'have I seen this?' memory that powers duplicate detection. Next you'll take collections apart as fluidly as you built them — destructuring and spread pull values out of arrays and objects and pour them into new ones."
+          }
+        },
+        {
+          "id": "js-destructuring",
+          "name": "Destructuring & Spread",
+          "trackId": "javascript",
+          "requires": ["js-maps-sets"],
+          "lesson": {
+            "intro": "Destructuring unpacks a collection into named variables in a single line, and spread pours a collection's contents into a new one — together they replace a lot of manual indexing and copying. Array destructuring binds by position: const [first, second] = arr, and a rest element sweeps up the tail, const [head, ...rest] = arr, giving head the first element and rest a real array of the others. Object destructuring binds by key: const { name, hp } = record, and you can attach a default for a key that might be missing, const { greeting = 'Hello' } = opts, which applies only when the property is absent. Spread is the mirror image. In an array literal, [...a, ...b] concatenates; in an object literal, { ...a, ...b } merges, and because later keys win, { ...defaults, ...opts } fills in gaps while letting the caller override — even with a falsy 0. A rest parameter, function f(...args), gathers any number of arguments into an array on the way in, the same syntax working in reverse.",
+            "exampleSql": "",
+            "wrapUp": "Destructuring names the pieces of an array by position or an object by key — with defaults for what might be missing and a rest element for the leftovers — while spread does the reverse, merging or copying into fresh arrays and objects where later values win. A rest parameter gathers arguments the same way. Because spread builds new collections, it is also how you update data without mutating the caller's copy. Next you'll aim all of this at realistic data: arrays of record objects, the everyday shape of a table of rows."
+          }
+        },
+        {
+          "id": "js-records",
+          "name": "Working with Records",
+          "trackId": "javascript",
+          "requires": ["js-destructuring"],
+          "lesson": {
+            "intro": "Real data is rarely a bare list of numbers — it is a list of records, each an object with named fields, which is exactly a database table in JavaScript form. This skill works a roster of Pokémon: an array like [{ name: 'charmander', type: 'fire', attack: 52 }, { name: 'squirtle', type: 'water', attack: 48 }, ...], which you can see in the data panel beside each exercise. Every tool you need is already in hand. Reach a field with p.name or p.attack. filter keeps the records matching a test — roster.filter(p => p.type === 'fire') — and map projects each record down to one field, roster.map(p => p.name), so filter-then-map answers 'the names of every fire type.' reduce aggregates the whole array: a running total of attack, or a running best record for 'the strongest.' And the same object-building you practiced turns records into a summary — countByType walks the roster tallying counts[p.type]. The prompts state each record's shape in words, so you can solve them from the description alone, but glance at the panel to picture the data you are shaping.",
+            "exampleSql": "",
+            "wrapUp": "An array of record objects is the shape of real tabular data, and you now query it with the tools you already had: p.field to read a column, filter to pick rows, map to project a field, and reduce to aggregate a total or find an extreme — while object-building tallies a roster into a summary. filter-then-map is the everyday 'select these fields where this holds,' the same question SELECT answers in SQL. That completes Objects, Maps & Sets: you can model records, count and bucket them, dedupe and look them up, and take them apart with destructuring — the full toolkit for shaping structured data in JavaScript."
+          }
+        }
+      ]
+    },
+    {
       "id": "py-foundations",
       "name": "Python · Foundations",
       "skills": [

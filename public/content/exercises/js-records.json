@@ -1,0 +1,111 @@
+{
+  "skillId": "js-records",
+  "exercises": [
+    {
+      "id": "js-names-of-type",
+      "prompt": "You are given roster, an array of Pokémon records, each an object { name, type, attack } — for example { name: 'charmander', type: 'fire', attack: 52 }. Implement namesOfType(roster, type) so it returns an array of the names of every record whose type equals the given type, in the roster's original order. namesOfType(roster, 'fire') is ['charmander', 'vulpix', 'growlithe']. A type no record has, or an empty roster, returns an empty array.",
+      "functionName": "namesOfType",
+      "fixture": "const roster = [\n  { name: 'charmander', type: 'fire', attack: 52 },\n  { name: 'squirtle', type: 'water', attack: 48 },\n  { name: 'bulbasaur', type: 'grass', attack: 49 },\n  { name: 'pikachu', type: 'electric', attack: 55 },\n  { name: 'vulpix', type: 'fire', attack: 41 },\n  { name: 'psyduck', type: 'water', attack: 52 },\n  { name: 'oddish', type: 'grass', attack: 50 },\n  { name: 'growlithe', type: 'fire', attack: 70 }\n]",
+      "starter": "function namesOfType(roster, type) {\n  // return the names of records matching type, in order\n}",
+      "solution": "function namesOfType(roster, type) {\n  return roster.filter(p => p.type === type).map(p => p.name)\n}",
+      "tests": [
+        { "expr": "namesOfType(roster, 'fire')", "expect": "['charmander', 'vulpix', 'growlithe']" },
+        { "expr": "namesOfType(roster, 'water')", "expect": "['squirtle', 'psyduck']" },
+        { "expr": "namesOfType(roster, 'electric')", "expect": "['pikachu']" },
+        { "expr": "namesOfType(roster, 'dragon')", "expect": "[]" },
+        { "expr": "namesOfType([], 'fire')", "expect": "[]" },
+        { "expr": "namesOfType(roster, 'grass')", "expect": "['bulbasaur', 'oddish']" }
+      ],
+      "hints": [
+        "Two steps: keep only the records of the right type, then pull the name out of each survivor.",
+        "filter narrows the records by a test on each one — p => p.type === type — and map turns each kept record into a single field.",
+        "return roster.filter(p => p.type === type).map(p => p.name) — filtering before mapping keeps the names in their original order."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-strongest",
+      "prompt": "You are given roster, an array of Pokémon records of shape { name, type, attack }. Implement strongest(roster) so it returns the name of the record with the highest attack. strongest(roster) is 'growlithe'. Assume the roster has at least one record and a single clear winner.",
+      "functionName": "strongest",
+      "fixture": "const roster = [\n  { name: 'charmander', type: 'fire', attack: 52 },\n  { name: 'squirtle', type: 'water', attack: 48 },\n  { name: 'bulbasaur', type: 'grass', attack: 49 },\n  { name: 'pikachu', type: 'electric', attack: 55 },\n  { name: 'vulpix', type: 'fire', attack: 41 },\n  { name: 'psyduck', type: 'water', attack: 52 },\n  { name: 'oddish', type: 'grass', attack: 50 },\n  { name: 'growlithe', type: 'fire', attack: 70 }\n]",
+      "starter": "function strongest(roster) {\n  // return the name of the highest-attack record\n}",
+      "solution": "function strongest(roster) {\n  return roster.reduce((best, p) => (p.attack > best.attack ? p : best)).name\n}",
+      "tests": [
+        { "expr": "strongest(roster)", "expect": "'growlithe'" },
+        { "expr": "strongest([{ name: 'solo', type: 'x', attack: 10 }])", "expect": "'solo'" },
+        { "expr": "strongest([{ name: 'a', type: 'x', attack: 5 }, { name: 'b', type: 'y', attack: 8 }])", "expect": "'b'" },
+        { "expr": "strongest([{ name: 'a', type: 'x', attack: 8 }, { name: 'b', type: 'y', attack: 5 }])", "expect": "'a'" },
+        { "expr": "strongest([{ name: 'lo', type: 'x', attack: 1 }, { name: 'hi', type: 'y', attack: 100 }, { name: 'mid', type: 'z', attack: 50 }])", "expect": "'hi'" }
+      ],
+      "hints": [
+        "Fold the records down to the single best one by carrying the current leader as you go, then read its name at the end.",
+        "reduce with no initial value seeds the accumulator with the first record; each step keeps whichever of best and p has the larger attack.",
+        "return roster.reduce((best, p) => (p.attack > best.attack ? p : best)).name — compare on .attack while carrying the whole record, so .name is there when you finish."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-count-by-type",
+      "prompt": "You are given roster, an array of Pokémon records of shape { name, type, attack }. Implement countByType(roster) so it returns an object mapping each type to how many records have it — { type: count }. countByType(roster) is {fire: 3, water: 2, grass: 2, electric: 1}. An empty roster returns an empty object {}.",
+      "functionName": "countByType",
+      "fixture": "const roster = [\n  { name: 'charmander', type: 'fire', attack: 52 },\n  { name: 'squirtle', type: 'water', attack: 48 },\n  { name: 'bulbasaur', type: 'grass', attack: 49 },\n  { name: 'pikachu', type: 'electric', attack: 55 },\n  { name: 'vulpix', type: 'fire', attack: 41 },\n  { name: 'psyduck', type: 'water', attack: 52 },\n  { name: 'oddish', type: 'grass', attack: 50 },\n  { name: 'growlithe', type: 'fire', attack: 70 }\n]",
+      "starter": "function countByType(roster) {\n  // tally records into a {type: count} object\n}",
+      "solution": "function countByType(roster) {\n  const counts = {}\n  for (const p of roster) {\n    counts[p.type] = (counts[p.type] || 0) + 1\n  }\n  return counts\n}",
+      "tests": [
+        { "expr": "countByType(roster)", "expect": "{fire: 3, water: 2, grass: 2, electric: 1}" },
+        { "expr": "countByType([])", "expect": "{}" },
+        { "expr": "countByType([{ name: 'a', type: 'fire', attack: 1 }])", "expect": "{fire: 1}" },
+        { "expr": "countByType([{ name: 'a', type: 'fire', attack: 1 }, { name: 'b', type: 'fire', attack: 2 }])", "expect": "{fire: 2}" },
+        { "setup": "const c = countByType(roster)", "expr": "c.water", "expect": "2" }
+      ],
+      "hints": [
+        "This is a frequency tally, but the value you count is each record's type field rather than the record itself.",
+        "Walk the records and bump the bucket for p.type: counts[p.type] = (counts[p.type] || 0) + 1.",
+        "Loop the roster updating counts[p.type] = (counts[p.type] || 0) + 1, then return counts — || 0 handles the first record of each type."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-total-attack",
+      "prompt": "You are given roster, an array of Pokémon records of shape { name, type, attack }. Implement totalAttack(roster) so it returns the sum of the attack fields across all records. totalAttack(roster) is 417. An empty roster returns 0.",
+      "functionName": "totalAttack",
+      "fixture": "const roster = [\n  { name: 'charmander', type: 'fire', attack: 52 },\n  { name: 'squirtle', type: 'water', attack: 48 },\n  { name: 'bulbasaur', type: 'grass', attack: 49 },\n  { name: 'pikachu', type: 'electric', attack: 55 },\n  { name: 'vulpix', type: 'fire', attack: 41 },\n  { name: 'psyduck', type: 'water', attack: 52 },\n  { name: 'oddish', type: 'grass', attack: 50 },\n  { name: 'growlithe', type: 'fire', attack: 70 }\n]",
+      "starter": "function totalAttack(roster) {\n  // add up every record's attack\n}",
+      "solution": "function totalAttack(roster) {\n  return roster.reduce((sum, p) => sum + p.attack, 0)\n}",
+      "tests": [
+        { "expr": "totalAttack(roster)", "expect": "417" },
+        { "expr": "totalAttack([])", "expect": "0" },
+        { "expr": "totalAttack([{ name: 'a', type: 'x', attack: 10 }])", "expect": "10" },
+        { "expr": "totalAttack([{ name: 'a', type: 'x', attack: 5 }, { name: 'b', type: 'y', attack: 7 }])", "expect": "12" },
+        { "expr": "totalAttack([{ name: 'a', type: 'x', attack: 0 }])", "expect": "0" }
+      ],
+      "hints": [
+        "Fold the records into one running total, adding each record's attack rather than the record.",
+        "reduce with a 0 seed accumulates the sum: (sum, p) => sum + p.attack.",
+        "return roster.reduce((sum, p) => sum + p.attack, 0) — the 0 seed is both the starting total and the empty-roster answer."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-strongest-of-type",
+      "prompt": "You are given roster, an array of Pokémon records of shape { name, type, attack }. Implement strongestOfType(roster, type) so it returns the name of the highest-attack record among those whose type equals the given type — ignoring records of any other type. strongestOfType(roster, 'water') is 'psyduck'. Assume at least one record has the requested type.",
+      "functionName": "strongestOfType",
+      "fixture": "const roster = [\n  { name: 'charmander', type: 'fire', attack: 52 },\n  { name: 'squirtle', type: 'water', attack: 48 },\n  { name: 'bulbasaur', type: 'grass', attack: 49 },\n  { name: 'pikachu', type: 'electric', attack: 55 },\n  { name: 'vulpix', type: 'fire', attack: 41 },\n  { name: 'psyduck', type: 'water', attack: 52 },\n  { name: 'oddish', type: 'grass', attack: 50 },\n  { name: 'growlithe', type: 'fire', attack: 70 }\n]",
+      "starter": "function strongestOfType(roster, type) {\n  // return the name of the strongest record of the given type\n}",
+      "solution": "function strongestOfType(roster, type) {\n  return roster\n    .filter(p => p.type === type)\n    .reduce((best, p) => (p.attack > best.attack ? p : best))\n    .name\n}",
+      "tests": [
+        { "expr": "strongestOfType(roster, 'fire')", "expect": "'growlithe'" },
+        { "expr": "strongestOfType(roster, 'water')", "expect": "'psyduck'" },
+        { "expr": "strongestOfType(roster, 'grass')", "expect": "'oddish'" },
+        { "expr": "strongestOfType(roster, 'electric')", "expect": "'pikachu'" },
+        { "expr": "strongestOfType([{ name: 'a', type: 'fire', attack: 3 }, { name: 'b', type: 'water', attack: 9 }, { name: 'c', type: 'fire', attack: 7 }], 'fire')", "expect": "'c'" }
+      ],
+      "hints": [
+        "Narrow to just the records of the requested type first, so the global strongest of another type cannot sneak in.",
+        "After filter, fold the survivors to the biggest with the same running-best reduce, then read its .name.",
+        "roster.filter(p => p.type === type).reduce((best, p) => (p.attack > best.attack ? p : best)).name — the last test proves a stronger record of another type is correctly ignored."
+      ],
+      "xp": 15
+    }
+  ]
+}
