@@ -97,7 +97,9 @@
         { "expr": "has_duplicates([])", "expect": "False" },
         { "expr": "has_duplicates([5, 5, 5])", "expect": "True" },
         { "expr": "has_duplicates([1, 2, 3, 1])", "expect": "True" },
-        { "expr": "has_duplicates([9])", "expect": "False" }
+        { "expr": "has_duplicates([9])", "expect": "False" },
+        { "expr": "has_duplicates([1, 2, 2]) is True", "expect": "True" },
+        { "expr": "has_duplicates([1, 2, 3]) is False", "expect": "True" }
       ],
       "hints": [
         "Building a set drops duplicates, so if the set is smaller than the list, something must have collapsed.",
