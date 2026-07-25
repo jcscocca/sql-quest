@@ -147,6 +147,34 @@ test('addCatches tags entries with world and label, deduping by world+name', () 
   expect(useProgress.getState().collection.length).toBe(4)
 })
 
+test('addCatches dedupes repeats inside a single call', () => {
+  const added = useProgress.getState().addCatches('pokemon', [
+    { name: 'pikachu', label: 'electric' },
+    { name: 'pikachu', label: 'electric' },
+  ])
+  expect(added.map(e => e.name)).toEqual(['pikachu'])
+  expect(useProgress.getState().collection).toHaveLength(1)
+})
+
+test('recordReview ignores a skill that has no progress yet', () => {
+  useProgress.getState().recordReview('never-started', true)
+  expect(useProgress.getState().skills['never-started']).toBeUndefined()
+})
+
+test('importState backfills a review schedule for completed SQL skills', () => {
+  useProgress.getState().importState({
+    version: 1,
+    xp: 10,
+    streak: { count: 1, lastDay: '2026-07-18' },
+    skills: { 'select-basics': { solved: ['sb-1', 'sb-2'], completed: true, mastery: 3 } },
+    collection: [],
+    badges: [],
+  } as unknown as ProgressState)
+  const sk = useProgress.getState().skills['select-basics']
+  expect(sk.interval).toBe(2)
+  expect(sk.due).toBe(todayString())
+})
+
 test('legacy string collection entries migrate to pokemon-world entries', async () => {
   const { set: idbSet } = await import('idb-keyval')
   await idbSet('sql-quest-progress', {

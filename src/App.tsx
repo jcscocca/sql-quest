@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { HomeScreen } from './components/HomeScreen'
 import { ExerciseScreen } from './components/ExerciseScreen'
 import { CodeScreen } from './components/CodeScreen'
@@ -47,6 +47,12 @@ export default function App() {
         useProgress.getState().awardBadge(`region:${region.id}`)
     }
   }, [content, hydrated])
+
+  const today = todayString()
+  const reviewItems = useMemo(
+    () => (content ? assembleReview(skills, content.banks, today) : []),
+    [skills, content, today],
+  )
 
   if (error)
     return (
@@ -113,8 +119,6 @@ export default function App() {
       />
     )
   }
-  const today = todayString()
-  const reviewItems = assembleReview(skills, content.banks, today)
   const allSkills = content.curriculum.regions.flatMap(r => r.skills)
   const foundationsRegion = content.curriculum.regions.find(r => r.id === 'foundations')
   const worlds = [

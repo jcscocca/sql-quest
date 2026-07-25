@@ -173,7 +173,12 @@ export const useProgress = create<ProgressStore>((set, get) => ({
   addCatches(world, entries) {
     if (entries.length === 0) return []
     const s = get()
-    const fresh = entries.filter(e => !s.collection.some(c => c.world === world && c.name === e.name))
+    const seen = new Set(s.collection.filter(c => c.world === world).map(c => c.name))
+    const fresh = entries.filter(e => {
+      if (seen.has(e.name)) return false
+      seen.add(e.name)
+      return true
+    })
     if (fresh.length === 0) return []
     const tagged = fresh.map(e => ({ world, name: e.name, label: e.label }))
     const next: ProgressState = { ...dataOf(s), collection: [...s.collection, ...tagged] }

@@ -45,9 +45,16 @@ async function doLoadWorld(world: string, tables: string[]): Promise<void> {
   loadedTables = tables
 }
 
+// Loads are serialized: two overlapping calls for different worlds would each run
+// their CREATE OR REPLACE to completion and leave loadedWorld set by whichever
+// finished last, so the next same-world call would wrongly skip its load.
+let loadChain: Promise<void> = Promise.resolve()
+
 export async function loadWorld(world: string, tables: string[]): Promise<void> {
   if (restartPromise) await restartPromise
-  return doLoadWorld(world, tables)
+  const run = () => doLoadWorld(world, tables)
+  loadChain = loadChain.then(run, run)
+  return loadChain
 }
 
 export async function runQuery(sql: string): Promise<QueryResult> {
