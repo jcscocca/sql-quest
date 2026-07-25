@@ -20,10 +20,11 @@ function loadPyodideOnce(): Promise<Pyodide> {
   return ready
 }
 
-self.onmessage = async (e: MessageEvent<{ code: string; tests: CodeTest[]; fixture?: string }>) => {
-  const { code, tests, fixture } = e.data
+self.onmessage = async (e: MessageEvent<{ id: number; code: string; tests: CodeTest[]; fixture?: string }>) => {
+  const { id, code, tests, fixture } = e.data
   try {
     const py = await loadPyodideOnce()
+    self.postMessage({ id, ready: true })
     py.runPython(PY_RUNNER)
     const folded = tests.map(t => ({ ...t, setup: withFixtureSetup(fixture, t.setup) }))
     const runExercise = py.globals.get('_run_exercise')
@@ -40,8 +41,8 @@ self.onmessage = async (e: MessageEvent<{ code: string; tests: CodeTest[]; fixtu
       actual,
       error: error ?? undefined,
     }))
-    self.postMessage({ results })
+    self.postMessage({ id, results })
   } catch (err) {
-    self.postMessage({ results: [], error: String(err) })
+    self.postMessage({ id, results: [], error: String(err) })
   }
 }

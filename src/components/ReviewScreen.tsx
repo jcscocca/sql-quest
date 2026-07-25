@@ -49,6 +49,7 @@ export function ReviewScreen({ items, schemas, curriculum, onDone }: {
   const track = trackRef.current
 
   useEffect(() => {
+    setEngineReady(false)
     track?.prepare(allSkills.find(s => s.id === item?.skillId), schema)
       .then(() => setEngineReady(true))
       .catch(e => setFeedback({ kind: 'error', friendly: String(e), raw: '' }))

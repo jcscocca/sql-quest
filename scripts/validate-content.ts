@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { DuckDBInstance } from '@duckdb/node-api'
 import { compareResults, type QueryResult } from '../src/lib/compare'
 import { runCodeTests, withFixtureSetup } from '../src/lib/js-runtime'
@@ -30,6 +30,25 @@ for (const s of skills)
   for (const r of s.requires)
     if (!ids.has(r)) failures.push(`${s.id}: unknown prerequisite "${r}"`)
 
+// Every skill must be openable by completing prerequisites: walk out from the
+// no-prereq skills and flag anything left, which means a cycle or a dead end.
+const reachable = new Set<string>()
+for (let grew = true; grew; ) {
+  grew = false
+  for (const s of skills)
+    if (!reachable.has(s.id) && s.requires.every(r => reachable.has(r))) {
+      reachable.add(s.id)
+      grew = true
+    }
+}
+for (const s of skills)
+  if (!reachable.has(s.id))
+    failures.push(`${s.id}: unreachable — prerequisite cycle or dead end in requires`)
+
+const bankDir = 'public/content/exercises'
+for (const f of readdirSync(bankDir).filter(f => f.endsWith('.json')))
+  if (!ids.has(f.replace(/\.json$/, ''))) failures.push(`orphan exercise bank "${f}" — no skill with that id`)
+
 const db = await DuckDBInstance.create()
 const conn = await db.connect()
 
@@ -53,13 +72,15 @@ for (const w of worlds) {
   for (const t of schema.tables)
     await conn.run(`CREATE OR REPLACE TABLE ${t.name} AS SELECT * FROM 'public/worlds/${w}/${t.name}.parquet'`)
   if (schema.entity) {
+    // labelColumn is selected by the catch reward query at runtime, so it has to resolve too
+    const entityCols = [schema.entity.column, schema.entity.labelColumn].filter(Boolean).join(', ')
     try {
-      await conn.run(`SELECT ${schema.entity.column} FROM ${schema.entity.table} LIMIT 1`)
+      await conn.run(`SELECT ${entityCols} FROM ${schema.entity.table} LIMIT 1`)
       const nameReader = await conn.runAndReadAll(`SELECT DISTINCT ${schema.entity.column} FROM ${schema.entity.table}`)
       entityNames[w] = new Set(nameReader.getRows().map(r => String(r[0])))
       catchableByWorld[w] = new Set()
     } catch {
-      failures.push(`world ${w}: entity ${schema.entity.table}.${schema.entity.column} is not queryable`)
+      failures.push(`world ${w}: entity ${schema.entity.table} (${entityCols}) is not queryable`)
     }
   }
 }
@@ -93,6 +114,7 @@ for (const skill of skills) {
       checked++
       const tag = `${skill.id}/${ex.id}`
       idBanks.set(ex.id, [...(idBanks.get(ex.id) ?? []), skill.id])
+      if (!ex.prompt?.trim()) failures.push(`${tag}: missing prompt`)
       if (!ex.functionName?.trim()) failures.push(`${tag}: missing functionName`)
       if (!ex.starter?.trim()) failures.push(`${tag}: missing starter`)
       if (!ex.solution?.trim()) failures.push(`${tag}: missing solution`)
@@ -134,6 +156,7 @@ for (const skill of skills) {
       checked++
       const tag = `${skill.id}/${ex.id}`
       idBanks.set(ex.id, [...(idBanks.get(ex.id) ?? []), skill.id])
+      if (!ex.prompt?.trim()) failures.push(`${tag}: missing prompt`)
       if (!ex.functionName?.trim()) failures.push(`${tag}: missing functionName`)
       if (!ex.starter?.trim()) failures.push(`${tag}: missing starter`)
       if (!ex.solution?.trim()) failures.push(`${tag}: missing solution`)
@@ -185,6 +208,7 @@ for (const skill of skills) {
     checked++
     idBanks.set(ex.id, [...(idBanks.get(ex.id) ?? []), skill.id])
     const tag = `${skill.id}/${ex.id}`
+    if (!ex.prompt?.trim()) failures.push(`${tag}: missing prompt`)
     if (ex.hints.length !== 3) failures.push(`${tag}: expected 3 hints, found ${ex.hints.length}`)
     try {
       const a = await run(ex.referenceSql)
@@ -230,7 +254,10 @@ for (const [id, banks] of idBanks)
 for (const w of Object.keys(catchableByWorld)) {
   const manifestPath = `public/sprites/${w}/manifest.json`
   if (!existsSync(manifestPath)) {
-    console.warn(`${w}: no sprite manifest, skipping sprite coverage check`)
+    if (catchableByWorld[w].size > 0)
+      failures.push(
+        `${w}: ${catchableByWorld[w].size} catchable entities but no sprite manifest — run: npm run build:sprites ${w}`,
+      )
     continue
   }
   const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as { entities: Record<string, string> }

@@ -5,6 +5,12 @@ type RunResult = { results: TestResult[]; error?: string }
 
 // One long-lived worker so Pyodide is fetched/loaded once; reset it if a run is killed.
 let worker: Worker | null = null
+let nextId = 1
+
+// The cold CDN fetch of Pyodide is far slower than any exercise, so it gets its own
+// budget: the execution clock only starts once the worker reports the runtime is up.
+const LOAD_TIMEOUT = 60000
+const RUN_TIMEOUT = 15000
 
 export async function runPy(
   code: string,
@@ -13,23 +19,39 @@ export async function runPy(
   try {
     if (!worker) worker = new Worker(new URL('./py-worker.ts', import.meta.url), { type: 'module' })
     const w = worker
+    const id = nextId++
     return await new Promise<RunResult>(resolve => {
-      const timer = setTimeout(() => {
-        w.terminate()
-        worker = null
-        resolve({ results: [], error: 'timed out' })
-      }, 15000)
-      w.onmessage = (e: MessageEvent) => {
+      let timer: ReturnType<typeof setTimeout> | undefined
+      const done = (r: RunResult) => {
         clearTimeout(timer)
-        resolve(e.data as RunResult)
+        w.removeEventListener('message', onMessage)
+        w.removeEventListener('error', onError)
+        resolve(r)
       }
-      w.onerror = (e: ErrorEvent) => {
-        clearTimeout(timer)
+      const kill = () => {
         w.terminate()
-        worker = null
-        resolve({ results: [], error: e.message || 'worker error' })
+        if (worker === w) worker = null
+        done({ results: [], error: 'timed out' })
       }
-      w.postMessage({ code, tests: ex.tests, fixture: ex.fixture })
+      const onMessage = (e: MessageEvent) => {
+        const data = e.data as { id?: number; ready?: boolean } & RunResult
+        if (data.id !== id) return
+        if (data.ready) {
+          clearTimeout(timer)
+          timer = setTimeout(kill, RUN_TIMEOUT)
+          return
+        }
+        done(data)
+      }
+      const onError = (e: ErrorEvent) => {
+        w.terminate()
+        if (worker === w) worker = null
+        done({ results: [], error: e.message || 'worker error' })
+      }
+      timer = setTimeout(kill, LOAD_TIMEOUT)
+      w.addEventListener('message', onMessage)
+      w.addEventListener('error', onError)
+      w.postMessage({ id, code, tests: ex.tests, fixture: ex.fixture })
     })
   } catch (e) {
     return { results: [], error: String(e) }
