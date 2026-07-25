@@ -78,3 +78,41 @@ test('adjacent values are not concatenation-confused', () => {
   const ref = res(['a', 'b'], [['xy', 'z']])
   expect(compareResults(user, ref).equal).toBe(false)
 })
+
+// Matching user columns to reference ones is a permutation search. When many
+// columns share a value multiset every column is a candidate for every slot,
+// which used to cost O(n!) — a 10-column Latin square took ~11s on the main
+// thread. These pin the two guards: prefix pruning, and a hard budget.
+const cols = (n: number) => Array.from({ length: n }, (_, i) => `c${i}`)
+
+test('columns sharing a value multiset do not blow up the search', () => {
+  const n = 10
+  // Latin squares: every column holds {0..n-1}, so nothing is ruled out
+  // up front, yet no column permutation reconciles the rows.
+  const ref = res(cols(n), Array.from({ length: n }, (_, r) => Array.from({ length: n }, (_, c) => (r + c) % n)))
+  const user = res(cols(n), Array.from({ length: n }, (_, r) => Array.from({ length: n }, (_, c) => (r + 2 * c) % n)))
+  const started = Date.now()
+  expect(compareResults(user, ref).equal).toBe(false)
+  expect(Date.now() - started).toBeLessThan(1000)
+})
+
+test('an unmatchable result with duplicate columns gives up instead of hanging', () => {
+  const n = 14
+  // An all-identical prefix defeats prefix pruning, so only the budget bounds this.
+  const pad = (v: number) => Array.from({ length: n - 2 }, () => v)
+  const ref = res(cols(n), [[...pad(0), 1, 'x'], [...pad(0), 2, 'y']])
+  const user = res(cols(n), [[...pad(0), 1, 'y'], [...pad(0), 2, 'x']])
+  const started = Date.now()
+  const out = compareResults(user, ref)
+  expect(out.equal).toBe(false)
+  expect(out.reason).toContain('interchangeable')
+  expect(Date.now() - started).toBeLessThan(1000)
+})
+
+test('the budget never rejects a correct answer with duplicate columns', () => {
+  const n = 40
+  const pad = (v: number) => Array.from({ length: n - 2 }, () => v)
+  const rows = [[...pad(0), 1, 'x'], [...pad(0), 2, 'y']]
+  const rotated = rows.map(r => [r[n - 1], ...r.slice(0, n - 1)])
+  expect(compareResults(res(cols(n), rotated), res(cols(n), rows)).equal).toBe(true)
+})
