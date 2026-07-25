@@ -34,6 +34,7 @@ export function ReviewScreen({ items, schemas, curriculum, onDone }: {
   const [result, setResult] = useState<QueryResult | null>(null)
   const [hintsShown, setHintsShown] = useState(0)
   const [hintUsed, setHintUsed] = useState<Record<string, boolean>>({})
+  const [missed, setMissed] = useState<Record<string, boolean>>({})
   const [xpEarned, setXpEarned] = useState(0)
   const [summary, setSummary] = useState<Record<string, SkillResult> | null>(null)
 
@@ -89,6 +90,7 @@ export function ReviewScreen({ items, schemas, curriculum, onDone }: {
         setXpEarned(x => x + gained)
         setFeedback({ kind: 'success', gained })
       } else {
+        setMissed(m => ({ ...m, [item.skillId]: true }))
         setFeedback({ kind: 'wrong', message: `Not quite — ${outcome.reason}. Try again.` })
       }
     } catch (e) {
@@ -111,7 +113,7 @@ export function ReviewScreen({ items, schemas, curriculum, onDone }: {
     const out: Record<string, SkillResult> = {}
     for (const skillId of [...new Set(items.map(i => i.skillId))]) {
       const before = store.skills[skillId]?.mastery ?? 0
-      store.recordReview(skillId, !hintUsed[skillId])
+      store.recordReview(skillId, !hintUsed[skillId] && !missed[skillId])
       out[skillId] = { before, after: useProgress.getState().skills[skillId]?.mastery ?? before }
     }
     setSummary(out)

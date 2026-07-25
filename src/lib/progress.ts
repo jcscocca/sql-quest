@@ -36,7 +36,10 @@ export interface SolveResult {
 
 interface ProgressStore extends ProgressState {
   hydrated: boolean
+  /** Set once a write to IndexedDB has failed, so the UI can warn before progress is lost. */
+  saveFailed: boolean
   hydrate(): Promise<void>
+  awardCompletionBadges(region: { id: string; skills: { id: string }[] }, skillId: string): void
   recordSolve(skillId: string, exerciseId: string, baseXp: number, hintsUsed: number, bankSize: number, reviewed?: boolean): SolveResult
   addCatches(world: string, entries: { name: string; label: string }[]): CollectionEntry[]
   awardBadge(id: string): void
@@ -109,13 +112,17 @@ function dataOf(s: ProgressStore): ProgressState {
   }
 }
 
-function persist(next: ProgressState): void {
-  void idbSet(KEY, next).catch(err => console.error('Progress persist failed', err))
+function persist(next: ProgressState, set: (partial: Partial<ProgressStore>) => void): void {
+  void idbSet(KEY, next).catch(err => {
+    console.error('Progress persist failed', err)
+    set({ saveFailed: true })
+  })
 }
 
 export const useProgress = create<ProgressStore>((set, get) => ({
   ...empty,
   hydrated: false,
+  saveFailed: false,
 
   async hydrate() {
     let saved: ProgressState | undefined
@@ -130,7 +137,7 @@ export const useProgress = create<ProgressStore>((set, get) => ({
     }
     if (saved && isProgressState(saved)) {
       const normalized = normalize(saved)
-      if (JSON.stringify(normalized) !== JSON.stringify(saved)) persist(normalized)
+      if (JSON.stringify(normalized) !== JSON.stringify(saved)) persist(normalized, set)
       set({ ...normalized, hydrated: true })
     } else {
       set({ ...empty, hydrated: true })
@@ -166,7 +173,7 @@ export const useProgress = create<ProgressStore>((set, get) => ({
       },
     }
     set(next)
-    persist(next)
+    persist(next, set)
     return { gained, newlyCompleted }
   },
 
@@ -183,7 +190,7 @@ export const useProgress = create<ProgressStore>((set, get) => ({
     const tagged = fresh.map(e => ({ world, name: e.name, label: e.label }))
     const next: ProgressState = { ...dataOf(s), collection: [...s.collection, ...tagged] }
     set(next)
-    persist(next)
+    persist(next, set)
     return tagged
   },
 
@@ -192,7 +199,12 @@ export const useProgress = create<ProgressStore>((set, get) => ({
     if (s.badges.includes(id)) return
     const next: ProgressState = { ...dataOf(s), badges: [...s.badges, id] }
     set(next)
-    persist(next)
+    persist(next, set)
+  },
+
+  awardCompletionBadges(region, skillId) {
+    get().awardBadge(skillId)
+    if (region.skills.every(sk => get().skills[sk.id]?.completed)) get().awardBadge(`region:${region.id}`)
   },
 
   recordReview(skillId, success) {
@@ -204,7 +216,7 @@ export const useProgress = create<ProgressStore>((set, get) => ({
       skills: { ...s.skills, [skillId]: { ...prev, ...reviewOutcome(prev, success, todayString()) } },
     }
     set(next)
-    persist(next)
+    persist(next, set)
   },
 
   recordReviewSolve(hintsUsed) {
@@ -216,7 +228,7 @@ export const useProgress = create<ProgressStore>((set, get) => ({
       streak: updateStreak(s.streak.lastDay ? s.streak : null, todayString()),
     }
     set(next)
-    persist(next)
+    persist(next, set)
     return gained
   },
 
@@ -232,13 +244,13 @@ export const useProgress = create<ProgressStore>((set, get) => ({
       unlockAll: imported.unlockAll ?? false,
     })
     set(next)
-    persist(next)
+    persist(next, set)
   },
 
   setUnlockAll(value) {
     const next: ProgressState = { ...dataOf(get()), unlockAll: value }
     set(next)
-    persist(next)
+    persist(next, set)
   },
 }))
 

@@ -64,6 +64,12 @@ export function HomeScreen({ curriculum, onOpenSkill, onOpenCollection, reviewCo
           />
         </div>
       </header>
+      {progress.saveFailed && (
+        <div className="save-warning" role="alert">
+          ⚠️ Progress could not be saved — your browser may be out of storage or in private mode.
+          Use Export to keep a copy before closing this tab.
+        </div>
+      )}
       {reviewCount > 0 && (
         <div className="review-callout">
           <strong>📅 Daily Review — {reviewCount} drill{reviewCount === 1 ? '' : 's'} ready</strong>

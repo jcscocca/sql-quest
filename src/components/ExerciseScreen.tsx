@@ -67,11 +67,11 @@ export function ExerciseScreen({ skill, bank, schema, region, onBack }: {
     else setFeedback({ kind: 'error', friendly: translateError(raw, schema), raw })
   }
 
-  async function handleRun(text = sqlText) {
+  async function handleRun() {
     setBusy(true)
     setFeedback(null)
     try {
-      setResult(await track.run(text))
+      setResult(await track.run(sqlText))
     } catch (e) {
       showError(e)
     } finally {
@@ -106,11 +106,7 @@ export function ExerciseScreen({ skill, bank, schema, region, onBack }: {
             console.error('Catch check failed', err)
           }
         }
-        if (res.newlyCompleted) {
-          useProgress.getState().awardBadge(skill.id)
-          if (region.skills.every(sk => useProgress.getState().skills[sk.id]?.completed))
-            useProgress.getState().awardBadge(`region:${region.id}`)
-        }
+        if (res.newlyCompleted) useProgress.getState().awardCompletionBadges(region, skill.id)
         setFeedback({ kind: 'success', gained: res.gained, caught, finished: res.newlyCompleted })
       } else {
         setFeedback({ kind: 'wrong', message: `Not quite — ${outcome.reason}. Check the grid and try again.` })

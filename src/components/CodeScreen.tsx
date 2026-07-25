@@ -63,11 +63,7 @@ export function CodeScreen({ skill, bank, region, onBack, createTrack = createJa
       const res = useProgress
         .getState()
         .recordSolve(skill.id, ex.id, ex.xp, hintsShown, bank.exercises.length, false)
-      if (res.newlyCompleted) {
-        useProgress.getState().awardBadge(skill.id)
-        if (region.skills.every(sk => useProgress.getState().skills[sk.id]?.completed))
-          useProgress.getState().awardBadge(`region:${region.id}`)
-      }
+      if (res.newlyCompleted) useProgress.getState().awardCompletionBadges(region, skill.id)
       setFeedback({ kind: 'success', gained: res.gained, finished: res.newlyCompleted })
     } else {
       setFeedback({ kind: 'wrong', passed: r.results.filter(t => t.pass).length, total: r.results.length })

@@ -81,6 +81,17 @@ test('assembly takes only due, completed skills', () => {
   expect(items.every(i => i.skillId === 'a')).toBe(true)
 })
 
+test('every shuffle draws distinct exercises that exist in the bank', () => {
+  const banks = { a: bank('a', 6) }
+  const skills = { a: skill({ due: '2026-07-18' }) }
+  for (const rng of [seq(0), seq(0.999), seq(0.5, 0.1, 0.9), seq(0.25, 0.75, 0.4)]) {
+    const ids = assembleReview(skills, banks, '2026-07-19', rng).map(i => i.exercise.id)
+    expect(ids).toHaveLength(2)
+    expect(new Set(ids).size).toBe(2)
+    for (const id of ids) expect(banks.a.exercises.some(e => e.id === id)).toBe(true)
+  }
+})
+
 test('assembly caps at 2 exercises per skill and 8 total, most overdue first', () => {
   const skills = {
     fresh: skill({ due: '2026-07-19', interval: 10 }),

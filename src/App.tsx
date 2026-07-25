@@ -121,19 +121,22 @@ export default function App() {
   }
   const allSkills = content.curriculum.regions.flatMap(r => r.skills)
   const foundationsRegion = content.curriculum.regions.find(r => r.id === 'foundations')
+  // Regions can share a world (Shaping and Combining are both Yu-Gi-Oh!), so group by
+  // world — otherwise the panel lists the same world twice with separate lock states.
+  const byWorld = new Map<string, Region[]>()
+  for (const r of content.curriculum.regions)
+    if (r.world) byWorld.set(r.world, [...(byWorld.get(r.world) ?? []), r])
   const worlds = [
     {
       name: 'Pokémon',
       regionName: 'Foundations',
       state: foundationsRegion ? worldState(foundationsRegion, skills) : ('locked' as const),
     },
-    ...content.curriculum.regions
-      .filter((r): r is Region & { world: string } => !!r.world)
-      .map(r => ({
-        name: content.schemas[r.world]?.name ?? r.world,
-        regionName: r.name,
-        state: worldState(r, skills),
-      })),
+    ...[...byWorld].map(([world, regions]) => ({
+      name: content.schemas[world]?.name ?? world,
+      regionName: regions.map(r => r.name).join(' · '),
+      state: worldState({ ...regions[0], skills: regions.flatMap(r => r.skills) }, skills),
+    })),
   ]
   let rustiest: { name: string; from: number; to: number } | null = null
   for (const sk of allSkills) {
