@@ -58,6 +58,8 @@ test('catching pokemon and the collection page', async ({ page }) => {
 
 test('daily review updates mastery', async ({ page }) => {
   await page.addInitScript(() => {
+    // Relative to the run date so the seed can't age into meaninglessness.
+    const day = (offset: number) => new Date(Date.now() + offset * 86_400_000).toISOString().slice(0, 10)
     const req = indexedDB.open('keyval-store')
     req.onupgradeneeded = () => req.result.createObjectStore('keyval')
     req.onsuccess = () => {
@@ -66,14 +68,14 @@ test('daily review updates mastery', async ({ page }) => {
         {
           version: 1,
           xp: 20,
-          streak: { count: 1, lastDay: '2026-07-01' },
+          streak: { count: 1, lastDay: day(-14) },
           skills: {
             'select-basics': {
               solved: ['sb-1', 'sb-2'],
               completed: true,
               mastery: 3,
               interval: 2,
-              due: '2026-07-02',
+              due: day(-5),
             },
           },
           collection: [],
@@ -113,12 +115,14 @@ test('seeded Foundations+Shaping unlocks Combining, world panel shows Yu-Gi-Oh a
     req.onupgradeneeded = () => req.result.createObjectStore('keyval')
     req.onsuccess = () => {
       const tx = req.result.transaction('keyval', 'readwrite')
-      const done = { solved: [], completed: true, mastery: 3, interval: 2, due: '2099-01-01' }
+      // due far out, so these completed skills never pull up a Daily Review drill
+      const day = (offset: number) => new Date(Date.now() + offset * 86_400_000).toISOString().slice(0, 10)
+      const done = { solved: [], completed: true, mastery: 3, interval: 2, due: day(365) }
       tx.objectStore('keyval').put(
         {
           version: 1,
           xp: 200,
-          streak: { count: 1, lastDay: '2026-07-01' },
+          streak: { count: 1, lastDay: day(-14) },
           skills: {
             'select-basics': done,
             'where-filtering': done,

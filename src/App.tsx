@@ -39,13 +39,10 @@ export default function App() {
 
   useEffect(() => {
     if (!content || !hydrated) return
-    const store = useProgress.getState()
-    for (const region of content.curriculum.regions) {
+    for (const region of content.curriculum.regions)
       for (const sk of region.skills)
-        if (store.skills[sk.id]?.completed) useProgress.getState().awardBadge(sk.id)
-      if (region.skills.every(sk => useProgress.getState().skills[sk.id]?.completed))
-        useProgress.getState().awardBadge(`region:${region.id}`)
-    }
+        if (useProgress.getState().skills[sk.id]?.completed)
+          useProgress.getState().awardCompletionBadges(region, sk.id)
   }, [content, hydrated])
 
   const today = todayString()

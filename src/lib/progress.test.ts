@@ -223,6 +223,17 @@ test('awardBadge is idempotent', () => {
   expect(useProgress.getState().badges).toEqual(['select-basics'])
 })
 
+test('awardCompletionBadges adds the region badge only once every skill is done', () => {
+  const region = { id: 'foundations', skills: [{ id: 'a' }, { id: 'b' }] }
+  useProgress.getState().recordSolve('a', 'a-1', 10, 0, 1)
+  useProgress.getState().awardCompletionBadges(region, 'a')
+  expect(useProgress.getState().badges).toEqual(['a'])
+
+  useProgress.getState().recordSolve('b', 'b-1', 10, 0, 1)
+  useProgress.getState().awardCompletionBadges(region, 'b')
+  expect(useProgress.getState().badges).toEqual(['a', 'b', 'region:foundations'])
+})
+
 test('recordReview applies the scheduling outcome', () => {
   useProgress.getState().recordSolve('select-basics', 'sb-1', 10, 0, 1)
   useProgress.getState().recordReview('select-basics', true)
