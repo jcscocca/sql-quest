@@ -62,7 +62,7 @@ export function CodeScreen({ skill, bank, region, onBack, createTrack = createJa
     if (track.check(r).correct) {
       const res = useProgress
         .getState()
-        .recordSolve(skill.id, ex.id, ex.xp, hintsShown, bank.exercises.length)
+        .recordSolve(skill.id, ex.id, ex.xp, hintsShown, bank.exercises.length, false)
       if (res.newlyCompleted) {
         useProgress.getState().awardBadge(skill.id)
         if (region.skills.every(sk => useProgress.getState().skills[sk.id]?.completed))

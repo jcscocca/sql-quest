@@ -134,7 +134,7 @@ export default function App() {
   let rustiest: { name: string; from: number; to: number } | null = null
   for (const sk of allSkills) {
     const sp = skills[sk.id]
-    if (!sp?.completed) continue
+    if (!sp?.completed || !content.banks[sk.id]) continue
     const shown = displayedMastery(sp, today)
     if (shown < sp.mastery && (!rustiest || sp.mastery - shown > rustiest.from - rustiest.to))
       rustiest = { name: sk.name, from: sp.mastery, to: shown }

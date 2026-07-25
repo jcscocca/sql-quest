@@ -90,6 +90,15 @@ test('newly completing a node schedules its first review', () => {
   expect(again.newlyCompleted).toBe(false)
 })
 
+test('completing a non-reviewed (code) skill does not schedule a review', () => {
+  const res = useProgress.getState().recordSolve('js-arrays', 'ja-1', 10, 0, 1, false)
+  expect(res.newlyCompleted).toBe(true)
+  const sk = useProgress.getState().skills['js-arrays']
+  expect(sk.completed).toBe(true)
+  expect(sk.interval).toBeUndefined()
+  expect(sk.due).toBeUndefined()
+})
+
 test('addCatches tags entries with world and label, deduping by world+name', () => {
   const first = useProgress.getState().addCatches('pokemon', [
     { name: 'pikachu', label: 'electric' },

@@ -35,7 +35,7 @@ export interface SolveResult {
 interface ProgressStore extends ProgressState {
   hydrated: boolean
   hydrate(): Promise<void>
-  recordSolve(skillId: string, exerciseId: string, baseXp: number, hintsUsed: number, bankSize: number): SolveResult
+  recordSolve(skillId: string, exerciseId: string, baseXp: number, hintsUsed: number, bankSize: number, reviewed?: boolean): SolveResult
   addCatches(world: string, entries: { name: string; label: string }[]): CollectionEntry[]
   awardBadge(id: string): void
   recordReview(skillId: string, success: boolean): void
@@ -126,7 +126,7 @@ export const useProgress = create<ProgressStore>((set, get) => ({
     }
   },
 
-  recordSolve(skillId, exerciseId, baseXp, hintsUsed, bankSize) {
+  recordSolve(skillId, exerciseId, baseXp, hintsUsed, bankSize, reviewed = true) {
     const s = get()
     const prev = s.skills[skillId] ?? { solved: [], completed: false, mastery: 0 }
     if (prev.solved.includes(exerciseId)) return { gained: 0, newlyCompleted: false }
@@ -135,7 +135,7 @@ export const useProgress = create<ProgressStore>((set, get) => ({
     const completed = prev.completed || solved.length >= bankSize
     const newlyCompleted = completed && !prev.completed
     const today = todayString()
-    const schedule = newlyCompleted
+    const schedule = newlyCompleted && reviewed
       ? scheduleOnComplete(today)
       : { interval: prev.interval, due: prev.due }
     const next: ProgressState = {
