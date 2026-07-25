@@ -107,6 +107,45 @@ test('daily review updates mastery', async ({ page }) => {
   await expect(page.getByText(/Daily Review/)).not.toBeVisible()
 })
 
+test('exiting a review part-way still records the drills already answered', async ({ page }) => {
+  await page.addInitScript(() => {
+    const day = (offset: number) => new Date(Date.now() + offset * 86_400_000).toISOString().slice(0, 10)
+    const req = indexedDB.open('keyval-store')
+    req.onupgradeneeded = () => req.result.createObjectStore('keyval')
+    req.onsuccess = () => {
+      const tx = req.result.transaction('keyval', 'readwrite')
+      tx.objectStore('keyval').put(
+        {
+          version: 1,
+          xp: 20,
+          streak: { count: 1, lastDay: day(-14) },
+          skills: {
+            'select-basics': { solved: ['sb-1', 'sb-2'], completed: true, mastery: 3, interval: 2, due: day(-5) },
+          },
+          collection: [],
+          badges: ['select-basics'],
+        },
+        'sql-quest-progress',
+      )
+    }
+  })
+  await page.goto('/')
+  await page.getByRole('button', { name: 'Start review' }).click()
+
+  await expect(page.getByText(/1\/2/)).toBeVisible({ timeout: 30_000 })
+  for (let h = 0; h < 3; h++) await page.getByRole('button', { name: /💡 Hint/ }).click()
+  const hintText = await page.locator('.hint').last().textContent()
+  await page.locator('.cm-content').click()
+  await page.keyboard.type(hintText!.match(/```sql([\s\S]*?)```/)![1].trim())
+  await page.getByRole('button', { name: 'Submit' }).click()
+  await expect(page.getByText(/✓ Correct!/)).toBeVisible({ timeout: 30_000 })
+
+  // Bail out before the last drill: the answered skill must still be rescheduled,
+  // so the review stops being due instead of staying farmable.
+  await page.getByRole('button', { name: '← Exit' }).click()
+  await expect(page.getByText(/Daily Review/)).not.toBeVisible()
+})
+
 test('seeded Foundations+Shaping unlocks Combining, world panel shows Yu-Gi-Oh active, and ij-1 catches', async ({
   page,
 }) => {

@@ -100,6 +100,17 @@ export function ReviewScreen({ items, schemas, curriculum, onDone }: {
     }
   }
 
+  function recordOutcomes(skillIds: string[]): Record<string, SkillResult> {
+    const store = useProgress.getState()
+    const out: Record<string, SkillResult> = {}
+    for (const skillId of [...new Set(skillIds)]) {
+      const before = store.skills[skillId]?.mastery ?? 0
+      store.recordReview(skillId, !hintUsed[skillId] && !missed[skillId])
+      out[skillId] = { before, after: useProgress.getState().skills[skillId]?.mastery ?? before }
+    }
+    return out
+  }
+
   function advance() {
     if (idx + 1 < items.length) {
       setIdx(idx + 1)
@@ -109,14 +120,20 @@ export function ReviewScreen({ items, schemas, curriculum, onDone }: {
       setHintsShown(0)
       return
     }
-    const store = useProgress.getState()
-    const out: Record<string, SkillResult> = {}
-    for (const skillId of [...new Set(items.map(i => i.skillId))]) {
-      const before = store.skills[skillId]?.mastery ?? 0
-      store.recordReview(skillId, !hintUsed[skillId] && !missed[skillId])
-      out[skillId] = { before, after: useProgress.getState().skills[skillId]?.mastery ?? before }
-    }
-    setSummary(out)
+    setSummary(recordOutcomes(items.map(i => i.skillId)))
+  }
+
+  // Exiting early still banks the XP already earned, so it has to bank the recall
+  // outcome too — otherwise the drills stay due and can be re-farmed indefinitely.
+  // Only skills the user actually engaged with count: solved, missed, or hinted.
+  function exit() {
+    const solved = idx + (feedback?.kind === 'success' ? 1 : 0)
+    recordOutcomes([
+      ...items.slice(0, solved).map(i => i.skillId),
+      ...Object.keys(missed),
+      ...Object.keys(hintUsed),
+    ])
+    onDone()
   }
 
   function showHint() {
@@ -144,7 +161,7 @@ export function ReviewScreen({ items, schemas, curriculum, onDone }: {
   return (
     <div className="exercise">
       <header className="topbar">
-        <button className="back" onClick={onDone}>← Exit</button>
+        <button className="back" onClick={exit}>← Exit</button>
         <h2>📅 Daily Review</h2>
         <span className="progress-count">
           {idx + 1}/{items.length} · {skillName(item.skillId)}
