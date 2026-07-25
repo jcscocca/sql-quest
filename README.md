@@ -34,7 +34,7 @@ Live: https://jcscocca.github.io/sql-quest/ (deployed from main by GitHub Action
 
 ## Develop
 
-    npm test           # unit tests (comparator, XP, errors, progress)
+    npm test           # unit tests (comparator, XP, errors, progress, tracks, JS/Python runtimes)
     npm run e2e        # Playwright smoke tests
     npm run validate   # content gate: executes every exercise — SQL on DuckDB, JS in Node, Python in Pyodide
     npm run build      # typecheck + production build

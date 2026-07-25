@@ -1,6 +1,9 @@
 # Multi-track learning platform — design
 
-**Date:** 2026-07-22 · **Status:** approved, phased build not yet started
+**Date:** 2026-07-22 · **Status:** partly superseded — JavaScript and Python
+shipped; the Systems Design track was dropped. The body below is the original
+plan of record; see "Update (2026-07-24)" near the end and
+`2026-07-24-code-track-expansion-design.md` for what was actually built.
 
 Turn SQL Quest from a SQL trainer into a learning platform where SQL is one
 **track** of many. Scope, agreed during brainstorming: **code + technical

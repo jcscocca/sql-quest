@@ -9,6 +9,8 @@ export interface SkillProgress {
   mastery: number
   interval?: number
   due?: string
+  /** Set on tracks outside the review rotation (JS/Python) so normalize never back-fills a schedule. */
+  noReview?: boolean
 }
 
 export interface CollectionEntry {
@@ -55,6 +57,11 @@ const empty: ProgressState = {
   unlockAll: false,
 }
 
+function isSkillProgress(x: unknown): boolean {
+  const sp = x as SkillProgress
+  return !!sp && typeof sp === 'object' && Array.isArray(sp.solved) && typeof sp.mastery === 'number'
+}
+
 function isProgressState(x: unknown): x is ProgressState {
   if (typeof x !== 'object' || x === null) return false
   const s = x as ProgressState
@@ -64,7 +71,8 @@ function isProgressState(x: unknown): x is ProgressState {
     typeof s.streak === 'object' && s.streak !== null &&
     typeof s.streak.count === 'number' &&
     typeof s.streak.lastDay === 'string' &&
-    typeof s.skills === 'object' && s.skills !== null
+    typeof s.skills === 'object' && s.skills !== null &&
+    Object.values(s.skills).every(isSkillProgress)
   )
 }
 
@@ -74,7 +82,7 @@ function normalize(s: ProgressState): ProgressState {
   for (const [id, sp] of Object.entries(s.skills ?? {})) {
     if (id === 'arena-movies') continue
     skills[id] =
-      sp.completed && (!sp.interval || !sp.due)
+      sp.completed && !sp.noReview && (!sp.interval || !sp.due)
         ? { ...sp, interval: FIRST_INTERVAL, due: today }
         : sp
   }
@@ -116,7 +124,10 @@ export const useProgress = create<ProgressStore>((set, get) => ({
     } catch (err) {
       console.error('Failed to read saved progress', err)
     }
-    if (saved && !isProgressState(saved)) console.warn('Ignoring unrecognized saved progress')
+    if (saved && !isProgressState(saved)) {
+      console.warn('Ignoring unrecognized saved progress')
+      void idbSet(`${KEY}-broken`, saved).catch(err => console.error('Progress backup failed', err))
+    }
     if (saved && isProgressState(saved)) {
       const normalized = normalize(saved)
       if (JSON.stringify(normalized) !== JSON.stringify(saved)) persist(normalized)
@@ -150,6 +161,7 @@ export const useProgress = create<ProgressStore>((set, get) => ({
           mastery: completed ? Math.max(prev.mastery, 3) : prev.mastery,
           interval: schedule.interval,
           due: schedule.due,
+          ...(reviewed ? {} : { noReview: true }),
         },
       },
     }

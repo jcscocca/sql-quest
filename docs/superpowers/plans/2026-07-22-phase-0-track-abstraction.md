@@ -2,6 +2,8 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+**Status (2026-07-24):** completed. JavaScript and Python tracks shipped on this abstraction; the Systems Design track was dropped.
+
 **Goal:** Extract a `Track` abstraction so the SQL exercise flow runs behind a pluggable interface — with zero behavior change — making room for future JavaScript, Python, and Systems Design tracks.
 
 **Architecture:** Introduce a `Track` interface with five ports (`prepare`, `run`, `check`, `reward`, `example`). Implement one SQL track that delegates to the existing `duckdb`, `compare`, and `catches` modules via injected dependencies (so it is unit-testable without the WASM engine). Route `ExerciseScreen` and `ReviewScreen` through the track instead of calling those modules directly. Content JSON, `content.ts` types, and the `scripts/` pipeline are unchanged — the SQL track reads the existing `referenceSql` / `orderMatters` / `entity` / `exampleSql` fields internally. The existing unit + e2e + `validate` suites are the regression net for "no behavior change."

@@ -79,6 +79,28 @@ test('hydrate treats a corrupt saved blob as empty', async () => {
   expect(useProgress.getState().xp).toBe(0)
 })
 
+test('importState rejects a skill entry with a malformed solved list', () => {
+  const bad = (skills: unknown) =>
+    ({ version: 1, xp: 0, streak: { count: 0, lastDay: '' }, skills }) as unknown as ProgressState
+  expect(() => useProgress.getState().importState(bad({ cte: {} }))).toThrow()
+  expect(() => useProgress.getState().importState(bad({ cte: null }))).toThrow()
+  expect(() =>
+    useProgress.getState().importState(bad({ cte: { solved: 'sb-1', completed: true, mastery: 3 } })),
+  ).toThrow()
+  expect(() =>
+    useProgress.getState().importState(bad({ cte: { solved: [], completed: true, mastery: 'high' } })),
+  ).toThrow()
+})
+
+test('hydrate keeps an unrecognized blob under a backup key instead of losing it', async () => {
+  const { set: idbSet, get: idbGetRaw } = await import('idb-keyval')
+  const corrupt = { version: 1, xp: 'lots', streak: { count: 1, lastDay: '' }, skills: {} }
+  await idbSet('sql-quest-progress', corrupt)
+  await useProgress.getState().hydrate()
+  expect(useProgress.getState().xp).toBe(0)
+  expect(await idbGetRaw('sql-quest-progress-broken')).toEqual(corrupt)
+})
+
 test('newly completing a node schedules its first review', () => {
   useProgress.getState().recordSolve('select-basics', 'sb-1', 10, 0, 2)
   const res = useProgress.getState().recordSolve('select-basics', 'sb-2', 10, 0, 2)
@@ -93,6 +115,16 @@ test('newly completing a node schedules its first review', () => {
 test('completing a non-reviewed (code) skill does not schedule a review', () => {
   const res = useProgress.getState().recordSolve('js-arrays', 'ja-1', 10, 0, 1, false)
   expect(res.newlyCompleted).toBe(true)
+  const sk = useProgress.getState().skills['js-arrays']
+  expect(sk.completed).toBe(true)
+  expect(sk.interval).toBeUndefined()
+  expect(sk.due).toBeUndefined()
+})
+
+test('a completed code skill stays unscheduled across a reload', async () => {
+  useProgress.getState().recordSolve('js-arrays', 'ja-1', 10, 0, 1, false)
+  await new Promise(r => setTimeout(r, 0))
+  await useProgress.getState().hydrate()
   const sk = useProgress.getState().skills['js-arrays']
   expect(sk.completed).toBe(true)
   expect(sk.interval).toBeUndefined()
