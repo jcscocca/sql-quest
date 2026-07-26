@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Editor } from './Editor'
 import { ResultGrid } from './ResultGrid'
-import { type QueryResult } from '../lib/compare'
+import type { QueryResult } from '../lib/compare'
 import { loadWorld, runQuery } from '../lib/duckdb'
 import { translateError, TrainerError } from '../lib/errors'
 import { getTrack } from '../lib/tracks/registry'
@@ -49,6 +49,7 @@ export function ReviewScreen({ items, schemas, curriculum, onDone }: {
   }
   const track = trackRef.current
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: prepare only matters per world — re-running per item would be a no-op
   useEffect(() => {
     setEngineReady(false)
     track?.prepare(allSkills.find(s => s.id === item?.skillId), schema)
@@ -153,7 +154,7 @@ export function ReviewScreen({ items, schemas, curriculum, onDone }: {
             </li>
           ))}
         </ul>
-        <button onClick={onDone}>Done</button>
+        <button type="button" onClick={onDone}>Done</button>
       </div>
     )
   }
@@ -161,7 +162,7 @@ export function ReviewScreen({ items, schemas, curriculum, onDone }: {
   return (
     <div className="exercise">
       <header className="topbar">
-        <button className="back" onClick={exit}>← Exit</button>
+        <button type="button" className="back" onClick={exit}>← Exit</button>
         <h2>📅 Daily Review</h2>
         <span className="progress-count">
           {idx + 1}/{items.length} · {skillName(item.skillId)}
@@ -180,17 +181,17 @@ export function ReviewScreen({ items, schemas, curriculum, onDone }: {
               </div>
             ))}
             {hintsShown < item.exercise.hints.length && (
-              <button onClick={showHint}>💡 Hint (marks this skill for reset)</button>
+              <button type="button" onClick={showHint}>💡 Hint (marks this skill for reset)</button>
             )}
           </div>
         </aside>
         <main className="right-panel">
           <Editor key={`${idx}`} value={sqlText} onChange={setSqlText} schema={schema} />
           <div className="actions">
-            <button onClick={() => void handleRun()} disabled={busy || !engineReady}>
+            <button type="button" onClick={() => void handleRun()} disabled={busy || !engineReady}>
               ▶ Run
             </button>
-            <button onClick={() => void handleSubmit()} disabled={busy || !engineReady || feedback?.kind === 'success'} className="submit">
+            <button type="button" onClick={() => void handleSubmit()} disabled={busy || !engineReady || feedback?.kind === 'success'} className="submit">
               Submit
             </button>
             {!engineReady && <span className="engine-status">Loading SQL engine…</span>}
@@ -198,7 +199,7 @@ export function ReviewScreen({ items, schemas, curriculum, onDone }: {
           {feedback?.kind === 'success' && (
             <div className="feedback success">
               ✓ Correct! +{feedback.gained} XP
-              <button onClick={advance}>{idx + 1 < items.length ? 'Next →' : 'Finish review →'}</button>
+              <button type="button" onClick={advance}>{idx + 1 < items.length ? 'Next →' : 'Finish review →'}</button>
             </div>
           )}
           {feedback?.kind === 'wrong' && <div className="feedback wrong">{feedback.message}</div>}

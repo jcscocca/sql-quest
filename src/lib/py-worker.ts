@@ -7,9 +7,9 @@ interface Pyodide {
   globals: { get(name: string): ((...args: unknown[]) => unknown) & { destroy?(): void } }
 }
 
-// Pyodide is fetched from the CDN on first run — the only online dependency of the app.
-const PYODIDE_VERSION = '0.26.2'
-const BASE = `https://cdn.jsdelivr.net/pyodide/v${PYODIDE_VERSION}/full/`
+// Pyodide is served from our own origin (see vite.config.ts), so the app works offline
+// and the runtime version always matches the pyodide package used by validate.
+const BASE = new URL(`${import.meta.env.BASE_URL}pyodide/`, self.location.origin).href
 let ready: Promise<Pyodide> | null = null
 
 function loadPyodideOnce(): Promise<Pyodide> {

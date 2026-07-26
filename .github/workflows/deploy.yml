@@ -24,6 +24,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - run: npm run lint
       - run: npm test
       - run: npm run validate
       - run: npm run build
@@ -36,8 +37,7 @@ jobs:
         with:
           path: dist
   # Runs alongside build so the Playwright suite can't rot unnoticed. Deliberately
-  # not a dependency of deploy: the Python drill fetches Pyodide from a CDN, and a
-  # flaky browser run shouldn't block shipping.
+  # not a dependency of deploy: a flaky browser run shouldn't block shipping.
   e2e:
     runs-on: ubuntu-latest
     steps:

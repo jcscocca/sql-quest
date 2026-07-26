@@ -7,7 +7,7 @@ type RunResult = { results: TestResult[]; error?: string }
 let worker: Worker | null = null
 let nextId = 1
 
-// The cold CDN fetch of Pyodide is far slower than any exercise, so it gets its own
+// The cold Pyodide fetch/compile is far slower than any exercise, so it gets its own
 // budget: the execution clock only starts once the worker reports the runtime is up.
 const LOAD_TIMEOUT = 60000
 const RUN_TIMEOUT = 15000

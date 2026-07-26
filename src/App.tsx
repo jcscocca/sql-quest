@@ -55,7 +55,7 @@ export default function App() {
     return (
       <div className="load-error">
         <p>Failed to load content: {error}</p>
-        <button onClick={() => location.reload()}>Retry</button>
+        <button type="button" onClick={() => location.reload()}>Retry</button>
       </div>
     )
   if (!content || !hydrated) return <div className="loading">Loading…</div>

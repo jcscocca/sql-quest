@@ -22,6 +22,7 @@ export function CollectionScreen({ curriculum, worldNames, onBack }: {
   const worlds = [...new Set(collection.map(e => e.world))].sort()
 
   const [manifests, setManifests] = useState<Record<string, SpriteManifest | null>>({})
+  // biome-ignore lint/correctness/useExhaustiveDependencies: keyed on the world list's contents — `worlds` is rebuilt every render
   useEffect(() => {
     let live = true
     for (const w of worlds)
@@ -36,7 +37,7 @@ export function CollectionScreen({ curriculum, worldNames, onBack }: {
   return (
     <div className="collection">
       <header className="topbar">
-        <button className="back" onClick={onBack}>← Back</button>
+        <button type="button" className="back" onClick={onBack}>← Back</button>
         <h2>📚 Collection ({collection.length})</h2>
       </header>
       <section className="badge-shelf">

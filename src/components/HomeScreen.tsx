@@ -41,10 +41,11 @@ export function HomeScreen({ curriculum, onOpenSkill, onOpenCollection, reviewCo
         <div className="stats">
           <span>🔥 {progress.streak.count}-day streak</span>
           <span>⭐ {progress.xp} XP</span>
-          <button onClick={onOpenCollection}>📚 {progress.collection.length}</button>
-          <button onClick={download}>Export</button>
-          <button onClick={() => fileRef.current?.click()}>Import</button>
+          <button type="button" onClick={onOpenCollection}>📚 {progress.collection.length}</button>
+          <button type="button" onClick={download}>Export</button>
+          <button type="button" onClick={() => fileRef.current?.click()}>Import</button>
           <button
+            type="button"
             onClick={() => useProgress.getState().setUnlockAll(!progress.unlockAll)}
             title="Open every skill regardless of prerequisites"
             aria-pressed={progress.unlockAll}
@@ -78,7 +79,7 @@ export function HomeScreen({ curriculum, onOpenSkill, onOpenCollection, reviewCo
               {' '}· {rustiest.name} is getting rusty ({rustiest.from}→{rustiest.to})
             </span>
           )}
-          <button onClick={onStartReview}>Start review</button>
+          <button type="button" onClick={onStartReview}>Start review</button>
         </div>
       )}
       <div className="world-panel">
@@ -103,6 +104,7 @@ export function HomeScreen({ curriculum, onOpenSkill, onOpenCollection, reviewCo
               const solvedCount = progress.skills[skill.id]?.solved.length ?? 0
               return (
                 <button
+                  type="button"
                   key={skill.id}
                   disabled={!unlocked}
                   className={`node ${done ? 'done' : earned ? 'open' : 'locked'}`}

@@ -8,7 +8,7 @@ export function computeXp(base: number, hintsUsed: number): number {
 }
 
 export function updateStreak(prev: Streak | null, today: string): Streak {
-  if (!prev || !prev.lastDay) return { count: 1, lastDay: today }
+  if (!prev?.lastDay) return { count: 1, lastDay: today }
   const days = (Date.parse(today) - Date.parse(prev.lastDay)) / 86_400_000
   if (days === 0) return prev
   if (days === 1) return { count: prev.count + 1, lastDay: today }

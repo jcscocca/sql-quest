@@ -1,5 +1,5 @@
 import { beforeEach, expect, test } from 'vitest'
-import { exportState, useProgress, type CollectionEntry, type ProgressState } from './progress'
+import { exportState, useProgress, type ProgressState } from './progress'
 import { todayString } from './xp'
 
 beforeEach(() => {
@@ -212,7 +212,7 @@ test('movies world remnants are dropped on hydrate', async () => {
   const s = useProgress.getState()
   expect(s.collection).toEqual([{ world: 'pokemon', name: 'pikachu', label: 'electric' }])
   expect(s.skills['arena-movies']).toBeUndefined()
-  expect(s.skills['cte'].completed).toBe(true)
+  expect(s.skills.cte.completed).toBe(true)
   expect(s.badges).toEqual(['cte'])
   expect(s.xp).toBe(500)
 })

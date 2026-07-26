@@ -49,7 +49,7 @@ if (existsSync(idsPath)) {
   for (let p = 0; ; p++) {
     const page = await fetchJson<ListPage>(`${API}?pageSize=100&page=${p}`)
     if (!page.content?.length) break // past-the-end pages return 200 with no content key
-    page.content.forEach(d => ids.push(d.id))
+    for (const d of page.content) ids.push(d.id)
     await sleep(200)
   }
   if (ids.length < 1400) throw new Error(`BLOCKED: only ${ids.length} ids fetched — expected ~1488; not caching a truncated list`)
@@ -111,7 +111,7 @@ for (const d of details) {
 }
 console.log(`transformed ${digimonOut.length} digimon, ${evoOut.length} evolution edges (${droppedEdges} dangling edges dropped)`)
 
-const toJsonl = (rows: object[]) => rows.map(r => JSON.stringify(r)).join('\n') + '\n'
+const toJsonl = (rows: object[]) => `${rows.map(r => JSON.stringify(r)).join('\n')}\n`
 writeFileSync(`${SRC}/digimon.jsonl`, toJsonl(digimonOut))
 writeFileSync(`${SRC}/evolutions.jsonl`, toJsonl(evoOut))
 
@@ -180,7 +180,7 @@ console.log('\n--- sanity checks ---')
 const agu = await conn.runAndReadAll(`SELECT level, type, attribute FROM digimon WHERE name = 'Agumon'`)
 const aguRow = agu.getRows()[0]
 console.log(`Agumon: ${JSON.stringify(aguRow)}`)
-if (!aguRow || aguRow[0] !== 'Child' || aguRow[1] !== 'Reptile' || aguRow[2] !== 'Vaccine')
+if (aguRow?.[0] !== 'Child' || aguRow?.[1] !== 'Reptile' || aguRow?.[2] !== 'Vaccine')
   throw new Error('sanity check failed: Agumon missing or not Child/Reptile/Vaccine')
 
 const edge = await conn.runAndReadAll(

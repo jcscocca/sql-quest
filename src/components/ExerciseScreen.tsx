@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Editor } from './Editor'
 import { ResultGrid } from './ResultGrid'
 import { SchemaBrowser } from './SchemaBrowser'
-import { type QueryResult } from '../lib/compare'
+import type { QueryResult } from '../lib/compare'
 import { loadWorld, runQuery } from '../lib/duckdb'
 import { translateError, TrainerError } from '../lib/errors'
 import { getTrack } from '../lib/tracks/registry'
@@ -55,6 +55,7 @@ export function ExerciseScreen({ skill, bank, schema, region, onBack }: {
   const ex = bank.exercises[idx]
   const exSolved = solved.includes(ex.id)
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: skill/track are fixed per mount (keyed by skill.id in App)
   useEffect(() => {
     track.prepare(skill, schema)
       .then(() => setEngineReady(true))
@@ -138,12 +139,13 @@ export function ExerciseScreen({ skill, bank, schema, region, onBack }: {
   if (showLesson) {
     return (
       <div className="lesson">
-        <button className="back" onClick={onBack}>← Back</button>
+        <button type="button" className="back" onClick={onBack}>← Back</button>
         <h2>{skill.name}</h2>
         <p>{skill.lesson.intro}</p>
         <pre className="example-sql">{skill.lesson.exampleSql}</pre>
         <div className="lesson-actions">
           <button
+            type="button"
             onClick={() => {
               setSqlText(track.example(skill))
               setShowLesson(false)
@@ -151,7 +153,7 @@ export function ExerciseScreen({ skill, bank, schema, region, onBack }: {
           >
             Try the example
           </button>
-          <button onClick={() => setShowLesson(false)}>Start exercises</button>
+          <button type="button" onClick={() => setShowLesson(false)}>Start exercises</button>
         </div>
       </div>
     )
@@ -166,7 +168,7 @@ export function ExerciseScreen({ skill, bank, schema, region, onBack }: {
           Badge earned: <strong>{skill.name}</strong>
         </p>
         {completion.catches.length > 0 && <p>Caught this node: {completion.catches.join(', ')}</p>}
-        <button onClick={onBack}>Back to map</button>
+        <button type="button" onClick={onBack}>Back to map</button>
       </div>
     )
   }
@@ -174,7 +176,7 @@ export function ExerciseScreen({ skill, bank, schema, region, onBack }: {
   return (
     <div className="exercise">
       <header className="topbar">
-        <button className="back" onClick={onBack}>← Back</button>
+        <button type="button" className="back" onClick={onBack}>← Back</button>
         <h2>{skill.name}</h2>
         <span className="progress-count">
           {solved.length}/{bank.exercises.length} solved
@@ -194,7 +196,7 @@ export function ExerciseScreen({ skill, bank, schema, region, onBack }: {
               </div>
             ))}
             {hintsShown < ex.hints.length && (
-              <button onClick={() => setHintsShown(hintsShown + 1)}>
+              <button type="button" onClick={() => setHintsShown(hintsShown + 1)}>
                 💡 Hint {hintsShown + 1}/{ex.hints.length} (costs XP)
               </button>
             )}
@@ -204,10 +206,10 @@ export function ExerciseScreen({ skill, bank, schema, region, onBack }: {
         <main className="right-panel">
           <Editor key={ex.id} value={sqlText} onChange={setSqlText} schema={schema} />
           <div className="actions">
-            <button onClick={() => void handleRun()} disabled={busy || !engineReady}>
+            <button type="button" onClick={() => void handleRun()} disabled={busy || !engineReady}>
               ▶ Run
             </button>
-            <button onClick={() => void handleSubmit()} disabled={busy || !engineReady} className="submit">
+            <button type="button" onClick={() => void handleSubmit()} disabled={busy || !engineReady} className="submit">
               Submit
             </button>
             {!engineReady && !engineError && <span className="engine-status">Loading SQL engine…</span>}
@@ -233,9 +235,9 @@ export function ExerciseScreen({ skill, bank, schema, region, onBack }: {
                 </span>
               )}
               {feedback.finished ? (
-                <button onClick={() => setCompletion({ catches: sessionCatches })}>Finish node →</button>
+                <button type="button" onClick={() => setCompletion({ catches: sessionCatches })}>Finish node →</button>
               ) : (
-                <button onClick={advance}>Next →</button>
+                <button type="button" onClick={advance}>Next →</button>
               )}
             </div>
           )}

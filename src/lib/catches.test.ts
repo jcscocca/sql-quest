@@ -8,7 +8,7 @@ const zero = () => 0
 test('catches up to 3 new pokemon appearing in result cells', () => {
   const out = pickCatches(res([['pikachu'], ['mew'], ['eevee'], ['ditto']]), names, new Set(), [], 3, zero)
   expect(out.length).toBe(3)
-  out.forEach(n => expect(names.has(n)).toBe(true))
+  for (const n of out) expect(names.has(n)).toBe(true)
 })
 
 test('owned pokemon and non-name cells are ignored', () => {

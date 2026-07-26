@@ -78,7 +78,7 @@ for (const c of cards) {
   if (c.banlist_info.ban_ocg) banlistOut.push({ card_id: c.id, format: 'ocg', status: c.banlist_info.ban_ocg })
 }
 
-const toJsonl = (rows: object[]) => rows.map(r => JSON.stringify(r)).join('\n') + '\n'
+const toJsonl = (rows: object[]) => `${rows.map(r => JSON.stringify(r)).join('\n')}\n`
 writeFileSync(`${SRC}/cards.jsonl`, toJsonl(cardsOut))
 writeFileSync(`${SRC}/card_sets.jsonl`, toJsonl(cardSetsOut))
 writeFileSync(`${SRC}/banlist.jsonl`, toJsonl(banlistOut))

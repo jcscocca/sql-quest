@@ -1,8 +1,8 @@
 import { useRef, useState } from 'react'
-import { type Extension } from '@uiw/react-codemirror'
+import type { Extension } from '@uiw/react-codemirror'
 import { CodeEditor } from './CodeEditor'
 import { createJavascriptTrack } from '../lib/tracks/javascript'
-import { type TestResult } from '../lib/js-runtime'
+import type { TestResult } from '../lib/js-runtime'
 import { useProgress } from '../lib/progress'
 import type { JsBank, CodeTest, PyBank, Region, Skill } from '../lib/content'
 
@@ -92,11 +92,11 @@ export function CodeScreen({ skill, bank, region, onBack, createTrack = createJa
   if (showLesson) {
     return (
       <div className="lesson">
-        <button className="back" onClick={onBack}>← Back</button>
+        <button type="button" className="back" onClick={onBack}>← Back</button>
         <h2>{skill.name}</h2>
         <p>{skill.lesson.intro}</p>
         <div className="lesson-actions">
-          <button onClick={() => setShowLesson(false)}>Start exercises</button>
+          <button type="button" onClick={() => setShowLesson(false)}>Start exercises</button>
         </div>
       </div>
     )
@@ -110,7 +110,7 @@ export function CodeScreen({ skill, bank, region, onBack, createTrack = createJa
         <p>
           Badge earned: <strong>{skill.name}</strong>
         </p>
-        <button onClick={onBack}>Back to map</button>
+        <button type="button" onClick={onBack}>Back to map</button>
       </div>
     )
   }
@@ -118,7 +118,7 @@ export function CodeScreen({ skill, bank, region, onBack, createTrack = createJa
   return (
     <div className="exercise">
       <header className="topbar">
-        <button className="back" onClick={onBack}>← Back</button>
+        <button type="button" className="back" onClick={onBack}>← Back</button>
         <h2>{skill.name}</h2>
         <span className="progress-count">
           {solved.length}/{bank.exercises.length} solved
@@ -144,7 +144,7 @@ export function CodeScreen({ skill, bank, region, onBack, createTrack = createJa
               </div>
             ))}
             {hintsShown < ex.hints.length && (
-              <button onClick={() => setHintsShown(hintsShown + 1)}>
+              <button type="button" onClick={() => setHintsShown(hintsShown + 1)}>
                 💡 Hint {hintsShown + 1}/{ex.hints.length} (costs XP)
               </button>
             )}
@@ -153,10 +153,10 @@ export function CodeScreen({ skill, bank, region, onBack, createTrack = createJa
         <main className="right-panel">
           <CodeEditor key={ex.id} value={code} onChange={setCode} lang={lang} />
           <div className="actions">
-            <button onClick={() => void handleRun()} disabled={busy}>
+            <button type="button" onClick={() => void handleRun()} disabled={busy}>
               ▶ Run
             </button>
-            <button onClick={() => void handleSubmit()} disabled={busy} className="submit">
+            <button type="button" onClick={() => void handleSubmit()} disabled={busy} className="submit">
               Submit
             </button>
           </div>
@@ -164,9 +164,9 @@ export function CodeScreen({ skill, bank, region, onBack, createTrack = createJa
             <div className="feedback success">
               ✓ Correct! {feedback.gained > 0 ? `+${feedback.gained} XP` : 'Already solved — no XP this time.'}
               {feedback.finished ? (
-                <button onClick={() => setCompletion(true)}>Finish node →</button>
+                <button type="button" onClick={() => setCompletion(true)}>Finish node →</button>
               ) : (
-                <button onClick={advance}>Next →</button>
+                <button type="button" onClick={advance}>Next →</button>
               )}
             </div>
           )}

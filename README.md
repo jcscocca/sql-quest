@@ -16,8 +16,8 @@ backbone, all in-browser with no accounts.
   Pyodide for Python). ~120 exercises each across five regions: Foundations,
   Arrays/Lists & Iteration, Objects/Dicts/Maps & Sets, Functions & Classes, and
   Applied Data — grounded capstones over inline Pokémon / Yu-Gi-Oh! / Seattle 311
-  datasets (shown in a per-exercise data panel). Python fetches Pyodide from a
-  CDN on first run (the app's only online dependency).
+  datasets (shown in a per-exercise data panel). Pyodide is served from the
+  app's own origin, so Python has no CDN dependency either.
 
 Every subject plugs into the same backbone through a `Track` interface
 (`src/lib/tracks/`). See
@@ -29,12 +29,16 @@ original SQL trainer.
 
 Live: https://jcscocca.github.io/sql-quest/ (deployed from main by GitHub Actions)
 
+The app is an installable PWA: the shell precaches on first visit, and engines,
+worlds, and sprites are cached as you use them — after that it works offline.
+
     npm install
     npm run dev        # → http://localhost:5173
 
 ## Develop
 
-    npm test           # unit tests (comparator, XP, errors, progress, tracks, JS/Python runtimes)
+    npm test           # unit tests (comparator, XP, errors, progress, tracks, JS/Python runtimes, components)
+    npm run lint       # Biome (typescript-eslint doesn't support TS 7 yet)
     npm run e2e        # Playwright smoke tests
     npm run validate   # content gate: executes every exercise — SQL on DuckDB, JS in Node, Python in Pyodide
     npm run build      # typecheck + production build

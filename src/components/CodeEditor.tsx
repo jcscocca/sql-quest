@@ -7,7 +7,7 @@ export function CodeEditor({ value, onChange, lang }: {
   onChange: (v: string) => void
   lang?: () => Extension
 }) {
-  const extensions = useMemo(() => [(lang ?? javascript)()], [])
+  const extensions = useMemo(() => [(lang ?? javascript)()], [lang])
   return (
     <CodeMirror
       value={value}

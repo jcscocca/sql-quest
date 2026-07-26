@@ -1,4 +1,4 @@
-import { type TestResult } from '../js-runtime'
+import type { TestResult } from '../js-runtime'
 import { runPy } from '../py-runtime'
 import type { CodeTest } from '../content'
 

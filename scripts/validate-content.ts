@@ -238,7 +238,10 @@ for (const skill of skills) {
           for (const c of ex.collectibles ?? []) {
             const hit = await run(`SELECT 1 FROM ${entity.table} WHERE ${entity.column} = '${c.replace(/'/g, "''")}'`)
             if (hit.rows.length === 0) failures.push(`${tag}: collectible "${c}" not found in world`)
-            else (catchableByWorld[world] ??= new Set()).add(c)
+            else {
+              catchableByWorld[world] ??= new Set()
+              catchableByWorld[world].add(c)
+            }
           }
         }
       }

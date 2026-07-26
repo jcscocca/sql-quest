@@ -1,0 +1,22 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.5.5/schema.json",
+  "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
+  "files": { "includes": ["src/**", "scripts/**", "e2e/**"] },
+  "formatter": { "enabled": false },
+  "assist": { "enabled": false },
+  "linter": {
+    "enabled": true,
+    "domains": { "react": "recommended", "test": "recommended" },
+    "rules": {
+      "preset": "recommended",
+      "style": {
+        // Deliberate house style: `!` is used where invariants hold (e.g. engine handles after init).
+        "noNonNullAssertion": "off"
+      },
+      "suspicious": {
+        // Query rows, hints, and test results have no stable identity — index keys are correct here.
+        "noArrayIndexKey": "off"
+      }
+    }
+  }
+}

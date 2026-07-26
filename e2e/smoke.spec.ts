@@ -388,7 +388,7 @@ test('javascript: solve the first JS exercise end to end', async ({ page }) => {
   await expect(page.getByText(/\+\d+ XP/)).toBeVisible({ timeout: 30_000 })
 })
 
-// Python fetches Pyodide from the CDN on first run — needs network and a longer timeout.
+// Pyodide's first load (fetch + compile) is far slower than any exercise — needs a longer timeout.
 test('python: solve the first Python exercise end to end', async ({ page }) => {
   await page.addInitScript(() => {
     const req = indexedDB.open('keyval-store')
