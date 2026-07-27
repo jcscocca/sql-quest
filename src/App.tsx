@@ -47,7 +47,7 @@ export default function App() {
 
   const today = todayString()
   const reviewItems = useMemo(
-    () => (content ? assembleReview(skills, content.banks, today) : []),
+    () => (content ? assembleReview(skills, content.banks, today, Math.random, content.jsBanks, content.pyBanks) : []),
     [skills, content, today],
   )
 
@@ -138,7 +138,7 @@ export default function App() {
   let rustiest: { name: string; from: number; to: number } | null = null
   for (const sk of allSkills) {
     const sp = skills[sk.id]
-    if (!sp?.completed || !content.banks[sk.id]) continue
+    if (!sp?.completed || !(content.banks[sk.id] || content.jsBanks[sk.id] || content.pyBanks[sk.id])) continue
     const shown = displayedMastery(sp, today)
     if (shown < sp.mastery && (!rustiest || sp.mastery - shown > rustiest.from - rustiest.to))
       rustiest = { name: sk.name, from: sp.mastery, to: shown }

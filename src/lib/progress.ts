@@ -9,8 +9,6 @@ export interface SkillProgress {
   mastery: number
   interval?: number
   due?: string
-  /** Set on tracks outside the review rotation (JS/Python) so normalize never back-fills a schedule. */
-  noReview?: boolean
 }
 
 export interface CollectionEntry {
@@ -40,7 +38,7 @@ interface ProgressStore extends ProgressState {
   saveFailed: boolean
   hydrate(): Promise<void>
   awardCompletionBadges(region: { id: string; skills: { id: string }[] }, skillId: string): void
-  recordSolve(skillId: string, exerciseId: string, baseXp: number, hintsUsed: number, bankSize: number, reviewed?: boolean): SolveResult
+  recordSolve(skillId: string, exerciseId: string, baseXp: number, hintsUsed: number, bankSize: number): SolveResult
   addCatches(world: string, entries: { name: string; label: string }[]): CollectionEntry[]
   awardBadge(id: string): void
   recordReview(skillId: string, success: boolean): void
@@ -84,10 +82,12 @@ function normalize(s: ProgressState): ProgressState {
   const skills: Record<string, SkillProgress> = {}
   for (const [id, sp] of Object.entries(s.skills ?? {})) {
     if (id === 'arena-movies') continue
+    // strip the retired noReview flag: code skills joined the review rotation
+    const { noReview: _noReview, ...rest } = sp as SkillProgress & { noReview?: boolean }
     skills[id] =
-      sp.completed && !sp.noReview && (!sp.interval || !sp.due)
-        ? { ...sp, interval: FIRST_INTERVAL, due: today }
-        : sp
+      rest.completed && (!rest.interval || !rest.due)
+        ? { ...rest, interval: FIRST_INTERVAL, due: today }
+        : rest
   }
   const collection: CollectionEntry[] = (Array.isArray(s.collection) ? s.collection : [])
     .map(e => (typeof e === 'string' ? { world: 'pokemon', name: e, label: '' } : (e as CollectionEntry)))
@@ -144,7 +144,7 @@ export const useProgress = create<ProgressStore>((set, get) => ({
     }
   },
 
-  recordSolve(skillId, exerciseId, baseXp, hintsUsed, bankSize, reviewed = true) {
+  recordSolve(skillId, exerciseId, baseXp, hintsUsed, bankSize) {
     const s = get()
     const prev = s.skills[skillId] ?? { solved: [], completed: false, mastery: 0 }
     if (prev.solved.includes(exerciseId)) return { gained: 0, newlyCompleted: false }
@@ -153,7 +153,7 @@ export const useProgress = create<ProgressStore>((set, get) => ({
     const completed = prev.completed || solved.length >= bankSize
     const newlyCompleted = completed && !prev.completed
     const today = todayString()
-    const schedule = newlyCompleted && reviewed
+    const schedule = newlyCompleted
       ? scheduleOnComplete(today)
       : { interval: prev.interval, due: prev.due }
     const next: ProgressState = {
@@ -168,7 +168,6 @@ export const useProgress = create<ProgressStore>((set, get) => ({
           mastery: completed ? Math.max(prev.mastery, 3) : prev.mastery,
           interval: schedule.interval,
           due: schedule.due,
-          ...(reviewed ? {} : { noReview: true }),
         },
       },
     }

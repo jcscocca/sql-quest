@@ -1,14 +1,19 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { python } from '@codemirror/lang-python'
 import { Editor } from './Editor'
+import { CodeEditor } from './CodeEditor'
 import { ResultGrid } from './ResultGrid'
 import type { QueryResult } from '../lib/compare'
 import { loadWorld, runQuery } from '../lib/duckdb'
 import { translateError, TrainerError } from '../lib/errors'
 import { getTrack } from '../lib/tracks/registry'
 import type { Track } from '../lib/tracks/types'
+import { createJavascriptTrack } from '../lib/tracks/javascript'
+import { createPythonTrack } from '../lib/tracks/python'
+import type { TestResult } from '../lib/js-runtime'
 import { useProgress } from '../lib/progress'
 import type { ReviewItem } from '../lib/review'
-import type { Curriculum, Exercise, WorldSchema } from '../lib/content'
+import type { CodeTest, Curriculum, Exercise, WorldSchema } from '../lib/content'
 
 type Feedback =
   | { kind: 'success'; gained: number }
@@ -20,18 +25,31 @@ interface SkillResult {
   after: number
 }
 
-export function ReviewScreen({ items, schemas, curriculum, onDone }: {
+type CodeRun = { results: TestResult[]; error?: string }
+interface CodeTrack {
+  run: (code: string, ex: { tests: CodeTest[]; fixture?: string; mustCall?: string[] }) => Promise<CodeRun>
+  check: (r: CodeRun) => { correct: boolean; reason?: string }
+}
+type CodeTrackId = 'javascript' | 'python'
+
+const defaultCodeTrack = (trackId: CodeTrackId): CodeTrack =>
+  trackId === 'javascript' ? createJavascriptTrack() : createPythonTrack()
+
+export function ReviewScreen({ items, schemas, curriculum, onDone, createCodeTrack = defaultCodeTrack }: {
   items: ReviewItem[]
   schemas: Record<string, WorldSchema>
   curriculum: Curriculum
   onDone: () => void
+  createCodeTrack?: (trackId: CodeTrackId) => CodeTrack
 }) {
+  const first = items[0] as ReviewItem | undefined
   const [idx, setIdx] = useState(0)
-  const [sqlText, setSqlText] = useState('')
+  const [submission, setSubmission] = useState(first && first.trackId !== 'sql' ? first.exercise.starter : '')
   const [busy, setBusy] = useState(false)
   const [engineReady, setEngineReady] = useState(false)
   const [feedback, setFeedback] = useState<Feedback | null>(null)
   const [result, setResult] = useState<QueryResult | null>(null)
+  const [tests, setTests] = useState<TestResult[] | null>(null)
   const [hintsShown, setHintsShown] = useState(0)
   const [hintUsed, setHintUsed] = useState<Record<string, boolean>>({})
   const [missed, setMissed] = useState<Record<string, boolean>>({})
@@ -40,17 +58,30 @@ export function ReviewScreen({ items, schemas, curriculum, onDone }: {
 
   const item = items[idx]
   const allSkills = useMemo(() => curriculum.regions.flatMap(r => r.skills), [curriculum])
+  const sqlNeeded = useMemo(() => items.some(i => i.trackId === 'sql'), [items])
   const world = allSkills.find(s => s.id === item?.skillId)?.world ?? 'pokemon'
   const schema = schemas[world]
   const trackRef = useRef<Track<QueryResult, Exercise> | null>(null)
-  if (!trackRef.current) {
-    const sk = allSkills.find(s => s.id === item?.skillId)
+  if (!trackRef.current && sqlNeeded) {
+    const sk = allSkills.find(s => s.id === items.find(i => i.trackId === 'sql')?.skillId)
     if (sk) trackRef.current = getTrack(sk, { runQuery, loadWorld })
   }
   const track = trackRef.current
+  const codeTracksRef = useRef<Partial<Record<CodeTrackId, CodeTrack>>>({})
+  function codeTrack(trackId: CodeTrackId): CodeTrack {
+    const existing = codeTracksRef.current[trackId]
+    if (existing) return existing
+    const created = createCodeTrack(trackId)
+    codeTracksRef.current[trackId] = created
+    return created
+  }
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: prepare only matters per world — re-running per item would be a no-op
   useEffect(() => {
+    if (!sqlNeeded) {
+      setEngineReady(true)
+      return
+    }
     setEngineReady(false)
     track?.prepare(allSkills.find(s => s.id === item?.skillId), schema)
       .then(() => setEngineReady(true))
@@ -70,35 +101,56 @@ export function ReviewScreen({ items, schemas, curriculum, onDone }: {
   async function handleRun() {
     setBusy(true)
     setFeedback(null)
-    try {
-      setResult(await track!.run(sqlText))
-    } catch (e) {
-      showError(e)
-    } finally {
-      setBusy(false)
+    if (item.trackId === 'sql') {
+      try {
+        setResult(await track!.run(submission))
+      } catch (e) {
+        showError(e)
+      } finally {
+        setBusy(false)
+      }
+      return
     }
+    const r = await codeTrack(item.trackId).run(submission, item.exercise)
+    setTests(r.results)
+    if (r.error) setFeedback({ kind: 'error', friendly: r.error, raw: '' })
+    setBusy(false)
   }
 
   async function handleSubmit() {
     setBusy(true)
     setFeedback(null)
-    try {
-      const user = await track!.run(sqlText)
-      setResult(user)
-      const outcome = await track!.check(user, item.exercise)
-      if (outcome.correct) {
-        const gained = useProgress.getState().recordReviewSolve(hintsShown)
-        setXpEarned(x => x + gained)
-        setFeedback({ kind: 'success', gained })
-      } else {
-        setMissed(m => ({ ...m, [item.skillId]: true }))
-        setFeedback({ kind: 'wrong', message: `Not quite — ${outcome.reason}. Try again.` })
+    if (item.trackId === 'sql') {
+      try {
+        const user = await track!.run(submission)
+        setResult(user)
+        const outcome = await track!.check(user, item.exercise)
+        if (outcome.correct) succeed()
+        else miss(`Not quite — ${outcome.reason}. Try again.`)
+      } catch (e) {
+        showError(e)
+      } finally {
+        setBusy(false)
       }
-    } catch (e) {
-      showError(e)
-    } finally {
-      setBusy(false)
+      return
     }
+    const r = await codeTrack(item.trackId).run(submission, item.exercise)
+    setTests(r.results)
+    if (r.error) setFeedback({ kind: 'error', friendly: r.error, raw: '' })
+    else if (codeTrack(item.trackId).check(r).correct) succeed()
+    else miss(`${r.results.filter(t => t.pass).length}/${r.results.length} tests passing — try again.`)
+    setBusy(false)
+  }
+
+  function succeed() {
+    const gained = useProgress.getState().recordReviewSolve(hintsShown)
+    setXpEarned(x => x + gained)
+    setFeedback({ kind: 'success', gained })
+  }
+
+  function miss(message: string) {
+    setMissed(m => ({ ...m, [item.skillId]: true }))
+    setFeedback({ kind: 'wrong', message })
   }
 
   function recordOutcomes(skillIds: string[]): Record<string, SkillResult> {
@@ -114,9 +166,11 @@ export function ReviewScreen({ items, schemas, curriculum, onDone }: {
 
   function advance() {
     if (idx + 1 < items.length) {
+      const next = items[idx + 1]
       setIdx(idx + 1)
-      setSqlText('')
+      setSubmission(next.trackId === 'sql' ? '' : next.exercise.starter)
       setResult(null)
+      setTests(null)
       setFeedback(null)
       setHintsShown(0)
       return
@@ -174,6 +228,12 @@ export function ReviewScreen({ items, schemas, curriculum, onDone }: {
             <span className="label">Review drill {idx + 1} of {items.length}</span>
             <p>{item.exercise.prompt}</p>
           </div>
+          {item.trackId !== 'sql' && item.exercise.fixture && (
+            <div className="fixture">
+              <span className="label">Data available to your code</span>
+              <pre>{item.exercise.fixture}</pre>
+            </div>
+          )}
           <div className="hints">
             {item.exercise.hints.slice(0, hintsShown).map((h, i) => (
               <div key={i} className="hint">
@@ -186,15 +246,24 @@ export function ReviewScreen({ items, schemas, curriculum, onDone }: {
           </div>
         </aside>
         <main className="right-panel">
-          <Editor key={`${idx}`} value={sqlText} onChange={setSqlText} schema={schema} />
+          {item.trackId === 'sql' ? (
+            <Editor key={`${idx}`} value={submission} onChange={setSubmission} schema={schema} />
+          ) : (
+            <CodeEditor key={`${idx}`} value={submission} onChange={setSubmission} lang={item.trackId === 'python' ? python : undefined} />
+          )}
           <div className="actions">
-            <button type="button" onClick={() => void handleRun()} disabled={busy || !engineReady}>
+            <button type="button" onClick={() => void handleRun()} disabled={busy || (item.trackId === 'sql' && !engineReady)}>
               ▶ Run
             </button>
-            <button type="button" onClick={() => void handleSubmit()} disabled={busy || !engineReady || feedback?.kind === 'success'} className="submit">
+            <button
+              type="button"
+              onClick={() => void handleSubmit()}
+              disabled={busy || (item.trackId === 'sql' && !engineReady) || feedback?.kind === 'success'}
+              className="submit"
+            >
               Submit
             </button>
-            {!engineReady && <span className="engine-status">Loading SQL engine…</span>}
+            {item.trackId === 'sql' && !engineReady && <span className="engine-status">Loading SQL engine…</span>}
           </div>
           {feedback?.kind === 'success' && (
             <div className="feedback success">
@@ -209,7 +278,23 @@ export function ReviewScreen({ items, schemas, curriculum, onDone }: {
               {feedback.raw && <pre className="raw-error">{feedback.raw}</pre>}
             </div>
           )}
-          {result && <ResultGrid result={result} />}
+          {item.trackId === 'sql' && result && <ResultGrid result={result} />}
+          {item.trackId !== 'sql' && tests && (
+            <div className="tests">
+              {tests.map((t, i) => (
+                <div key={i} className={`test ${t.pass ? 'pass' : 'fail'}`}>
+                  <span>{t.pass ? '✓' : '✗'} Test {i + 1}</span>
+                  {!t.pass && (
+                    <span className="test-detail">
+                      {t.error
+                        ? `error: ${t.error}`
+                        : `expected ${t.expected}, got ${t.actual}`}
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </main>
       </div>
     </div>

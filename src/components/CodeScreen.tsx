@@ -8,7 +8,7 @@ import type { JsBank, CodeTest, PyBank, Region, Skill } from '../lib/content'
 
 type RunResult = { results: TestResult[]; error?: string }
 interface CodeTrack {
-  run: (code: string, ex: { tests: CodeTest[]; fixture?: string }) => Promise<RunResult>
+  run: (code: string, ex: { tests: CodeTest[]; fixture?: string; mustCall?: string[] }) => Promise<RunResult>
   check: (r: RunResult) => { correct: boolean; reason?: string }
 }
 
@@ -62,7 +62,7 @@ export function CodeScreen({ skill, bank, region, onBack, createTrack = createJa
     if (track.check(r).correct) {
       const res = useProgress
         .getState()
-        .recordSolve(skill.id, ex.id, ex.xp, hintsShown, bank.exercises.length, false)
+        .recordSolve(skill.id, ex.id, ex.xp, hintsShown, bank.exercises.length)
       if (res.newlyCompleted) useProgress.getState().awardCompletionBadges(region, skill.id)
       setFeedback({ kind: 'success', gained: res.gained, finished: res.newlyCompleted })
     } else {

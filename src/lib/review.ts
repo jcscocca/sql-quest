@@ -1,5 +1,5 @@
 import { addDays, dayDiff } from './xp'
-import type { Exercise, ExerciseBank } from './content'
+import type { Exercise, ExerciseBank, JsBank, JsExercise, PyBank, PyExercise } from './content'
 
 export interface ReviewableSkill {
   mastery: number
@@ -13,10 +13,9 @@ export interface Schedule {
   due: string
 }
 
-export interface ReviewItem {
-  skillId: string
-  exercise: Exercise
-}
+export type ReviewItem =
+  | { skillId: string; trackId: 'sql'; exercise: Exercise }
+  | { skillId: string; trackId: 'javascript' | 'python'; exercise: JsExercise | PyExercise }
 
 export const FIRST_INTERVAL = 2
 export const MAX_INTERVAL = 30
@@ -47,13 +46,26 @@ export function assembleReview(
   banks: Record<string, ExerciseBank>,
   today: string,
   rng: () => number = Math.random,
+  jsBanks: Record<string, JsBank> = {},
+  pyBanks: Record<string, PyBank> = {},
 ): ReviewItem[] {
+  const bankFor = (id: string): { trackId: ReviewItem['trackId']; exercises: (Exercise | JsExercise | PyExercise)[] } | null =>
+    banks[id]
+      ? { trackId: 'sql', exercises: banks[id].exercises }
+      : jsBanks[id]
+        ? { trackId: 'javascript', exercises: jsBanks[id].exercises }
+        : pyBanks[id]
+          ? { trackId: 'python', exercises: pyBanks[id].exercises }
+          : null
+
   const pools = Object.entries(skills)
-    .filter(([id, sp]) => sp.completed && sp.due && sp.interval && sp.due <= today && banks[id])
-    .map(([id, sp]) => ({
+    .map(([id, sp]) => ({ id, sp, bank: bankFor(id) }))
+    .filter(({ sp, bank }) => sp.completed && sp.due && sp.interval && sp.due <= today && bank)
+    .map(({ id, sp, bank }) => ({
       id,
+      trackId: bank!.trackId,
       ratio: dayDiff(sp.due!, today) / sp.interval!,
-      pool: shuffle([...banks[id].exercises], rng).slice(0, PER_SKILL_MAX),
+      pool: shuffle([...bank!.exercises], rng).slice(0, PER_SKILL_MAX),
     }))
     .sort((a, b) => b.ratio - a.ratio)
 
@@ -65,7 +77,7 @@ export function assembleReview(
       if (items.length >= REVIEW_MAX) break
       const exercise = p.pool[round]
       if (exercise) {
-        items.push({ skillId: p.id, exercise })
+        items.push({ skillId: p.id, trackId: p.trackId, exercise } as ReviewItem)
         took = true
       }
     }

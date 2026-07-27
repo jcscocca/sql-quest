@@ -6,7 +6,7 @@ import {
   scheduleOnComplete,
   type ReviewableSkill,
 } from './review'
-import type { ExerciseBank } from './content'
+import type { ExerciseBank, JsBank } from './content'
 
 const seq = (...vals: number[]) => {
   let i = 0
@@ -111,4 +111,32 @@ test('assembly caps at 2 exercises per skill and 8 total, most overdue first', (
 test('assembly with one due skill yields at most 2 items', () => {
   const items = assembleReview({ a: skill({ due: '2026-07-01' }) }, { a: bank('a', 6) }, '2026-07-19', seq(0))
   expect(items.length).toBe(2)
+})
+
+const jsBank = (skillId: string, n: number): JsBank => ({
+  skillId,
+  exercises: Array.from({ length: n }, (_, i) => ({
+    id: `${skillId}-${i + 1}`,
+    prompt: 'p',
+    functionName: 'f',
+    starter: 'function f() {\n}',
+    solution: 'function f() { return 1 }',
+    tests: [{ expr: 'f()', expect: '1' }],
+    hints: ['a', 'b', 'c'],
+    xp: 15,
+  })),
+})
+
+test('code skills join the rotation tagged with their trackId, most overdue first', () => {
+  const items = assembleReview(
+    { sel: skill({ due: '2026-07-18' }), 'js-arrays': skill({ due: '2026-07-01' }) },
+    { sel: bank('sel', 6) },
+    '2026-07-19',
+    seq(0),
+    { 'js-arrays': jsBank('js-arrays', 6) },
+  )
+  expect(items[0].skillId).toBe('js-arrays')
+  expect(items[0].trackId).toBe('javascript')
+  expect(items.filter(i => i.trackId === 'sql' && i.skillId === 'sel').length).toBe(2)
+  expect(items.filter(i => i.trackId === 'javascript').length).toBe(2)
 })

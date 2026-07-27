@@ -112,23 +112,33 @@ test('newly completing a node schedules its first review', () => {
   expect(again.newlyCompleted).toBe(false)
 })
 
-test('completing a non-reviewed (code) skill does not schedule a review', () => {
-  const res = useProgress.getState().recordSolve('js-arrays', 'ja-1', 10, 0, 1, false)
+test('completing a code skill schedules its first review like any other', () => {
+  const res = useProgress.getState().recordSolve('js-arrays', 'ja-1', 10, 0, 1)
   expect(res.newlyCompleted).toBe(true)
   const sk = useProgress.getState().skills['js-arrays']
   expect(sk.completed).toBe(true)
-  expect(sk.interval).toBeUndefined()
-  expect(sk.due).toBeUndefined()
+  expect(sk.interval).toBe(2)
+  expect(sk.due).toBeDefined()
 })
 
-test('a completed code skill stays unscheduled across a reload', async () => {
-  useProgress.getState().recordSolve('js-arrays', 'ja-1', 10, 0, 1, false)
+test('hydrate backfills a schedule for legacy noReview code skills and strips the flag', async () => {
+  const { set: idbSet, get: idbGetRaw } = await import('idb-keyval')
+  useProgress.getState().recordSolve('js-arrays', 'ja-1', 10, 0, 1)
   await new Promise(r => setTimeout(r, 0))
+  const raw = (await idbGetRaw('sql-quest-progress')) as ProgressState
+  const legacy = {
+    ...raw,
+    skills: {
+      'js-arrays': { solved: ['ja-1'], completed: true, mastery: 3, noReview: true },
+    },
+  }
+  await idbSet('sql-quest-progress', legacy)
   await useProgress.getState().hydrate()
   const sk = useProgress.getState().skills['js-arrays']
   expect(sk.completed).toBe(true)
-  expect(sk.interval).toBeUndefined()
-  expect(sk.due).toBeUndefined()
+  expect(sk.interval).toBe(2)
+  expect(sk.due).toBeDefined()
+  expect('noReview' in sk).toBe(false)
 })
 
 test('addCatches tags entries with world and label, deduping by world+name', () => {
