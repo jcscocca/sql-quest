@@ -150,6 +150,50 @@
         "Iterate Object.keys(sums).sort() tracking the largest average with a strict >, so on a tie the alphabetically earlier type is kept and an empty roster leaves best as null."
       ],
       "xp": 20
+    },
+    {
+      "id": "js-app-biggest-attack-defense-gap",
+      "prompt": "You are given roster, an array of Pokémon records of shape { name, type, attack, defense }. A record's offense gap is attack - defense. Implement biggestAttackDefenseGap(roster) so it returns the name of the record with the largest offense gap. biggestAttackDefenseGap(roster) is 'bellsprout' — its gap of 75 - 35 = 40 beats charizard's 84 - 78 = 6, so the highest-attack record is not the answer. If several records tie for the largest gap, keep the one that appears first in the roster. Gaps can be negative, and an empty roster returns null.",
+      "functionName": "biggestAttackDefenseGap",
+      "fixture": "const roster = [\n  { name: 'charmander', type: 'fire', attack: 52, defense: 43 },\n  { name: 'charizard', type: 'fire', attack: 84, defense: 78 },\n  { name: 'vulpix', type: 'fire', attack: 41, defense: 40 },\n  { name: 'growlithe', type: 'fire', attack: 70, defense: 45 },\n  { name: 'squirtle', type: 'water', attack: 48, defense: 65 },\n  { name: 'blastoise', type: 'water', attack: 83, defense: 100 },\n  { name: 'psyduck', type: 'water', attack: 52, defense: 48 },\n  { name: 'staryu', type: 'water', attack: 45, defense: 55 },\n  { name: 'bulbasaur', type: 'grass', attack: 49, defense: 49 },\n  { name: 'oddish', type: 'grass', attack: 50, defense: 55 },\n  { name: 'bellsprout', type: 'grass', attack: 75, defense: 35 },\n  { name: 'pikachu', type: 'electric', attack: 55, defense: 40 },\n  { name: 'magnemite', type: 'electric', attack: 35, defense: 70 },\n  { name: 'geodude', type: 'rock', attack: 80, defense: 100 },\n  { name: 'onix', type: 'rock', attack: 45, defense: 160 }\n]",
+      "starter": "function biggestAttackDefenseGap(roster) {\n  // return the name of the record with the largest attack - defense gap\n}",
+      "solution": "function biggestAttackDefenseGap(roster) {\n  let best = null\n  for (const p of roster) {\n    if (best === null || p.attack - p.defense > best.attack - best.defense) best = p\n  }\n  return best === null ? null : best.name\n}",
+      "tests": [
+        { "expr": "biggestAttackDefenseGap(roster)", "expect": "'bellsprout'" },
+        { "expr": "biggestAttackDefenseGap([])", "expect": "null" },
+        { "expr": "biggestAttackDefenseGap([{ name: 'first', type: 'x', attack: 60, defense: 40 }, { name: 'second', type: 'y', attack: 30, defense: 10 }])", "expect": "'first'" },
+        { "expr": "biggestAttackDefenseGap([{ name: 'tank', type: 'x', attack: 10, defense: 90 }, { name: 'wall', type: 'y', attack: 5, defense: 20 }])", "expect": "'wall'" },
+        { "expr": "biggestAttackDefenseGap([{ name: 'brute', type: 'x', attack: 100, defense: 99 }, { name: 'spike', type: 'y', attack: 40, defense: 5 }])", "expect": "'spike'" },
+        { "expr": "biggestAttackDefenseGap([{ name: 'solo', type: 'ghost', attack: 12, defense: 30 }])", "expect": "'solo'" }
+      ],
+      "hints": [
+        "The value you rank on is not stored on the record — each record scores p.attack - p.defense, so compare gaps rather than attacks.",
+        "Carry one running leader and compare p.attack - p.defense against best.attack - best.defense; seed it with null, not a zero-gap stand-in, or an all-negative roster picks nobody.",
+        "Loop with if (best === null || p.attack - p.defense > best.attack - best.defense) best = p, then return best === null ? null : best.name — the strict > keeps the earlier record on a tie, and bellsprout (40) beats charizard (6)."
+      ],
+      "xp": 20
+    },
+    {
+      "id": "js-app-names-by-type-above",
+      "prompt": "You are given roster, an array of Pokémon records of shape { name, type, attack, defense }. Implement namesByTypeAbove(roster, minAttack) so it returns an object mapping each type to an array of the names of its records whose attack is greater than or equal to minAttack, each array in roster order — { type: [name, ...] }. A type with no qualifying record must be absent from the result entirely, not mapped to an empty array. namesByTypeAbove(roster, 50) is {fire: ['charmander', 'charizard', 'growlithe'], water: ['blastoise', 'psyduck'], grass: ['oddish', 'bellsprout'], electric: ['pikachu'], rock: ['geodude']}. The test is >=, so oddish at exactly 50 qualifies. If nothing qualifies, or the roster is empty, return an empty object {}.",
+      "functionName": "namesByTypeAbove",
+      "fixture": "const roster = [\n  { name: 'charmander', type: 'fire', attack: 52, defense: 43 },\n  { name: 'charizard', type: 'fire', attack: 84, defense: 78 },\n  { name: 'vulpix', type: 'fire', attack: 41, defense: 40 },\n  { name: 'growlithe', type: 'fire', attack: 70, defense: 45 },\n  { name: 'squirtle', type: 'water', attack: 48, defense: 65 },\n  { name: 'blastoise', type: 'water', attack: 83, defense: 100 },\n  { name: 'psyduck', type: 'water', attack: 52, defense: 48 },\n  { name: 'staryu', type: 'water', attack: 45, defense: 55 },\n  { name: 'bulbasaur', type: 'grass', attack: 49, defense: 49 },\n  { name: 'oddish', type: 'grass', attack: 50, defense: 55 },\n  { name: 'bellsprout', type: 'grass', attack: 75, defense: 35 },\n  { name: 'pikachu', type: 'electric', attack: 55, defense: 40 },\n  { name: 'magnemite', type: 'electric', attack: 35, defense: 70 },\n  { name: 'geodude', type: 'rock', attack: 80, defense: 100 },\n  { name: 'onix', type: 'rock', attack: 45, defense: 160 }\n]",
+      "starter": "function namesByTypeAbove(roster, minAttack) {\n  // group the qualifying names into a {type: [name, ...]} object\n}",
+      "solution": "function namesByTypeAbove(roster, minAttack) {\n  const groups = {}\n  for (const p of roster) {\n    if (p.attack >= minAttack) (groups[p.type] ||= []).push(p.name)\n  }\n  return groups\n}",
+      "tests": [
+        { "expr": "namesByTypeAbove(roster, 50)", "expect": "{fire: ['charmander', 'charizard', 'growlithe'], water: ['blastoise', 'psyduck'], grass: ['oddish', 'bellsprout'], electric: ['pikachu'], rock: ['geodude']}" },
+        { "expr": "namesByTypeAbove(roster, 80)", "expect": "{fire: ['charizard'], water: ['blastoise'], rock: ['geodude']}" },
+        { "expr": "namesByTypeAbove(roster, 200)", "expect": "{}" },
+        { "expr": "namesByTypeAbove([], 10)", "expect": "{}" },
+        { "expr": "namesByTypeAbove(roster, 0)", "expect": "{fire: ['charmander', 'charizard', 'vulpix', 'growlithe'], water: ['squirtle', 'blastoise', 'psyduck', 'staryu'], grass: ['bulbasaur', 'oddish', 'bellsprout'], electric: ['pikachu', 'magnemite'], rock: ['geodude', 'onix']}" },
+        { "setup": "const g = namesByTypeAbove(roster, 80)", "expr": "Object.keys(g).length", "expect": "3" }
+      ],
+      "hints": [
+        "Group and filter in the same pass: only a record that clears minAttack may create or join a bucket.",
+        "Create each array lazily with (groups[p.type] ||= []).push(p.name), so a type appears only once a qualifying record shows up.",
+        "Loop with if (p.attack >= minAttack) (groups[p.type] ||= []).push(p.name) and return groups — >= keeps oddish at exactly 50, and grass and electric are simply missing at minAttack 80 because nothing ever seeded them."
+      ],
+      "xp": 20
     }
   ]
 }

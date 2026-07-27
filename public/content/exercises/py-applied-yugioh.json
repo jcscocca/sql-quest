@@ -262,6 +262,90 @@
         "if c['archetype'] not in best or c['atk'] > best[c['archetype']]['atk']: best[c['archetype']] = c, then map each leader to its ['name'] — the strict > makes the first Blue-Eyes win its 3000-atk tie."
       ],
       "xp": 20
+    },
+    {
+      "id": "py-app-most-efficient-card",
+      "prompt": "You are given cards, a list of card records of shape {'name', 'archetype', 'atk', 'def', 'level'}, where every 'level' is at least 1. A card's efficiency is its atk divided by its level — how much attack it pays for per star. Implement most_efficient_card(cards) so it returns the 'name' of the most efficient card. most_efficient_card(cards) is 'Elemental HERO Burstinatrix' (1250 / 3 = 416.67), which beats the 3000-atk Blue-Eyes White Dragon (3000 / 8 = 375) — the strongest card is not the most efficient one. Summoned Skull ties it exactly at 2500 / 6, and a tie goes to the card that appears first in the list. An empty list returns None.",
+      "functionName": "most_efficient_card",
+      "starter": "def most_efficient_card(cards):\n    # return the name of the card with the highest atk-per-level\n    pass",
+      "solution": "def most_efficient_card(cards):\n    if not cards:\n        return None\n    return max(cards, key=lambda c: c['atk'] / c['level'])['name']",
+      "fixture": "cards = [\n    {'name': 'Blue-Eyes White Dragon', 'archetype': 'Blue-Eyes', 'atk': 3000, 'def': 2500, 'level': 8},\n    {'name': 'Blue-Eyes Alternative Dragon', 'archetype': 'Blue-Eyes', 'atk': 3000, 'def': 2500, 'level': 8},\n    {'name': 'Dark Magician', 'archetype': 'Dark Magician', 'atk': 2500, 'def': 2100, 'level': 7},\n    {'name': 'Dark Magician Girl', 'archetype': 'Dark Magician', 'atk': 2000, 'def': 1700, 'level': 6},\n    {'name': 'Dark Magician of Chaos', 'archetype': 'Dark Magician', 'atk': 2800, 'def': 2600, 'level': 8},\n    {'name': 'Red-Eyes Black Dragon', 'archetype': 'Red-Eyes', 'atk': 2400, 'def': 2000, 'level': 7},\n    {'name': 'Red-Eyes Darkness Dragon', 'archetype': 'Red-Eyes', 'atk': 2800, 'def': 2400, 'level': 9},\n    {'name': 'Elemental HERO Neos', 'archetype': 'Elemental HERO', 'atk': 2500, 'def': 2000, 'level': 7},\n    {'name': 'Elemental HERO Sparkman', 'archetype': 'Elemental HERO', 'atk': 1600, 'def': 1400, 'level': 4},\n    {'name': 'Elemental HERO Avian', 'archetype': 'Elemental HERO', 'atk': 1000, 'def': 1000, 'level': 3},\n    {'name': 'Elemental HERO Burstinatrix', 'archetype': 'Elemental HERO', 'atk': 1250, 'def': 800, 'level': 3},\n    {'name': 'Kuriboh', 'archetype': 'Kuriboh', 'atk': 300, 'def': 200, 'level': 1},\n    {'name': 'Winged Kuriboh', 'archetype': 'Kuriboh', 'atk': 300, 'def': 200, 'level': 1},\n    {'name': 'Summoned Skull', 'archetype': 'Archfiend', 'atk': 2500, 'def': 1200, 'level': 6},\n    {'name': 'Jinzo', 'archetype': 'Archfiend', 'atk': 2400, 'def': 1500, 'level': 6}\n]",
+      "tests": [
+        {
+          "expr": "most_efficient_card(cards)",
+          "expect": "'Elemental HERO Burstinatrix'"
+        },
+        {
+          "expr": "most_efficient_card([])",
+          "expect": "None"
+        },
+        {
+          "expr": "most_efficient_card([{'name': 'first', 'archetype': 'x', 'atk': 100, 'def': 0, 'level': 1}, {'name': 'second', 'archetype': 'y', 'atk': 200, 'def': 0, 'level': 2}])",
+          "expect": "'first'"
+        },
+        {
+          "expr": "most_efficient_card([{'name': 'big', 'archetype': 'x', 'atk': 900, 'def': 0, 'level': 9}, {'name': 'small', 'archetype': 'y', 'atk': 300, 'def': 0, 'level': 1}])",
+          "expect": "'small'"
+        },
+        {
+          "expr": "most_efficient_card([{'name': 'solo', 'archetype': 'z', 'atk': 500, 'def': 0, 'level': 2}])",
+          "expect": "'solo'"
+        },
+        {
+          "expr": "most_efficient_card([{'name': 'a', 'archetype': 'x', 'atk': 800, 'def': 0, 'level': 4}, {'name': 'b', 'archetype': 'y', 'atk': 700, 'def': 0, 'level': 2}, {'name': 'c', 'archetype': 'z', 'atk': 1200, 'def': 0, 'level': 6}])",
+          "expect": "'b'"
+        }
+      ],
+      "hints": [
+        "The ranking value is not on the card — you derive it per card as c['atk'] / c['level'], then pick the record that scores highest.",
+        "max(cards, key=lambda c: c['atk'] / c['level']) scores every card with that derived value and hands back the whole record, so read ['name'] off the result.",
+        "Return None early for the empty list, then return max(cards, key=lambda c: c['atk'] / c['level'])['name'] — max keeps the first record on a tie, which is why Burstinatrix wins its exact 416.67 tie with Summoned Skull."
+      ],
+      "xp": 20
+    },
+    {
+      "id": "py-app-deck-summary",
+      "prompt": "You are given cards, a list of card records of shape {'name', 'archetype', 'atk', 'def', 'level'}. Implement deck_summary(cards, archetype) so it returns one report line about that archetype, formatted exactly as '<archetype>: <n> cards, top ATK <atk> (<name>)' — deck_summary(cards, 'Dark Magician') is 'Dark Magician: 3 cards, top ATK 2800 (Dark Magician of Chaos)'. Use the singular '1 card' when the archetype has exactly one card. If two of its cards tie for the highest atk, name the one that appears first in the list, so deck_summary(cards, 'Blue-Eyes') is 'Blue-Eyes: 2 cards, top ATK 3000 (Blue-Eyes White Dragon)'. If the archetype has no cards — including when the list is empty — return '<archetype>: no cards' instead.",
+      "functionName": "deck_summary",
+      "starter": "def deck_summary(cards, archetype):\n    # build the one-line report for this archetype\n    pass",
+      "solution": "def deck_summary(cards, archetype):\n    owned = [c for c in cards if c['archetype'] == archetype]\n    if not owned:\n        return f'{archetype}: no cards'\n    top = max(owned, key=lambda c: c['atk'])\n    label = '1 card' if len(owned) == 1 else f'{len(owned)} cards'\n    return f\"{archetype}: {label}, top ATK {top['atk']} ({top['name']})\"",
+      "fixture": "cards = [\n    {'name': 'Blue-Eyes White Dragon', 'archetype': 'Blue-Eyes', 'atk': 3000, 'def': 2500, 'level': 8},\n    {'name': 'Blue-Eyes Alternative Dragon', 'archetype': 'Blue-Eyes', 'atk': 3000, 'def': 2500, 'level': 8},\n    {'name': 'Dark Magician', 'archetype': 'Dark Magician', 'atk': 2500, 'def': 2100, 'level': 7},\n    {'name': 'Dark Magician Girl', 'archetype': 'Dark Magician', 'atk': 2000, 'def': 1700, 'level': 6},\n    {'name': 'Dark Magician of Chaos', 'archetype': 'Dark Magician', 'atk': 2800, 'def': 2600, 'level': 8},\n    {'name': 'Red-Eyes Black Dragon', 'archetype': 'Red-Eyes', 'atk': 2400, 'def': 2000, 'level': 7},\n    {'name': 'Red-Eyes Darkness Dragon', 'archetype': 'Red-Eyes', 'atk': 2800, 'def': 2400, 'level': 9},\n    {'name': 'Elemental HERO Neos', 'archetype': 'Elemental HERO', 'atk': 2500, 'def': 2000, 'level': 7},\n    {'name': 'Elemental HERO Sparkman', 'archetype': 'Elemental HERO', 'atk': 1600, 'def': 1400, 'level': 4},\n    {'name': 'Elemental HERO Avian', 'archetype': 'Elemental HERO', 'atk': 1000, 'def': 1000, 'level': 3},\n    {'name': 'Elemental HERO Burstinatrix', 'archetype': 'Elemental HERO', 'atk': 1250, 'def': 800, 'level': 3},\n    {'name': 'Kuriboh', 'archetype': 'Kuriboh', 'atk': 300, 'def': 200, 'level': 1},\n    {'name': 'Winged Kuriboh', 'archetype': 'Kuriboh', 'atk': 300, 'def': 200, 'level': 1},\n    {'name': 'Summoned Skull', 'archetype': 'Archfiend', 'atk': 2500, 'def': 1200, 'level': 6},\n    {'name': 'Jinzo', 'archetype': 'Archfiend', 'atk': 2400, 'def': 1500, 'level': 6}\n]",
+      "tests": [
+        {
+          "expr": "deck_summary(cards, 'Blue-Eyes')",
+          "expect": "'Blue-Eyes: 2 cards, top ATK 3000 (Blue-Eyes White Dragon)'"
+        },
+        {
+          "expr": "deck_summary(cards, 'Dark Magician')",
+          "expect": "'Dark Magician: 3 cards, top ATK 2800 (Dark Magician of Chaos)'"
+        },
+        {
+          "expr": "deck_summary(cards, 'Kuriboh')",
+          "expect": "'Kuriboh: 2 cards, top ATK 300 (Kuriboh)'"
+        },
+        {
+          "expr": "deck_summary(cards, 'Archfiend')",
+          "expect": "'Archfiend: 2 cards, top ATK 2500 (Summoned Skull)'"
+        },
+        {
+          "expr": "deck_summary(cards, 'Ojama')",
+          "expect": "'Ojama: no cards'"
+        },
+        {
+          "expr": "deck_summary([], 'Blue-Eyes')",
+          "expect": "'Blue-Eyes: no cards'"
+        },
+        {
+          "expr": "deck_summary([{'name': 'Toon Summoned Skull', 'archetype': 'Toon', 'atk': 2500, 'def': 1200, 'level': 6}], 'Toon')",
+          "expect": "'Toon: 1 card, top ATK 2500 (Toon Summoned Skull)'"
+        }
+      ],
+      "hints": [
+        "Narrow to the archetype's cards first — the count, the top atk and that card's name all come off the same working list.",
+        "max(owned, key=lambda c: c['atk']) finds the record whose atk and name go in the line, and an f-string drops all four pieces into place.",
+        "Return the no-cards line when owned is empty, otherwise pick the label ('1 card' when len(owned) == 1, else the count plus ' cards') and interpolate archetype, label, the top card's atk and its name — max keeps the first card on a tie, so Blue-Eyes reports the White Dragon."
+      ],
+      "xp": 20
     }
   ]
 }

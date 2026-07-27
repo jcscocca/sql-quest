@@ -149,6 +149,51 @@
         "if (!(c.archetype in best) || c.atk > best[c.archetype].atk) best[c.archetype] = c, then map each best[a] to its .name — the strict > makes the first Blue-Eyes win its 3000-atk tie."
       ],
       "xp": 20
+    },
+    {
+      "id": "js-app-top-cards-by-atk",
+      "prompt": "You are given cards, an array of card records of shape { name, archetype, atk, def, level }. Implement topCardsByAtk(cards, n) so it returns an array of the names of the n highest-atk cards, ordered from highest atk to lowest. Cards that tie on atk are ordered alphabetically by name, not by their position in the array — so the two 3000-atk dragons come back as 'Blue-Eyes Alternative Dragon' then 'Blue-Eyes White Dragon'. topCardsByAtk(cards, 3) is ['Blue-Eyes Alternative Dragon', 'Blue-Eyes White Dragon', 'Dark Magician of Chaos']. If n is 0 return an empty array; if n exceeds the number of cards return every name in that order. Do not modify the cards array.",
+      "functionName": "topCardsByAtk",
+      "fixture": "const cards = [\n  { name: 'Blue-Eyes White Dragon', archetype: 'Blue-Eyes', atk: 3000, def: 2500, level: 8 },\n  { name: 'Blue-Eyes Alternative Dragon', archetype: 'Blue-Eyes', atk: 3000, def: 2500, level: 8 },\n  { name: 'Dark Magician', archetype: 'Dark Magician', atk: 2500, def: 2100, level: 7 },\n  { name: 'Dark Magician Girl', archetype: 'Dark Magician', atk: 2000, def: 1700, level: 6 },\n  { name: 'Dark Magician of Chaos', archetype: 'Dark Magician', atk: 2800, def: 2600, level: 8 },\n  { name: 'Red-Eyes Black Dragon', archetype: 'Red-Eyes', atk: 2400, def: 2000, level: 7 },\n  { name: 'Red-Eyes Darkness Dragon', archetype: 'Red-Eyes', atk: 2800, def: 2400, level: 9 },\n  { name: 'Elemental HERO Neos', archetype: 'Elemental HERO', atk: 2500, def: 2000, level: 7 },\n  { name: 'Elemental HERO Sparkman', archetype: 'Elemental HERO', atk: 1600, def: 1400, level: 4 },\n  { name: 'Elemental HERO Avian', archetype: 'Elemental HERO', atk: 1000, def: 1000, level: 3 },\n  { name: 'Elemental HERO Burstinatrix', archetype: 'Elemental HERO', atk: 1250, def: 800, level: 3 },\n  { name: 'Kuriboh', archetype: 'Kuriboh', atk: 300, def: 200, level: 1 },\n  { name: 'Winged Kuriboh', archetype: 'Kuriboh', atk: 300, def: 200, level: 1 },\n  { name: 'Summoned Skull', archetype: 'Archfiend', atk: 2500, def: 1200, level: 6 },\n  { name: 'Jinzo', archetype: 'Archfiend', atk: 2400, def: 1500, level: 6 }\n]",
+      "starter": "function topCardsByAtk(cards, n) {\n  // return the n highest-atk names, strongest first, ties alphabetical\n}",
+      "solution": "function topCardsByAtk(cards, n) {\n  return [...cards]\n    .sort((a, b) => b.atk - a.atk || a.name.localeCompare(b.name))\n    .slice(0, n)\n    .map(c => c.name)\n}",
+      "tests": [
+        { "expr": "topCardsByAtk(cards, 3)", "expect": "['Blue-Eyes Alternative Dragon', 'Blue-Eyes White Dragon', 'Dark Magician of Chaos']" },
+        { "expr": "topCardsByAtk(cards, 5)", "expect": "['Blue-Eyes Alternative Dragon', 'Blue-Eyes White Dragon', 'Dark Magician of Chaos', 'Red-Eyes Darkness Dragon', 'Dark Magician']" },
+        { "expr": "topCardsByAtk(cards, 7)", "expect": "['Blue-Eyes Alternative Dragon', 'Blue-Eyes White Dragon', 'Dark Magician of Chaos', 'Red-Eyes Darkness Dragon', 'Dark Magician', 'Elemental HERO Neos', 'Summoned Skull']" },
+        { "expr": "topCardsByAtk(cards, 0)", "expect": "[]" },
+        { "expr": "topCardsByAtk(cards, 20)", "expect": "['Blue-Eyes Alternative Dragon', 'Blue-Eyes White Dragon', 'Dark Magician of Chaos', 'Red-Eyes Darkness Dragon', 'Dark Magician', 'Elemental HERO Neos', 'Summoned Skull', 'Jinzo', 'Red-Eyes Black Dragon', 'Dark Magician Girl', 'Elemental HERO Sparkman', 'Elemental HERO Burstinatrix', 'Elemental HERO Avian', 'Kuriboh', 'Winged Kuriboh']" },
+        { "expr": "topCardsByAtk([{ name: 'Zeta', archetype: 'z', atk: 100, def: 0, level: 1 }, { name: 'Alpha', archetype: 'a', atk: 100, def: 0, level: 1 }], 2)", "expect": "['Alpha', 'Zeta']" },
+        { "setup": "topCardsByAtk(cards, 4)", "expr": "cards[0].name", "expect": "'Blue-Eyes White Dragon'" }
+      ],
+      "hints": [
+        "Rank the whole deck before you cut it: sort a copy by atk descending, but the top of this deck is full of ties, so one key is not enough.",
+        "A comparator can chain — b.atk - a.atk || a.name.localeCompare(b.name) falls through to the name only when the atk values are equal.",
+        "return [...cards].sort((a, b) => b.atk - a.atk || a.name.localeCompare(b.name)).slice(0, n).map(c => c.name) — the spread protects the original array, and the name tie-break is why 'Blue-Eyes Alternative Dragon' outranks 'Blue-Eyes White Dragon' even though it is listed second."
+      ],
+      "xp": 20
+    },
+    {
+      "id": "js-app-distinct-levels-by-archetype",
+      "prompt": "You are given cards, an array of card records of shape { name, archetype, atk, def, level }. Implement distinctLevelsByArchetype(cards) so it returns an object mapping each archetype to how many distinct levels its cards occupy — { archetype: count }. Count each level once however many cards share it: Kuriboh has two cards but both sit at level 1, so its count is 1, and Elemental HERO's four cards occupy only three levels. distinctLevelsByArchetype(cards) is {'Blue-Eyes': 1, 'Dark Magician': 3, 'Red-Eyes': 2, 'Elemental HERO': 3, 'Kuriboh': 1, 'Archfiend': 1}. An empty array returns an empty object {}.",
+      "functionName": "distinctLevelsByArchetype",
+      "fixture": "const cards = [\n  { name: 'Blue-Eyes White Dragon', archetype: 'Blue-Eyes', atk: 3000, def: 2500, level: 8 },\n  { name: 'Blue-Eyes Alternative Dragon', archetype: 'Blue-Eyes', atk: 3000, def: 2500, level: 8 },\n  { name: 'Dark Magician', archetype: 'Dark Magician', atk: 2500, def: 2100, level: 7 },\n  { name: 'Dark Magician Girl', archetype: 'Dark Magician', atk: 2000, def: 1700, level: 6 },\n  { name: 'Dark Magician of Chaos', archetype: 'Dark Magician', atk: 2800, def: 2600, level: 8 },\n  { name: 'Red-Eyes Black Dragon', archetype: 'Red-Eyes', atk: 2400, def: 2000, level: 7 },\n  { name: 'Red-Eyes Darkness Dragon', archetype: 'Red-Eyes', atk: 2800, def: 2400, level: 9 },\n  { name: 'Elemental HERO Neos', archetype: 'Elemental HERO', atk: 2500, def: 2000, level: 7 },\n  { name: 'Elemental HERO Sparkman', archetype: 'Elemental HERO', atk: 1600, def: 1400, level: 4 },\n  { name: 'Elemental HERO Avian', archetype: 'Elemental HERO', atk: 1000, def: 1000, level: 3 },\n  { name: 'Elemental HERO Burstinatrix', archetype: 'Elemental HERO', atk: 1250, def: 800, level: 3 },\n  { name: 'Kuriboh', archetype: 'Kuriboh', atk: 300, def: 200, level: 1 },\n  { name: 'Winged Kuriboh', archetype: 'Kuriboh', atk: 300, def: 200, level: 1 },\n  { name: 'Summoned Skull', archetype: 'Archfiend', atk: 2500, def: 1200, level: 6 },\n  { name: 'Jinzo', archetype: 'Archfiend', atk: 2400, def: 1500, level: 6 }\n]",
+      "starter": "function distinctLevelsByArchetype(cards) {\n  // map each archetype to its number of distinct levels\n}",
+      "solution": "function distinctLevelsByArchetype(cards) {\n  const levels = {}\n  for (const c of cards) {\n    (levels[c.archetype] ||= new Set()).add(c.level)\n  }\n  const result = {}\n  for (const a of Object.keys(levels)) result[a] = levels[a].size\n  return result\n}",
+      "tests": [
+        { "expr": "distinctLevelsByArchetype(cards)", "expect": "{'Blue-Eyes': 1, 'Dark Magician': 3, 'Red-Eyes': 2, 'Elemental HERO': 3, 'Kuriboh': 1, 'Archfiend': 1}" },
+        { "expr": "distinctLevelsByArchetype([])", "expect": "{}" },
+        { "expr": "distinctLevelsByArchetype([{ name: 'A', archetype: 'Ojama', atk: 0, def: 1000, level: 2 }, { name: 'B', archetype: 'Ojama', atk: 0, def: 1000, level: 2 }])", "expect": "{'Ojama': 1}" },
+        { "expr": "distinctLevelsByArchetype([{ name: 'A', archetype: 'Toon', atk: 0, def: 0, level: 4 }, { name: 'B', archetype: 'Toon', atk: 0, def: 0, level: 6 }])", "expect": "{'Toon': 2}" },
+        { "expr": "distinctLevelsByArchetype([{ name: 'A', archetype: 'X', atk: 0, def: 0, level: 3 }, { name: 'B', archetype: 'Y', atk: 0, def: 0, level: 3 }, { name: 'C', archetype: 'X', atk: 0, def: 0, level: 5 }])", "expect": "{'X': 2, 'Y': 1}" },
+        { "setup": "const d = distinctLevelsByArchetype(cards)", "expr": "d['Elemental HERO']", "expect": "3" }
+      ],
+      "hints": [
+        "Two layers: bucket the cards by archetype, and inside each bucket keep only levels you have not already recorded.",
+        "A Set per archetype dedupes for you — add every c.level to it and read .size at the end.",
+        "Build levels[c.archetype] as a Set with (levels[c.archetype] ||= new Set()).add(c.level), then map each archetype to levels[a].size — counting cards instead would report 2 for Kuriboh, whose two cards share level 1."
+      ],
+      "xp": 20
     }
   ]
 }

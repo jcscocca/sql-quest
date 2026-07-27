@@ -86,7 +86,7 @@
     },
     {
       "id": "py-exc-require-int",
-      "prompt": "Implement require_int(x) so it returns x unchanged when x is an int, but raises TypeError when x is any other type — a str, a float, a list, and so on. require_int(5) is 5, while require_int('5') and require_int(3.0) both raise TypeError. Use isinstance(x, int) to test the type; do NOT convert the value, just accept or reject it.",
+      "prompt": "Implement require_int(x) so it returns x unchanged when x is an int, but raises TypeError when x is any other type — a str, a float, a list, and so on. require_int(5) is 5, while require_int('5') and require_int(3.0) both raise TypeError. Use isinstance(x, int) to test the type; do NOT convert the value, just accept or reject it. One Python gotcha to know: bool is a subclass of int, so isinstance(True, int) is True and require_int(True) returns True unchanged.",
       "functionName": "require_int",
       "starter": "def require_int(x):\n    # raise TypeError when x is not an int; otherwise return x\n    pass",
       "solution": "def require_int(x):\n    if not isinstance(x, int):\n        raise TypeError('expected an int')\n    return x",
@@ -94,6 +94,7 @@
         { "expr": "require_int(5)", "expect": "5" },
         { "expr": "require_int(0)", "expect": "0" },
         { "expr": "require_int(-7)", "expect": "-7" },
+        { "expr": "require_int(True) is True", "expect": "True" },
         { "expr": "require_int('5')", "raises": "TypeError" },
         { "expr": "require_int(3.0)", "raises": "TypeError" },
         { "expr": "require_int([1])", "raises": "TypeError" }

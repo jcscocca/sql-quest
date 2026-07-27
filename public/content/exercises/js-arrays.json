@@ -63,6 +63,49 @@
         "'aeiou'.includes(ch) is a compact membership test — increment a counter each time it is true."
       ],
       "xp": 15
+    },
+    {
+      "id": "js-longer-than",
+      "prompt": "Implement longerThan(words, minLength) so it returns a new array holding only the strings from words whose length is strictly greater than minLength, in their original order. A word exactly minLength characters long is left out. An empty array — or one where nothing is long enough — returns an empty array.",
+      "functionName": "longerThan",
+      "starter": "function longerThan(words, minLength) {\n  // return a new array of the words longer than minLength\n}",
+      "solution": "function longerThan(words, minLength) {\n  return words.filter(w => w.length > minLength)\n}",
+      "tests": [
+        { "expr": "longerThan(['a', 'bb', 'ccc'], 1)", "expect": "['bb', 'ccc']" },
+        { "expr": "longerThan([], 2)", "expect": "[]" },
+        { "expr": "longerThan(['hi', 'yo'], 5)", "expect": "[]" },
+        { "expr": "longerThan(['', 'a'], 0)", "expect": "['a']" },
+        { "expr": "longerThan(['abc'], 3)", "expect": "[]" },
+        { "expr": "longerThan(['one', 'three', 'to'], 2)", "expect": "['one', 'three']" },
+        { "expr": "longerThan(['x', 'yy'], 0)", "expect": "['x', 'yy']" }
+      ],
+      "hints": [
+        "Keeping some elements and dropping the rest is the filter shape — the result may be shorter than the input, and the survivors stay in their original order.",
+        "A string's length is w.length, and 'strictly greater' means > rather than >=, so a word exactly minLength long is dropped.",
+        "return words.filter(w => w.length > minLength) — filtering an empty array already gives [], so no special case is needed."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "js-parity-labels",
+      "prompt": "Implement parityLabels(arr) so it returns a new array of the same length as arr, holding 'even' for each even number and 'odd' for each odd one — parityLabels([1, 2]) is ['odd', 'even']. Zero is even, and negatives count as well (-4 is even, -3 is odd). An empty array returns an empty array.",
+      "functionName": "parityLabels",
+      "starter": "function parityLabels(arr) {\n  // return 'even' or 'odd' for each number\n}",
+      "solution": "function parityLabels(arr) {\n  return arr.map(x => (x % 2 === 0 ? 'even' : 'odd'))\n}",
+      "tests": [
+        { "expr": "parityLabels([1, 2, 3])", "expect": "['odd', 'even', 'odd']" },
+        { "expr": "parityLabels([])", "expect": "[]" },
+        { "expr": "parityLabels([0])", "expect": "['even']" },
+        { "expr": "parityLabels([-3, -4])", "expect": "['odd', 'even']" },
+        { "expr": "parityLabels([7])", "expect": "['odd']" },
+        { "expr": "parityLabels([10, 11, 12])", "expect": "['even', 'odd', 'even']" }
+      ],
+      "hints": [
+        "One label per number, same length as the input — that is a transform of every element, so map rather than filter.",
+        "Test evenness with x % 2 === 0; do not test oddness with x % 2 === 1, because % keeps the sign of the left operand and -3 % 2 is -1, not 1.",
+        "return arr.map(x => x % 2 === 0 ? 'even' : 'odd') — mapping an empty array gives [] for free."
+      ],
+      "xp": 15
     }
   ]
 }

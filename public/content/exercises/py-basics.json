@@ -63,6 +63,49 @@
         "For the fall-through case, convert the number to text with str(n) so you return '7', not the integer 7."
       ],
       "xp": 15
+    },
+    {
+      "id": "py-next-multiple",
+      "prompt": "Implement next_multiple(n, k) so it returns the smallest multiple of k that is greater than or equal to n — next_multiple(11, 5) is 15. When n is already a multiple of k, return n unchanged: next_multiple(10, 5) is 10 and next_multiple(0, 7) is 0. Assume n is zero or positive and k is a positive integer.",
+      "functionName": "next_multiple",
+      "starter": "def next_multiple(n, k):\n    # return the smallest multiple of k that is n or larger\n    pass",
+      "solution": "def next_multiple(n, k):\n    return n if n % k == 0 else n + k - n % k",
+      "tests": [
+        { "expr": "next_multiple(11, 5)", "expect": "15" },
+        { "expr": "next_multiple(10, 5)", "expect": "10" },
+        { "expr": "next_multiple(0, 7)", "expect": "0" },
+        { "expr": "next_multiple(7, 3)", "expect": "9" },
+        { "expr": "next_multiple(1, 1)", "expect": "1" },
+        { "expr": "next_multiple(14, 4)", "expect": "16" },
+        { "expr": "next_multiple(3, 10)", "expect": "10" }
+      ],
+      "hints": [
+        "The remainder n % k says how far n sits past the previous multiple of k — and a remainder of 0 means n is already a multiple, so it is its own answer.",
+        "When the remainder is not 0, you still have k - n % k to climb, which puts the answer at n + k - n % k.",
+        "Fold the two cases into one conditional expression: return n if n % k == 0 else n + k - n % k — adding the gap unconditionally would push an exact multiple a whole k too far."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-score-line",
+      "prompt": "Implement score_line(name, score) so it returns a sentence: the name, then ' scored ', then the score, then ' point' when the score is exactly 1 and ' points' for every other score. score_line('Ann', 3) is 'Ann scored 3 points', score_line('Bo', 1) is 'Bo scored 1 point', and score_line('Dee', -1) is 'Dee scored -1 points'. The result is always a string.",
+      "functionName": "score_line",
+      "starter": "def score_line(name, score):\n    # return '<name> scored <score> point(s)'\n    pass",
+      "solution": "def score_line(name, score):\n    return name + ' scored ' + str(score) + (' point' if score == 1 else ' points')",
+      "tests": [
+        { "expr": "score_line('Ann', 3)", "expect": "'Ann scored 3 points'" },
+        { "expr": "score_line('Bo', 1)", "expect": "'Bo scored 1 point'" },
+        { "expr": "score_line('Cy', 0)", "expect": "'Cy scored 0 points'" },
+        { "expr": "score_line('Dee', -1)", "expect": "'Dee scored -1 points'" },
+        { "expr": "score_line('', 2)", "expect": "' scored 2 points'" },
+        { "expr": "score_line('Eve', 100)", "expect": "'Eve scored 100 points'" }
+      ],
+      "hints": [
+        "You are gluing text together in four pieces: the name, a fixed middle, the score itself, and an ending that depends on the score.",
+        "A number cannot be joined to text as-is — str(score) turns 3 into '3' — and the conditional expression ' point' if score == 1 else ' points' picks the ending.",
+        "return name + ' scored ' + str(score) + (' point' if score == 1 else ' points') — only a score of exactly 1 is singular, so 0 and -1 both take ' points'."
+      ],
+      "xp": 15
     }
   ]
 }

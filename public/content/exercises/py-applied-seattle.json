@@ -258,6 +258,95 @@
         "Build counts, then loop sorted(counts) tracking the max — Pothole and Graffiti both reach 4, but scanning alphabetically with a strict > keeps 'Graffiti'."
       ],
       "xp": 20
+    },
+    {
+      "id": "py-app-top-neighborhoods-by-total-days",
+      "prompt": "You are given requests, a list of service-request records of shape {'type', 'neighborhood', 'days_open', 'status'}. Implement top_neighborhoods_by_total_days(requests, n) so it returns a list of the n neighborhoods with the greatest total days_open, ordered from the largest total down. This ranks on the total, not the average: Downtown's three requests total 90 days and lead, while Capitol Hill — the slowest neighborhood by average — totals 84 and comes second. Neighborhoods that tie on the total are ordered alphabetically. top_neighborhoods_by_total_days(requests, 3) is ['Downtown', 'Capitol Hill', 'Georgetown']. If n is 0 return an empty list; if n exceeds the number of neighborhoods return them all in that order; an empty list returns an empty list.",
+      "functionName": "top_neighborhoods_by_total_days",
+      "starter": "def top_neighborhoods_by_total_days(requests, n):\n    # return the n neighborhoods with the largest total days_open\n    pass",
+      "solution": "def top_neighborhoods_by_total_days(requests, n):\n    totals = {}\n    for r in requests:\n        totals[r['neighborhood']] = totals.get(r['neighborhood'], 0) + r['days_open']\n    return sorted(totals, key=lambda nb: (-totals[nb], nb))[:n]",
+      "fixture": "requests = [\n    {'type': 'Pothole', 'neighborhood': 'Ballard', 'days_open': 6, 'status': 'open'},\n    {'type': 'Pothole', 'neighborhood': 'Fremont', 'days_open': 8, 'status': 'closed'},\n    {'type': 'Pothole', 'neighborhood': 'Downtown', 'days_open': 50, 'status': 'open'},\n    {'type': 'Graffiti', 'neighborhood': 'Capitol Hill', 'days_open': 40, 'status': 'closed'},\n    {'type': 'Graffiti', 'neighborhood': 'Ballard', 'days_open': 18, 'status': 'open'},\n    {'type': 'Graffiti', 'neighborhood': 'Downtown', 'days_open': 30, 'status': 'closed'},\n    {'type': 'Streetlight', 'neighborhood': 'Fremont', 'days_open': 12, 'status': 'open'},\n    {'type': 'Streetlight', 'neighborhood': 'Georgetown', 'days_open': 20, 'status': 'open'},\n    {'type': 'Illegal Dumping', 'neighborhood': 'Georgetown', 'days_open': 25, 'status': 'open'},\n    {'type': 'Illegal Dumping', 'neighborhood': 'Ballard', 'days_open': 9, 'status': 'closed'},\n    {'type': 'Abandoned Vehicle', 'neighborhood': 'Capitol Hill', 'days_open': 44, 'status': 'closed'},\n    {'type': 'Abandoned Vehicle', 'neighborhood': 'Downtown', 'days_open': 10, 'status': 'open'},\n    {'type': 'Abandoned Vehicle', 'neighborhood': 'Fremont', 'days_open': 4, 'status': 'closed'},\n    {'type': 'Pothole', 'neighborhood': 'Georgetown', 'days_open': 15, 'status': 'open'},\n    {'type': 'Graffiti', 'neighborhood': 'Fremont', 'days_open': 16, 'status': 'closed'}\n]",
+      "tests": [
+        {
+          "expr": "top_neighborhoods_by_total_days(requests, 3)",
+          "expect": "['Downtown', 'Capitol Hill', 'Georgetown']"
+        },
+        {
+          "expr": "top_neighborhoods_by_total_days(requests, 1)",
+          "expect": "['Downtown']"
+        },
+        {
+          "expr": "top_neighborhoods_by_total_days(requests, 5)",
+          "expect": "['Downtown', 'Capitol Hill', 'Georgetown', 'Fremont', 'Ballard']"
+        },
+        {
+          "expr": "top_neighborhoods_by_total_days(requests, 9)",
+          "expect": "['Downtown', 'Capitol Hill', 'Georgetown', 'Fremont', 'Ballard']"
+        },
+        {
+          "expr": "top_neighborhoods_by_total_days(requests, 0)",
+          "expect": "[]"
+        },
+        {
+          "expr": "top_neighborhoods_by_total_days([], 3)",
+          "expect": "[]"
+        },
+        {
+          "expr": "top_neighborhoods_by_total_days([{'type': 't', 'neighborhood': 'Zed', 'days_open': 10, 'status': 'open'}, {'type': 't', 'neighborhood': 'Ann', 'days_open': 10, 'status': 'open'}], 2)",
+          "expect": "['Ann', 'Zed']"
+        }
+      ],
+      "hints": [
+        "Tally a total per neighborhood first, then rank the tally itself — the sort key is the total, with the name as the fallback.",
+        "sorted(totals, key=lambda nb: (-totals[nb], nb)) orders by descending total and ascending name in one pass, and slicing [:n] already handles n = 0 and an oversized n.",
+        "Accumulate totals[r['neighborhood']] = totals.get(r['neighborhood'], 0) + r['days_open'], then return sorted(totals, key=lambda nb: (-totals[nb], nb))[:n] — ranking on the total is why Downtown (90 across three requests) leads Capitol Hill (84 across two) even though Capitol Hill has the higher average."
+      ],
+      "xp": 20
+    },
+    {
+      "id": "py-app-types-by-neighborhood",
+      "prompt": "You are given requests, a list of service-request records of shape {'type', 'neighborhood', 'days_open', 'status'}. Implement types_by_neighborhood(requests) so it returns a dict mapping each 'neighborhood' to the list of its request types, ordered from its longest-open request to its shortest, with ties broken alphabetically by type — {neighborhood: [type, ...]}. The order inside a list follows days_open, not the order the requests appear in the log: Capitol Hill logged its 40-day Graffiti first, but its 44-day Abandoned Vehicle comes first in the list. Repeated types are kept, one entry per request. types_by_neighborhood(requests)['Georgetown'] is ['Illegal Dumping', 'Streetlight', 'Pothole']. An empty list returns an empty dict {}.",
+      "functionName": "types_by_neighborhood",
+      "starter": "def types_by_neighborhood(requests):\n    # map each neighborhood to its types, stalest request first\n    pass",
+      "solution": "def types_by_neighborhood(requests):\n    groups = {}\n    for r in requests:\n        groups.setdefault(r['neighborhood'], []).append(r)\n    return {nb: [r['type'] for r in sorted(rs, key=lambda r: (-r['days_open'], r['type']))] for nb, rs in groups.items()}",
+      "fixture": "requests = [\n    {'type': 'Pothole', 'neighborhood': 'Ballard', 'days_open': 6, 'status': 'open'},\n    {'type': 'Pothole', 'neighborhood': 'Fremont', 'days_open': 8, 'status': 'closed'},\n    {'type': 'Pothole', 'neighborhood': 'Downtown', 'days_open': 50, 'status': 'open'},\n    {'type': 'Graffiti', 'neighborhood': 'Capitol Hill', 'days_open': 40, 'status': 'closed'},\n    {'type': 'Graffiti', 'neighborhood': 'Ballard', 'days_open': 18, 'status': 'open'},\n    {'type': 'Graffiti', 'neighborhood': 'Downtown', 'days_open': 30, 'status': 'closed'},\n    {'type': 'Streetlight', 'neighborhood': 'Fremont', 'days_open': 12, 'status': 'open'},\n    {'type': 'Streetlight', 'neighborhood': 'Georgetown', 'days_open': 20, 'status': 'open'},\n    {'type': 'Illegal Dumping', 'neighborhood': 'Georgetown', 'days_open': 25, 'status': 'open'},\n    {'type': 'Illegal Dumping', 'neighborhood': 'Ballard', 'days_open': 9, 'status': 'closed'},\n    {'type': 'Abandoned Vehicle', 'neighborhood': 'Capitol Hill', 'days_open': 44, 'status': 'closed'},\n    {'type': 'Abandoned Vehicle', 'neighborhood': 'Downtown', 'days_open': 10, 'status': 'open'},\n    {'type': 'Abandoned Vehicle', 'neighborhood': 'Fremont', 'days_open': 4, 'status': 'closed'},\n    {'type': 'Pothole', 'neighborhood': 'Georgetown', 'days_open': 15, 'status': 'open'},\n    {'type': 'Graffiti', 'neighborhood': 'Fremont', 'days_open': 16, 'status': 'closed'}\n]",
+      "tests": [
+        {
+          "expr": "types_by_neighborhood(requests)",
+          "expect": "{'Ballard': ['Graffiti', 'Illegal Dumping', 'Pothole'], 'Fremont': ['Graffiti', 'Streetlight', 'Pothole', 'Abandoned Vehicle'], 'Downtown': ['Pothole', 'Graffiti', 'Abandoned Vehicle'], 'Capitol Hill': ['Abandoned Vehicle', 'Graffiti'], 'Georgetown': ['Illegal Dumping', 'Streetlight', 'Pothole']}"
+        },
+        {
+          "expr": "types_by_neighborhood([])",
+          "expect": "{}"
+        },
+        {
+          "expr": "types_by_neighborhood(requests)['Capitol Hill']",
+          "expect": "['Abandoned Vehicle', 'Graffiti']"
+        },
+        {
+          "expr": "types_by_neighborhood([{'type': 'Pothole', 'neighborhood': 'SoDo', 'days_open': 3, 'status': 'open'}, {'type': 'Pothole', 'neighborhood': 'SoDo', 'days_open': 9, 'status': 'closed'}])",
+          "expect": "{'SoDo': ['Pothole', 'Pothole']}"
+        },
+        {
+          "expr": "types_by_neighborhood([{'type': 'Streetlight', 'neighborhood': 'SoDo', 'days_open': 5, 'status': 'open'}, {'type': 'Graffiti', 'neighborhood': 'SoDo', 'days_open': 5, 'status': 'closed'}])",
+          "expect": "{'SoDo': ['Graffiti', 'Streetlight']}"
+        },
+        {
+          "expr": "types_by_neighborhood([{'type': 'Pothole', 'neighborhood': 'Ravenna', 'days_open': 12, 'status': 'open'}])",
+          "expect": "{'Ravenna': ['Pothole']}"
+        },
+        {
+          "setup": "g = types_by_neighborhood(requests)",
+          "expr": "g['Fremont']",
+          "expect": "['Graffiti', 'Streetlight', 'Pothole', 'Abandoned Vehicle']"
+        }
+      ],
+      "hints": [
+        "Group first and sort second: collect each neighborhood's whole records, then decide the order inside each bucket.",
+        "groups.setdefault(r['neighborhood'], []).append(r) builds the buckets, and sorted(rs, key=lambda r: (-r['days_open'], r['type'])) puts the stalest first with an alphabetical tie-break.",
+        "Finish with {nb: [r['type'] for r in sorted(rs, key=lambda r: (-r['days_open'], r['type']))] for nb, rs in groups.items()} — sorting rather than appending types in encounter order is what puts Capitol Hill's 44-day Abandoned Vehicle ahead of its 40-day Graffiti."
+      ],
+      "xp": 20
     }
   ]
 }
