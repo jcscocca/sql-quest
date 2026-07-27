@@ -17,8 +17,9 @@ docs/superpowers/specs/ for per-feature design docs.
 - Tracks share one XP/streak/badge/review backbone. SQL implements the full
   `Track` interface in `src/lib/tracks/` (prepare/run/check/reward/example);
   the JS and Python tracks implement the narrower run/check pair consumed by
-  `CodeScreen`. The backbone (`progress.ts`, `xp.ts`, `review.ts`) should not
-  need changes when adding a track.
+  `CodeScreen`. `progress.ts` and `xp.ts` should not need changes when adding
+  a track; `review.ts` only needs the new track's banks wired into its bank
+  lookup.
 - Runtimes: DuckDB-WASM bundled locally (`src/lib/duckdb.ts`), JS in a Web Worker
   (`js-worker.ts`), Python via Pyodide served from `/pyodide/` on our own origin
   (`py-worker.ts` — do not reintroduce a CDN fetch; the app is offline-capable).

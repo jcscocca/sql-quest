@@ -8,19 +8,22 @@ backbone, all in-browser with no accounts.
   caring about: 142 exercises across five regions (Foundations, Shaping,
   Combining, Analyst Power, Boss Arenas) and four worlds (Pokémon, Yu-Gi-Oh!,
   Digimon, Seattle 311). Correct queries catch the entities they return into a
-  collection with real sprite/card art; Daily Review resurfaces rusty SQL
-  skills on an expanding schedule.
+  collection with real sprite/card art.
 - **JavaScript** & **Python** — implement a named function verified by
   in-language test cases (each test is an `{expr, expect}` pair, or `expr` +
   `raises`, evaluated and compared inside the runtime — a Web Worker for JS,
-  Pyodide for Python). ~120 exercises each across five regions: Foundations,
+  Pyodide for Python; exercises that mandate a technique, like recursion or
+  reduce, enforce it with an AST check on the submission). ~130 exercises
+  each across five regions: Foundations,
   Arrays/Lists & Iteration, Objects/Dicts/Maps & Sets, Functions & Classes, and
   Applied Data — grounded capstones over inline Pokémon / Yu-Gi-Oh! / Seattle 311
   datasets (shown in a per-exercise data panel). Pyodide is served from the
   app's own origin, so Python has no CDN dependency either.
 
-Every subject plugs into the same backbone through a `Track` interface
-(`src/lib/tracks/`). See
+Daily Review resurfaces rusty skills from every track on an expanding
+schedule — SQL and code drills alike. All tracks share the same backbone:
+SQL implements the full `Track` interface in `src/lib/tracks/`, the code
+tracks the narrower run/check pair. See
 `docs/superpowers/specs/2026-07-22-multi-track-platform-design.md` for the
 multi-track design and `2026-07-18-sql-learning-app-design.md` for the
 original SQL trainer.
