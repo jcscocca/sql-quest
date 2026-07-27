@@ -5,6 +5,7 @@
       "id": "js-sum-all",
       "prompt": "Implement sumAll(arr) so it returns the sum of every number in arr, using Array.prototype.reduce. An empty array returns 0.",
       "functionName": "sumAll",
+      "mustCall": ["reduce"],
       "starter": "function sumAll(arr) {\n  // fold arr into its total with reduce\n}",
       "solution": "function sumAll(arr) {\n  return arr.reduce((sum, x) => sum + x, 0)\n}",
       "tests": [
@@ -26,6 +27,7 @@
       "id": "js-product-all",
       "prompt": "Implement productAll(arr) so it returns the product of every number in arr, using reduce. By convention the product of an empty array is 1.",
       "functionName": "productAll",
+      "mustCall": ["reduce"],
       "starter": "function productAll(arr) {\n  // multiply every element together with reduce\n}",
       "solution": "function productAll(arr) {\n  return arr.reduce((product, x) => product * x, 1)\n}",
       "tests": [
@@ -47,6 +49,7 @@
       "id": "js-max-of",
       "prompt": "Implement maxOf(arr) so it returns the largest number in arr, using reduce. Assume arr has at least one element. Note the values may all be negative.",
       "functionName": "maxOf",
+      "mustCall": ["reduce"],
       "starter": "function maxOf(arr) {\n  // reduce arr down to its largest value\n}",
       "solution": "function maxOf(arr) {\n  return arr.reduce((max, x) => (x > max ? x : max))\n}",
       "tests": [
@@ -68,6 +71,7 @@
       "id": "js-count-positive",
       "prompt": "Implement countPositive(arr) so it returns how many numbers in arr are strictly greater than zero, using reduce. Zero itself is not positive. An empty array returns 0.",
       "functionName": "countPositive",
+      "mustCall": ["reduce"],
       "starter": "function countPositive(arr) {\n  // tally the positive numbers with reduce\n}",
       "solution": "function countPositive(arr) {\n  return arr.reduce((count, x) => count + (x > 0 ? 1 : 0), 0)\n}",
       "tests": [
@@ -89,6 +93,7 @@
       "id": "js-tally",
       "prompt": "Implement tally(arr), where arr is an array of strings, so it returns an object counting how many times each string appears — tally(['a', 'b', 'a']) is {a: 2, b: 1}. Use reduce with an object accumulator. An empty array returns an empty object {}.",
       "functionName": "tally",
+      "mustCall": ["reduce"],
       "starter": "function tally(arr) {\n  // build a {value: count} object with reduce\n}",
       "solution": "function tally(arr) {\n  return arr.reduce((counts, x) => {\n    counts[x] = (counts[x] || 0) + 1\n    return counts\n  }, {})\n}",
       "tests": [

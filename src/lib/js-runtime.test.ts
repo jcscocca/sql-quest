@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { deepEqual, render, runCodeTests } from './js-runtime'
+import { deepEqual, missingCalls, render, runCodeExercise, runCodeTests } from './js-runtime'
 import type { CodeTest } from './content'
 
 test('deepEqual handles Set and Map', () => {
@@ -86,4 +86,26 @@ test('a JS raises match comes only from expr, not a throwing setup', () => {
 test('raises still matches a runtime throw from expr', () => {
   const r = runCodeTests('function boom() { throw new TypeError("nope") }', [{ expr: 'boom()', raises: 'TypeError' }])
   expect(r[0].pass).toBe(true)
+})
+
+test('missingCalls sees identifier and method calls, not declarations', () => {
+  expect(missingCalls('function f(n) { return n <= 1 ? 1 : n * f(n - 1) }', ['f'])).toEqual([])
+  expect(missingCalls('function sumAll(xs) { return xs.reduce((a, b) => a + b, 0) }', ['reduce'])).toEqual([])
+  expect(missingCalls('function f(n) { let t = 0; for (let i = 1; i <= n; i++) t += i; return t }', ['f'])).toEqual(['f'])
+})
+
+test('missingCalls stays quiet on unparseable code so the tests surface the syntax error', () => {
+  expect(missingCalls('function f( {', ['f'])).toEqual([])
+})
+
+test('runCodeExercise gates on mustCall before running tests', () => {
+  const ex = { tests: [{ expr: 'sumTo(3)', expect: '6' }], mustCall: ['sumTo'] }
+  const iterative = 'function sumTo(n) { let t = 0; for (let i = 1; i <= n; i++) t += i; return t }'
+  const rejected = runCodeExercise(iterative, ex)
+  expect(rejected.error).toContain('sumTo')
+  expect(rejected.results).toEqual([])
+  const recursive = 'function sumTo(n) { return n === 0 ? 0 : n + sumTo(n - 1) }'
+  const accepted = runCodeExercise(recursive, ex)
+  expect(accepted.error).toBeUndefined()
+  expect(accepted.results.every(t => t.pass)).toBe(true)
 })

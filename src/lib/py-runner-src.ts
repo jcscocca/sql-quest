@@ -1,9 +1,28 @@
 // Shared by src/lib/py-worker.ts (browser) and scripts/validate-content.ts (Node)
 // so browser and CI verify Python with identical semantics.
 export const PY_RUNNER = `
+import ast as _ast
 import json as _json
 
-def _run_exercise(_code, _tests_json):
+def _missing_calls(_code, _must):
+    try:
+        _tree = _ast.parse(_code)
+    except SyntaxError:
+        return []
+    _called = set()
+    for _n in _ast.walk(_tree):
+        if isinstance(_n, _ast.Call):
+            _f = _n.func
+            if isinstance(_f, _ast.Name):
+                _called.add(_f.id)
+            elif isinstance(_f, _ast.Attribute):
+                _called.add(_f.attr)
+    return [_m for _m in _must if _m not in _called]
+
+def _run_exercise(_code, _tests_json, _must_call_json="[]"):
+    _missing = _missing_calls(_code, _json.loads(_must_call_json))
+    if _missing:
+        return _json.dumps({"error": "this exercise requires calling " + ", ".join(_missing) + " in your code"})
     _tests = _json.loads(_tests_json)
     _out = []
     for _t in _tests:

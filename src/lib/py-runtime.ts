@@ -14,7 +14,7 @@ const RUN_TIMEOUT = 15000
 
 export async function runPy(
   code: string,
-  ex: { tests: CodeTest[]; fixture?: string },
+  ex: { tests: CodeTest[]; fixture?: string; mustCall?: string[] },
 ): Promise<RunResult> {
   try {
     if (!worker) worker = new Worker(new URL('./py-worker.ts', import.meta.url), { type: 'module' })
@@ -51,7 +51,7 @@ export async function runPy(
       timer = setTimeout(kill, LOAD_TIMEOUT)
       w.addEventListener('message', onMessage)
       w.addEventListener('error', onError)
-      w.postMessage({ id, code, tests: ex.tests, fixture: ex.fixture })
+      w.postMessage({ id, code, tests: ex.tests, fixture: ex.fixture, mustCall: ex.mustCall })
     })
   } catch (e) {
     return { results: [], error: String(e) }

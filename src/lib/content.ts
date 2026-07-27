@@ -62,6 +62,8 @@ export interface JsExercise {
   solution: string
   fixture?: string   // statements prepended to every test's setup in this exercise
   tests: CodeTest[]
+  /** Names the submission must call — e.g. its own functionName to require recursion. */
+  mustCall?: string[]
   hints: string[]
   xp: number
 }
@@ -80,6 +82,8 @@ export interface PyExercise {
   solution: string
   fixture?: string   // statements prepended to every test's setup in this exercise
   tests: CodeTest[]
+  /** Names the submission must call — e.g. its own functionName to require recursion. */
+  mustCall?: string[]
   hints: string[]
   xp: number
 }
