@@ -1,7 +1,7 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { DuckDBInstance } from '@duckdb/node-api'
 import { compareResults, type QueryResult } from '../src/lib/compare'
-import { runCodeTests, withFixtureSetup } from '../src/lib/js-runtime'
+import { runCodeExercise, withFixtureSetup } from '../src/lib/js-runtime'
 import { PY_RUNNER } from '../src/lib/py-runner-src'
 import { loadPyodide } from 'pyodide'
 import type { CodeTest, Curriculum, ExerciseBank, JsBank, PyBank, WorldSchema } from '../src/lib/content'
@@ -54,11 +54,21 @@ const conn = await db.connect()
 
 const py = await loadPyodide()
 py.runPython(PY_RUNNER)
-const pyRunExercise = py.globals.get('_run_exercise') as (code: string, testsJson: string) => string
+const pyRunExercise = py.globals.get('_run_exercise') as (code: string, testsJson: string, mustCallJson?: string) => string
 
-function runPyExercise(code: string, tests: CodeTest[], fixture?: string): [boolean, string, string, string | null][] {
+function runPyExercise(
+  code: string,
+  tests: CodeTest[],
+  fixture?: string,
+  mustCall?: string[],
+): [boolean, string, string, string | null][] | { error: string } {
   const folded = tests.map(t => ({ ...t, setup: withFixtureSetup(fixture, t.setup) }))
-  return JSON.parse(pyRunExercise(code, JSON.stringify(folded)))
+  return JSON.parse(pyRunExercise(code, JSON.stringify(folded), JSON.stringify(mustCall ?? [])))
+}
+
+function checkMustCall(tag: string, mustCall: unknown): void {
+  if (mustCall !== undefined && (!Array.isArray(mustCall) || mustCall.some(m => typeof m !== 'string' || !m.trim())))
+    failures.push(`${tag}: mustCall must be an array of names`)
 }
 
 const worlds = new Set(skills.map(s => s.world).filter((w): w is string => !!w))
@@ -120,8 +130,11 @@ for (const skill of skills) {
       if (!ex.solution?.trim()) failures.push(`${tag}: missing solution`)
       if (ex.hints.length !== 3) failures.push(`${tag}: expected 3 hints, found ${ex.hints.length}`)
       if (!checkCodeTests(tag, ex.tests)) continue
+      checkMustCall(tag, ex.mustCall)
       if (ex.solution?.trim()) {
-        for (const [i, r] of runCodeTests(ex.solution, ex.tests, ex.fixture).entries()) {
+        const sol = runCodeExercise(ex.solution, ex)
+        if (sol.error) failures.push(`${tag}: solution rejected — ${sol.error}`)
+        for (const [i, r] of sol.results.entries()) {
           if (!r.pass)
             failures.push(
               `${tag}: solution fails test ${i + 1} — expected ${r.expected}, got ${r.error ? `error ${r.error}` : r.actual}`,
@@ -129,8 +142,8 @@ for (const skill of skills) {
         }
       }
       if (ex.starter?.trim()) {
-        const starterResults = runCodeTests(ex.starter, ex.tests, ex.fixture)
-        if (starterResults.length > 0 && starterResults.every(r => r.pass))
+        const st = runCodeExercise(ex.starter, ex)
+        if (!st.error && st.results.length > 0 && st.results.every(r => r.pass))
           failures.push(`${tag}: starter already passes every test — no work for the learner`)
       }
     }
@@ -162,23 +175,27 @@ for (const skill of skills) {
       if (!ex.solution?.trim()) failures.push(`${tag}: missing solution`)
       if (ex.hints.length !== 3) failures.push(`${tag}: expected 3 hints, found ${ex.hints.length}`)
       if (!checkCodeTests(tag, ex.tests)) continue
+      checkMustCall(tag, ex.mustCall)
       if (ex.solution?.trim()) {
         try {
-          for (const [i, row] of runPyExercise(ex.solution, ex.tests, ex.fixture).entries()) {
-            const [ok, expected, actual, error] = row
-            if (!ok)
-              failures.push(
-                `${tag}: solution fails test ${i + 1} — expected ${expected}, got ${error ? `error ${error}` : actual}`,
-              )
-          }
+          const out = runPyExercise(ex.solution, ex.tests, ex.fixture, ex.mustCall)
+          if (!Array.isArray(out)) failures.push(`${tag}: solution rejected — ${out.error}`)
+          else
+            for (const [i, row] of out.entries()) {
+              const [ok, expected, actual, error] = row
+              if (!ok)
+                failures.push(
+                  `${tag}: solution fails test ${i + 1} — expected ${expected}, got ${error ? `error ${error}` : actual}`,
+                )
+            }
         } catch (e) {
           failures.push(`${tag}: Python solution did not run — ${e}`)
         }
       }
       if (ex.starter?.trim()) {
         try {
-          const sr = runPyExercise(ex.starter, ex.tests, ex.fixture)
-          if (sr.length > 0 && sr.every(row => row[0]))
+          const sr = runPyExercise(ex.starter, ex.tests, ex.fixture, ex.mustCall)
+          if (Array.isArray(sr) && sr.length > 0 && sr.every(row => row[0]))
             failures.push(`${tag}: starter already passes every test — no work for the learner`)
         } catch {
           // a starter that errors out fails tests, which is fine

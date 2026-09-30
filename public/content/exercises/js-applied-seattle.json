@@ -148,6 +148,51 @@
         "Build counts, then loop Object.keys(counts).sort() tracking the max — Pothole and Graffiti both reach 4, but scanning alphabetically with a strict > keeps 'Graffiti'."
       ],
       "xp": 20
+    },
+    {
+      "id": "js-app-distinct-neighborhoods-by-status",
+      "prompt": "You are given requests, an array of service-request records of shape { type, neighborhood, daysOpen, status }, where status is 'open' or 'closed'. Implement distinctNeighborhoodsByStatus(requests) so it returns { open, closed } where each value is how many distinct neighborhoods filed at least one request with that status. Count a neighborhood once however many requests it filed: the log holds 8 open and 7 closed requests, but distinctNeighborhoodsByStatus(requests) is {open: 4, closed: 4}. Both keys are always present — a status with no requests reports 0, so an empty array returns {open: 0, closed: 0}.",
+      "functionName": "distinctNeighborhoodsByStatus",
+      "fixture": "const requests = [\n  { type: 'Pothole', neighborhood: 'Ballard', daysOpen: 6, status: 'open' },\n  { type: 'Pothole', neighborhood: 'Fremont', daysOpen: 8, status: 'closed' },\n  { type: 'Pothole', neighborhood: 'Downtown', daysOpen: 50, status: 'open' },\n  { type: 'Graffiti', neighborhood: 'Capitol Hill', daysOpen: 40, status: 'closed' },\n  { type: 'Graffiti', neighborhood: 'Ballard', daysOpen: 18, status: 'open' },\n  { type: 'Graffiti', neighborhood: 'Downtown', daysOpen: 30, status: 'closed' },\n  { type: 'Streetlight', neighborhood: 'Fremont', daysOpen: 12, status: 'open' },\n  { type: 'Streetlight', neighborhood: 'Georgetown', daysOpen: 20, status: 'open' },\n  { type: 'Illegal Dumping', neighborhood: 'Georgetown', daysOpen: 25, status: 'open' },\n  { type: 'Illegal Dumping', neighborhood: 'Ballard', daysOpen: 9, status: 'closed' },\n  { type: 'Abandoned Vehicle', neighborhood: 'Capitol Hill', daysOpen: 44, status: 'closed' },\n  { type: 'Abandoned Vehicle', neighborhood: 'Downtown', daysOpen: 10, status: 'open' },\n  { type: 'Abandoned Vehicle', neighborhood: 'Fremont', daysOpen: 4, status: 'closed' },\n  { type: 'Pothole', neighborhood: 'Georgetown', daysOpen: 15, status: 'open' },\n  { type: 'Graffiti', neighborhood: 'Fremont', daysOpen: 16, status: 'closed' }\n]",
+      "starter": "function distinctNeighborhoodsByStatus(requests) {\n  // count the distinct neighborhoods behind each status\n}",
+      "solution": "function distinctNeighborhoodsByStatus(requests) {\n  const seen = { open: new Set(), closed: new Set() }\n  for (const r of requests) seen[r.status].add(r.neighborhood)\n  return { open: seen.open.size, closed: seen.closed.size }\n}",
+      "tests": [
+        { "expr": "distinctNeighborhoodsByStatus(requests)", "expect": "{open: 4, closed: 4}" },
+        { "expr": "distinctNeighborhoodsByStatus([])", "expect": "{open: 0, closed: 0}" },
+        { "expr": "distinctNeighborhoodsByStatus([{ type: 'a', neighborhood: 'Ballard', daysOpen: 1, status: 'open' }, { type: 'b', neighborhood: 'Ballard', daysOpen: 2, status: 'open' }, { type: 'c', neighborhood: 'Ballard', daysOpen: 3, status: 'open' }])", "expect": "{open: 1, closed: 0}" },
+        { "expr": "distinctNeighborhoodsByStatus([{ type: 'a', neighborhood: 'SoDo', daysOpen: 1, status: 'closed' }, { type: 'b', neighborhood: 'Ravenna', daysOpen: 2, status: 'closed' }])", "expect": "{open: 0, closed: 2}" },
+        { "expr": "distinctNeighborhoodsByStatus([{ type: 'a', neighborhood: 'SoDo', daysOpen: 1, status: 'open' }, { type: 'b', neighborhood: 'SoDo', daysOpen: 2, status: 'closed' }])", "expect": "{open: 1, closed: 1}" },
+        { "setup": "const d = distinctNeighborhoodsByStatus(requests)", "expr": "d.open + d.closed", "expect": "8" }
+      ],
+      "hints": [
+        "You are counting neighborhoods, not requests, so a neighborhood that files three open requests still counts once on the open side.",
+        "Keep a Set per status and add r.neighborhood to it — a Set drops the repeats, and .size is the number you report.",
+        "Seed { open: new Set(), closed: new Set() } before the loop, add each r.neighborhood to seen[r.status], and return the two .size values — seeding both Sets is what makes an empty log report zeros instead of missing keys, and a plain tally would wrongly answer 8 and 7."
+      ],
+      "xp": 20
+    },
+    {
+      "id": "js-app-open-backlog-report",
+      "prompt": "You are given requests, an array of service-request records of shape { type, neighborhood, daysOpen, status }. Implement openBacklogReport(requests, minDays) so it returns an array of report lines for the requests that are still open and have stood open for at least minDays days, each formatted exactly as '<neighborhood>: <type> (<daysOpen> days)'. Order the lines from the longest-open request to the shortest; ties on daysOpen are broken alphabetically by neighborhood, then by type. Closed requests never appear however stale they are — Capitol Hill's 44-day abandoned vehicle is closed, so openBacklogReport(requests, 40) is just ['Downtown: Pothole (50 days)']. The day test is >=, so a request at exactly minDays is included. If nothing qualifies, or the array is empty, return an empty array.",
+      "functionName": "openBacklogReport",
+      "fixture": "const requests = [\n  { type: 'Pothole', neighborhood: 'Ballard', daysOpen: 6, status: 'open' },\n  { type: 'Pothole', neighborhood: 'Fremont', daysOpen: 8, status: 'closed' },\n  { type: 'Pothole', neighborhood: 'Downtown', daysOpen: 50, status: 'open' },\n  { type: 'Graffiti', neighborhood: 'Capitol Hill', daysOpen: 40, status: 'closed' },\n  { type: 'Graffiti', neighborhood: 'Ballard', daysOpen: 18, status: 'open' },\n  { type: 'Graffiti', neighborhood: 'Downtown', daysOpen: 30, status: 'closed' },\n  { type: 'Streetlight', neighborhood: 'Fremont', daysOpen: 12, status: 'open' },\n  { type: 'Streetlight', neighborhood: 'Georgetown', daysOpen: 20, status: 'open' },\n  { type: 'Illegal Dumping', neighborhood: 'Georgetown', daysOpen: 25, status: 'open' },\n  { type: 'Illegal Dumping', neighborhood: 'Ballard', daysOpen: 9, status: 'closed' },\n  { type: 'Abandoned Vehicle', neighborhood: 'Capitol Hill', daysOpen: 44, status: 'closed' },\n  { type: 'Abandoned Vehicle', neighborhood: 'Downtown', daysOpen: 10, status: 'open' },\n  { type: 'Abandoned Vehicle', neighborhood: 'Fremont', daysOpen: 4, status: 'closed' },\n  { type: 'Pothole', neighborhood: 'Georgetown', daysOpen: 15, status: 'open' },\n  { type: 'Graffiti', neighborhood: 'Fremont', daysOpen: 16, status: 'closed' }\n]",
+      "starter": "function openBacklogReport(requests, minDays) {\n  // return the formatted backlog lines, stalest first\n}",
+      "solution": "function openBacklogReport(requests, minDays) {\n  return requests\n    .filter(r => r.status === 'open' && r.daysOpen >= minDays)\n    .sort((a, b) => b.daysOpen - a.daysOpen || a.neighborhood.localeCompare(b.neighborhood) || a.type.localeCompare(b.type))\n    .map(r => `${r.neighborhood}: ${r.type} (${r.daysOpen} days)`)\n}",
+      "tests": [
+        { "expr": "openBacklogReport(requests, 20)", "expect": "['Downtown: Pothole (50 days)', 'Georgetown: Illegal Dumping (25 days)', 'Georgetown: Streetlight (20 days)']" },
+        { "expr": "openBacklogReport(requests, 40)", "expect": "['Downtown: Pothole (50 days)']" },
+        { "expr": "openBacklogReport(requests, 51)", "expect": "[]" },
+        { "expr": "openBacklogReport(requests, 0)", "expect": "['Downtown: Pothole (50 days)', 'Georgetown: Illegal Dumping (25 days)', 'Georgetown: Streetlight (20 days)', 'Ballard: Graffiti (18 days)', 'Georgetown: Pothole (15 days)', 'Fremont: Streetlight (12 days)', 'Downtown: Abandoned Vehicle (10 days)', 'Ballard: Pothole (6 days)']" },
+        { "expr": "openBacklogReport([], 5)", "expect": "[]" },
+        { "expr": "openBacklogReport([{ type: 'Pothole', neighborhood: 'Zed', daysOpen: 5, status: 'open' }, { type: 'Graffiti', neighborhood: 'Ann', daysOpen: 5, status: 'open' }], 5)", "expect": "['Ann: Graffiti (5 days)', 'Zed: Pothole (5 days)']" },
+        { "expr": "openBacklogReport([{ type: 'Pothole', neighborhood: 'Ann', daysOpen: 5, status: 'open' }, { type: 'Graffiti', neighborhood: 'Ann', daysOpen: 5, status: 'open' }, { type: 'Streetlight', neighborhood: 'Ann', daysOpen: 9, status: 'closed' }], 5)", "expect": "['Ann: Graffiti (5 days)', 'Ann: Pothole (5 days)']" }
+      ],
+      "hints": [
+        "Three stages in order: keep the rows that pass both conditions, rank what survives, then turn each surviving row into its line.",
+        "A template literal builds the line — `${r.neighborhood}: ${r.type} (${r.daysOpen} days)` — and a chained comparator b.daysOpen - a.daysOpen || a.neighborhood.localeCompare(b.neighborhood) || a.type.localeCompare(b.type) settles the order.",
+        "Filter with r.status === 'open' && r.daysOpen >= minDays first — dropping the status half would float Capitol Hill's closed 44- and 40-day rows to the top of the minDays 40 report — then sort that filtered array (filter already gave you a copy) and map each row to its line."
+      ],
+      "xp": 20
     }
   ]
 }

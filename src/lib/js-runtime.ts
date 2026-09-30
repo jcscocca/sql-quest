@@ -1,3 +1,4 @@
+import { parse } from 'acorn'
 import type { CodeTest } from './content'
 
 export interface TestResult {
@@ -50,6 +51,44 @@ export function withFixtureSetup(fixture: string | undefined, setup: string | un
   return [fixture, setup].filter(Boolean).join('\n')
 }
 
+/** Names in mustCall with no call site in code. Unparseable code reports nothing — the tests surface the syntax error. */
+export function missingCalls(code: string, mustCall: string[]): string[] {
+  if (mustCall.length === 0) return []
+  let tree: object
+  try {
+    tree = parse(code, { ecmaVersion: 'latest' })
+  } catch {
+    return []
+  }
+  const called = new Set<string>()
+  const walk = (n: unknown): void => {
+    if (Array.isArray(n)) {
+      for (const item of n) walk(item)
+      return
+    }
+    if (!n || typeof n !== 'object') return
+    const node = n as { type?: unknown } & Record<string, unknown>
+    if (node.type === 'CallExpression') {
+      const callee = node.callee as { type: string; name?: string; computed?: boolean; property?: { type: string; name?: string } }
+      if (callee.type === 'Identifier' && callee.name) called.add(callee.name)
+      else if (callee.type === 'MemberExpression' && !callee.computed && callee.property?.type === 'Identifier' && callee.property.name)
+        called.add(callee.property.name)
+    }
+    for (const k of Object.keys(node)) walk(node[k])
+  }
+  walk(tree)
+  return mustCall.filter(name => !called.has(name))
+}
+
+export function runCodeExercise(
+  code: string,
+  ex: { tests: CodeTest[]; fixture?: string; mustCall?: string[] },
+): { results: TestResult[]; error?: string } {
+  const missing = missingCalls(code, ex.mustCall ?? [])
+  if (missing.length > 0) return { results: [], error: `this exercise requires calling ${missing.join(', ')} in your code` }
+  return { results: runCodeTests(code, ex.tests, ex.fixture) }
+}
+
 function prepare(code: string, setup: string, expr: string, expectExpr: string): { expr: () => unknown; expect: () => unknown } {
   return new Function(
     `"use strict";\n${code}\n${setup}\nreturn { expr: () => (${expr}), expect: () => (${expectExpr}) };`,
@@ -86,7 +125,7 @@ export function runCodeTests(code: string, tests: CodeTest[], fixture?: string):
 
 export async function runJs(
   code: string,
-  ex: { tests: CodeTest[]; fixture?: string },
+  ex: { tests: CodeTest[]; fixture?: string; mustCall?: string[] },
 ): Promise<{ results: TestResult[]; error?: string }> {
   try {
     const worker = new Worker(new URL('./js-worker.ts', import.meta.url), { type: 'module' })
@@ -105,7 +144,7 @@ export async function runJs(
         worker.terminate()
         resolve({ results: [], error: e.message || 'worker error' })
       }
-      worker.postMessage({ code, tests: ex.tests, fixture: ex.fixture })
+      worker.postMessage({ code, tests: ex.tests, fixture: ex.fixture, mustCall: ex.mustCall })
     })
   } catch (e) {
     return { results: [], error: String(e) }

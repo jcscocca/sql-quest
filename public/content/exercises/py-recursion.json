@@ -5,6 +5,7 @@
       "id": "py-rec-factorial",
       "prompt": "Implement factorial(n) so it returns n! = n × (n−1) × … × 1, computed recursively. factorial(5) is 120. By definition factorial(0) is 1. Assume n is a non-negative integer. Write it recursively, with a base case and a call to itself — no loops.",
       "functionName": "factorial",
+      "mustCall": ["factorial"],
       "starter": "def factorial(n):\n    # base case, then recurse toward it\n    pass",
       "solution": "def factorial(n):\n    if n <= 1:\n        return 1\n    return n * factorial(n - 1)",
       "tests": [
@@ -25,6 +26,7 @@
       "id": "py-rec-sum-to",
       "prompt": "Implement sum_to(n) so it returns the sum 1 + 2 + … + n, computed recursively. sum_to(5) is 15. sum_to(0) is 0. Assume n is a non-negative integer. Use recursion with a base case — no loops.",
       "functionName": "sum_to",
+      "mustCall": ["sum_to"],
       "starter": "def sum_to(n):\n    # base case at 0, then add n to the sum of everything below it\n    pass",
       "solution": "def sum_to(n):\n    if n <= 0:\n        return 0\n    return n + sum_to(n - 1)",
       "tests": [
@@ -45,6 +47,7 @@
       "id": "py-rec-power",
       "prompt": "Implement power(base, exp) so it returns base raised to the exp power, computed recursively. power(2, 10) is 1024. By definition power(base, 0) is 1 for any base. Assume exp is a non-negative integer. Recurse on exp with a base case — no loops and no ** operator.",
       "functionName": "power",
+      "mustCall": ["power"],
       "starter": "def power(base, exp):\n    # base case when exp is 0, then recurse on exp - 1\n    pass",
       "solution": "def power(base, exp):\n    if exp == 0:\n        return 1\n    return base * power(base, exp - 1)",
       "tests": [
@@ -65,6 +68,7 @@
       "id": "py-rec-sum-list",
       "prompt": "Implement sum_list(xs), where xs is a list of numbers, so it returns their sum, computed recursively. sum_list([1, 2, 3]) is 6. An empty list sums to 0. Use recursion with a base case — no loops, and no built-in sum().",
       "functionName": "sum_list",
+      "mustCall": ["sum_list"],
       "starter": "def sum_list(xs):\n    # base case for the empty list, then first element plus the sum of the rest\n    pass",
       "solution": "def sum_list(xs):\n    if not xs:\n        return 0\n    return xs[0] + sum_list(xs[1:])",
       "tests": [
@@ -85,6 +89,7 @@
       "id": "py-rec-sum-nested",
       "prompt": "Implement sum_nested(xs) so it returns the sum of all numbers in xs, where each element is either a number OR a nested list of numbers, to any depth. sum_nested([1, [2, 3], [[4]]]) is 10. An empty list sums to 0. Use recursion to descend into the nested lists — no loops. (isinstance(x, list) tells you whether x is itself a list.)",
       "functionName": "sum_nested",
+      "mustCall": ["sum_nested"],
       "starter": "def sum_nested(xs):\n    # sum numbers, recursing into any element that is itself a list\n    pass",
       "solution": "def sum_nested(xs):\n    if not xs:\n        return 0\n    first, rest = xs[0], xs[1:]\n    head = sum_nested(first) if isinstance(first, list) else first\n    return head + sum_nested(rest)",
       "tests": [

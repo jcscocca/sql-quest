@@ -74,3 +74,25 @@ test('a Python raises match comes only from expr, not a throwing setup', () => {
   expect(out[0][0]).toBe(false)
   expect(out[0][3]).toContain('TypeError')
 })
+
+test('must-call gate rejects a solution without the call and accepts one with it', () => {
+  const runExercise = py.globals.get('_run_exercise') as (c: string, t: string, m: string) => string
+  const tests = JSON.stringify([{ expr: 'sum_to(3)', expect: '6' }])
+  const rejected = JSON.parse(runExercise('def sum_to(n):\n    return sum(range(n + 1))', tests, JSON.stringify(['sum_to'])))
+  expect(rejected.error).toContain('sum_to')
+  const accepted = JSON.parse(
+    runExercise('def sum_to(n):\n    return 0 if n == 0 else n + sum_to(n - 1)', tests, JSON.stringify(['sum_to'])),
+  )
+  expect(Array.isArray(accepted)).toBe(true)
+  expect(accepted[0][0]).toBe(true)
+  const method = JSON.parse(
+    runExercise(
+      'def add_one(xs):\n    xs.append(1)\n    return xs',
+      JSON.stringify([{ expr: 'add_one([2])', expect: '[2, 1]' }]),
+      JSON.stringify(['append']),
+    ),
+  )
+  expect(Array.isArray(method)).toBe(true)
+  expect(method[0][0]).toBe(true)
+  ;(runExercise as unknown as { destroy?: () => void }).destroy?.()
+})

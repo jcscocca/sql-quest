@@ -7,7 +7,7 @@ type RunResult = { results: TestResult[]; error?: string }
 export function createPythonTrack() {
   return {
     id: 'python' as const,
-    run: (code: string, ex: { tests: CodeTest[]; fixture?: string }): Promise<RunResult> => runPy(code, ex),
+    run: (code: string, ex: { tests: CodeTest[]; fixture?: string; mustCall?: string[] }): Promise<RunResult> => runPy(code, ex),
     check: (r: RunResult) => ({
       correct: !r.error && r.results.length > 0 && r.results.every(t => t.pass),
       reason: r.error,

@@ -63,6 +63,50 @@
         "sum(1 for ch in s.lower() if ch in 'aeiou') counts one for each vowel — and an empty string sums to 0."
       ],
       "xp": 15
+    },
+    {
+      "id": "py-count-multiples",
+      "prompt": "Implement count_multiples(xs, k) so it returns how many numbers in xs are exact multiples of k. Zero is a multiple of every k, and negatives count too — count_multiples([-6, 0, 5], 3) is 2. An empty list, or one with no multiples, returns 0. Assume k is a positive integer.",
+      "functionName": "count_multiples",
+      "starter": "def count_multiples(xs, k):\n    # count how many numbers are multiples of k\n    pass",
+      "solution": "def count_multiples(xs, k):\n    return sum(1 for x in xs if x % k == 0)",
+      "tests": [
+        { "expr": "count_multiples([1, 2, 3, 4, 5, 6], 3)", "expect": "2" },
+        { "expr": "count_multiples([], 4)", "expect": "0" },
+        { "expr": "count_multiples([1, 2, 3], 5)", "expect": "0" },
+        { "expr": "count_multiples([-6, 0, 5], 3)", "expect": "2" },
+        { "expr": "count_multiples([2, 4, 6], 2)", "expect": "3" },
+        { "expr": "count_multiples([7, 8, 9], 1)", "expect": "3" },
+        { "expr": "count_multiples([0], 9)", "expect": "1" }
+      ],
+      "hints": [
+        "The answer is a single number, not a new list, so fold the list down with sum() over a generator instead of building anything.",
+        "x % k == 0 is the 'x is a multiple of k' test, and it stays correct for 0 and for negatives (-6 % 3 is 0).",
+        "return sum(1 for x in xs if x % k == 0) — one is added per match, and an empty list sums to 0 with no special case."
+      ],
+      "xp": 15
+    },
+    {
+      "id": "py-evens-between",
+      "prompt": "Implement evens_between(lo, hi) so it returns a list of every even number from lo up to and including hi, in increasing order. evens_between(1, 6) is [2, 4, 6]. Zero and negatives are included when they fall in range — evens_between(-4, 1) is [-4, -2, 0]. When lo is greater than hi, or the range holds no even number, return an empty list.",
+      "functionName": "evens_between",
+      "starter": "def evens_between(lo, hi):\n    # return the even numbers from lo through hi\n    pass",
+      "solution": "def evens_between(lo, hi):\n    return [x for x in range(lo, hi + 1) if x % 2 == 0]",
+      "tests": [
+        { "expr": "evens_between(1, 6)", "expect": "[2, 4, 6]" },
+        { "expr": "evens_between(2, 2)", "expect": "[2]" },
+        { "expr": "evens_between(3, 3)", "expect": "[]" },
+        { "expr": "evens_between(5, 1)", "expect": "[]" },
+        { "expr": "evens_between(-4, 1)", "expect": "[-4, -2, 0]" },
+        { "expr": "evens_between(0, 0)", "expect": "[0]" },
+        { "expr": "evens_between(7, 10)", "expect": "[8, 10]" }
+      ],
+      "hints": [
+        "Two jobs in one line: walk every whole number in the range, then keep only the ones that qualify.",
+        "range(lo, hi + 1) counts from lo through hi — the + 1 is what includes hi — and a trailing if filters the comprehension; x % 2 == 0 stays right for 0 and negatives.",
+        "return [x for x in range(lo, hi + 1) if x % 2 == 0] — when lo is above hi the range is empty, so [] comes back on its own."
+      ],
+      "xp": 15
     }
   ]
 }

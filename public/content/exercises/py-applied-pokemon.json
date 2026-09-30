@@ -266,6 +266,88 @@
         "Iterate sorted(sums) tracking the largest average with a strict >, so on a tie the alphabetically earlier kind is kept and an empty roster leaves best as None."
       ],
       "xp": 20
+    },
+    {
+      "id": "py-app-attack-share-by-kind",
+      "prompt": "You are given roster, a list of Pokémon records of shape {'name', 'kind', 'attack', 'defense'}. Implement attack_share_by_kind(roster) so it returns a dict mapping each 'kind' to its share of the roster's total attack as a percentage — (kind total / roster total) * 100 — rounded to one decimal place with round(value, 1). Share is measured in attack points, not in how many records a kind has. attack_share_by_kind(roster) is {'fire': 28.6, 'water': 26.4, 'grass': 20.2, 'electric': 10.4, 'rock': 14.4}. Round rather than truncate: grass is 20.16…, which is 20.2, not 20.1. An empty roster returns an empty dict {}.",
+      "functionName": "attack_share_by_kind",
+      "starter": "def attack_share_by_kind(roster):\n    # map each kind to its percentage share of the total attack\n    pass",
+      "solution": "def attack_share_by_kind(roster):\n    total = sum(p['attack'] for p in roster)\n    sums = {}\n    for p in roster:\n        sums[p['kind']] = sums.get(p['kind'], 0) + p['attack']\n    return {k: round(v * 100 / total, 1) for k, v in sums.items()}",
+      "fixture": "roster = [\n    {'name': 'charmander', 'kind': 'fire', 'attack': 52, 'defense': 43},\n    {'name': 'charizard', 'kind': 'fire', 'attack': 84, 'defense': 78},\n    {'name': 'vulpix', 'kind': 'fire', 'attack': 41, 'defense': 40},\n    {'name': 'growlithe', 'kind': 'fire', 'attack': 70, 'defense': 45},\n    {'name': 'squirtle', 'kind': 'water', 'attack': 48, 'defense': 65},\n    {'name': 'blastoise', 'kind': 'water', 'attack': 83, 'defense': 100},\n    {'name': 'psyduck', 'kind': 'water', 'attack': 52, 'defense': 48},\n    {'name': 'staryu', 'kind': 'water', 'attack': 45, 'defense': 55},\n    {'name': 'bulbasaur', 'kind': 'grass', 'attack': 49, 'defense': 49},\n    {'name': 'oddish', 'kind': 'grass', 'attack': 50, 'defense': 55},\n    {'name': 'bellsprout', 'kind': 'grass', 'attack': 75, 'defense': 35},\n    {'name': 'pikachu', 'kind': 'electric', 'attack': 55, 'defense': 40},\n    {'name': 'magnemite', 'kind': 'electric', 'attack': 35, 'defense': 70},\n    {'name': 'geodude', 'kind': 'rock', 'attack': 80, 'defense': 100},\n    {'name': 'onix', 'kind': 'rock', 'attack': 44, 'defense': 160}\n]",
+      "tests": [
+        {
+          "expr": "attack_share_by_kind(roster)",
+          "expect": "{'fire': 28.6, 'water': 26.4, 'grass': 20.2, 'electric': 10.4, 'rock': 14.4}"
+        },
+        {
+          "expr": "attack_share_by_kind([])",
+          "expect": "{}"
+        },
+        {
+          "expr": "attack_share_by_kind([{'name': 'solo', 'kind': 'ghost', 'attack': 7, 'defense': 1}])",
+          "expect": "{'ghost': 100.0}"
+        },
+        {
+          "expr": "attack_share_by_kind([{'name': 'a', 'kind': 'x', 'attack': 20, 'defense': 1}, {'name': 'b', 'kind': 'y', 'attack': 20, 'defense': 1}])",
+          "expect": "{'x': 50.0, 'y': 50.0}"
+        },
+        {
+          "expr": "attack_share_by_kind([{'name': 'a', 'kind': 'x', 'attack': 1, 'defense': 1}, {'name': 'b', 'kind': 'x', 'attack': 1, 'defense': 1}, {'name': 'c', 'kind': 'y', 'attack': 1, 'defense': 1}])",
+          "expect": "{'x': 66.7, 'y': 33.3}"
+        },
+        {
+          "setup": "s = attack_share_by_kind(roster)",
+          "expr": "s['grass']",
+          "expect": "20.2"
+        }
+      ],
+      "hints": [
+        "Two tallies of different scope: one grand total over the whole roster, and one subtotal per kind — the share is the subtotal over the grand total.",
+        "sum(p['attack'] for p in roster) gives the denominator; multiply by 100 before rounding and use round(value, 1) for the single decimal.",
+        "Build sums per kind, then return {k: round(v * 100 / total, 1) for k, v in sums.items()} — grass is 174 / 863 * 100 = 20.16…, which rounds up to 20.2 where truncating would report 20.1, and an empty roster never divides because the comprehension has nothing to walk."
+      ],
+      "xp": 20
+    },
+    {
+      "id": "py-app-battle-roles",
+      "prompt": "You are given roster, a list of Pokémon records of shape {'name', 'kind', 'attack', 'defense'}. Implement battle_roles(roster) so it files every record into exactly one of four roles using two independent tests — attack >= 50 and defense >= 50 — and returns the counts: 'elite' passes both, 'attacker' passes the attack test only, 'defender' passes the defense test only, 'rookie' passes neither. battle_roles(roster) is {'elite': 4, 'attacker': 5, 'defender': 4, 'rookie': 2}. Both tests are >=, so oddish at 50/55 is 'elite' while bulbasaur at 49/49 is a 'rookie'. The result always carries all four keys, so an empty roster returns every count at 0.",
+      "functionName": "battle_roles",
+      "starter": "def battle_roles(roster):\n    # count the records in each of the four roles\n    pass",
+      "solution": "def battle_roles(roster):\n    roles = {'elite': 0, 'attacker': 0, 'defender': 0, 'rookie': 0}\n    for p in roster:\n        strong = p['attack'] >= 50\n        tough = p['defense'] >= 50\n        if strong and tough:\n            roles['elite'] += 1\n        elif strong:\n            roles['attacker'] += 1\n        elif tough:\n            roles['defender'] += 1\n        else:\n            roles['rookie'] += 1\n    return roles",
+      "fixture": "roster = [\n    {'name': 'charmander', 'kind': 'fire', 'attack': 52, 'defense': 43},\n    {'name': 'charizard', 'kind': 'fire', 'attack': 84, 'defense': 78},\n    {'name': 'vulpix', 'kind': 'fire', 'attack': 41, 'defense': 40},\n    {'name': 'growlithe', 'kind': 'fire', 'attack': 70, 'defense': 45},\n    {'name': 'squirtle', 'kind': 'water', 'attack': 48, 'defense': 65},\n    {'name': 'blastoise', 'kind': 'water', 'attack': 83, 'defense': 100},\n    {'name': 'psyduck', 'kind': 'water', 'attack': 52, 'defense': 48},\n    {'name': 'staryu', 'kind': 'water', 'attack': 45, 'defense': 55},\n    {'name': 'bulbasaur', 'kind': 'grass', 'attack': 49, 'defense': 49},\n    {'name': 'oddish', 'kind': 'grass', 'attack': 50, 'defense': 55},\n    {'name': 'bellsprout', 'kind': 'grass', 'attack': 75, 'defense': 35},\n    {'name': 'pikachu', 'kind': 'electric', 'attack': 55, 'defense': 40},\n    {'name': 'magnemite', 'kind': 'electric', 'attack': 35, 'defense': 70},\n    {'name': 'geodude', 'kind': 'rock', 'attack': 80, 'defense': 100},\n    {'name': 'onix', 'kind': 'rock', 'attack': 44, 'defense': 160}\n]",
+      "tests": [
+        {
+          "expr": "battle_roles(roster)",
+          "expect": "{'elite': 4, 'attacker': 5, 'defender': 4, 'rookie': 2}"
+        },
+        {
+          "expr": "battle_roles([])",
+          "expect": "{'elite': 0, 'attacker': 0, 'defender': 0, 'rookie': 0}"
+        },
+        {
+          "expr": "battle_roles([{'name': 'edge', 'kind': 'x', 'attack': 50, 'defense': 50}])",
+          "expect": "{'elite': 1, 'attacker': 0, 'defender': 0, 'rookie': 0}"
+        },
+        {
+          "expr": "battle_roles([{'name': 'edge', 'kind': 'x', 'attack': 49, 'defense': 49}])",
+          "expect": "{'elite': 0, 'attacker': 0, 'defender': 0, 'rookie': 1}"
+        },
+        {
+          "expr": "battle_roles([{'name': 'a', 'kind': 'x', 'attack': 90, 'defense': 10}, {'name': 'b', 'kind': 'y', 'attack': 10, 'defense': 90}])",
+          "expect": "{'elite': 0, 'attacker': 1, 'defender': 1, 'rookie': 0}"
+        },
+        {
+          "setup": "r = battle_roles(roster)",
+          "expr": "r['elite'] + r['attacker'] + r['defender'] + r['rookie']",
+          "expect": "15"
+        }
+      ],
+      "hints": [
+        "Every record answers the same two yes/no questions — is attack at least 50, is defense at least 50 — and the pair of answers names its role.",
+        "Compute strong and tough once per record, then branch four ways: both, strong only, tough only, neither.",
+        "Seed roles = {'elite': 0, 'attacker': 0, 'defender': 0, 'rookie': 0} before the loop so an empty roster still reports all four keys, and use >= so oddish (50/55) lands in 'elite' rather than 'defender'."
+      ],
+      "xp": 20
     }
   ]
 }

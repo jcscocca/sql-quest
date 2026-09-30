@@ -13,7 +13,7 @@ const pyodideCopy = viteStaticCopy({
     {
       src: [
         'node_modules/pyodide/pyodide.mjs',
-        'node_modules/pyodide/pyodide.asm.js',
+        'node_modules/pyodide/pyodide.asm.mjs',
         'node_modules/pyodide/pyodide.asm.wasm',
         'node_modules/pyodide/python_stdlib.zip',
         'node_modules/pyodide/pyodide-lock.json',

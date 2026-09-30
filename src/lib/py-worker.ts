@@ -20,22 +20,23 @@ function loadPyodideOnce(): Promise<Pyodide> {
   return ready
 }
 
-self.onmessage = async (e: MessageEvent<{ id: number; code: string; tests: CodeTest[]; fixture?: string }>) => {
-  const { id, code, tests, fixture } = e.data
+self.onmessage = async (e: MessageEvent<{ id: number; code: string; tests: CodeTest[]; fixture?: string; mustCall?: string[] }>) => {
+  const { id, code, tests, fixture, mustCall } = e.data
   try {
     const py = await loadPyodideOnce()
     self.postMessage({ id, ready: true })
     py.runPython(PY_RUNNER)
     const folded = tests.map(t => ({ ...t, setup: withFixtureSetup(fixture, t.setup) }))
     const runExercise = py.globals.get('_run_exercise')
-    const rows = JSON.parse(runExercise(code, JSON.stringify(folded)) as string) as [
-      boolean,
-      string,
-      string,
-      string | null,
-    ][]
+    const out = JSON.parse(runExercise(code, JSON.stringify(folded), JSON.stringify(mustCall ?? [])) as string) as
+      | [boolean, string, string, string | null][]
+      | { error: string }
     runExercise.destroy?.()
-    const results: TestResult[] = rows.map(([pass, expected, actual, error]) => ({
+    if (!Array.isArray(out)) {
+      self.postMessage({ id, results: [], error: out.error })
+      return
+    }
+    const results: TestResult[] = out.map(([pass, expected, actual, error]) => ({
       pass,
       expected,
       actual,
