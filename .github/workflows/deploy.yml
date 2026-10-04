@@ -31,7 +31,9 @@ jobs:
         if: runner.os == 'Linux'
         shell: bash
         run: |
-          job_tmp="$RUNNER_TEMP/ci-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT-$GITHUB_JOB"
+          # Chromium Unix sockets require a short path, even when _work is deeply nested.
+          job_tmp=$(mktemp -d /tmp/gha.XXXXXX)
+          echo "CI_JOB_TEMP=$job_tmp" >> "$GITHUB_ENV"
           mkdir -p "$job_tmp" "$HOME/.cache"
           printf 'TMPDIR=%s\nTMP=%s\nTEMP=%s\n' "$job_tmp" "$job_tmp" "$job_tmp" >> "$GITHUB_ENV"
           # Do not accidentally invoke Windows executables through WSL interop.
@@ -57,6 +59,17 @@ jobs:
           path: work/${{ github.run_id }}-${{ github.run_attempt }}-${{ github.job }}-${{ strategy.job-index || 0 }}/dist
   # Runs alongside build so the Playwright suite can't rot unnoticed. Deliberately
   # not a dependency of deploy: a flaky browser run shouldn't block shipping.
+      - name: Remove this job's Linux temporary directory
+        if: always() && runner.os == 'Linux'
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        run: |
+          case "${CI_JOB_TEMP:-}" in
+            /tmp/gha.*) rm -rf -- "$CI_JOB_TEMP" ;;
+            '') ;;
+            *) echo "Unexpected temporary directory; refusing cleanup" >&2; exit 1 ;;
+          esac
+
   e2e:
     runs-on: [self-hosted, Linux, thinkpad]
     defaults:
@@ -73,7 +86,9 @@ jobs:
         if: runner.os == 'Linux'
         shell: bash
         run: |
-          job_tmp="$RUNNER_TEMP/ci-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT-$GITHUB_JOB"
+          # Chromium Unix sockets require a short path, even when _work is deeply nested.
+          job_tmp=$(mktemp -d /tmp/gha.XXXXXX)
+          echo "CI_JOB_TEMP=$job_tmp" >> "$GITHUB_ENV"
           mkdir -p "$job_tmp" "$HOME/.cache"
           printf 'TMPDIR=%s\nTMP=%s\nTEMP=%s\n' "$job_tmp" "$job_tmp" "$job_tmp" >> "$GITHUB_ENV"
           # Do not accidentally invoke Windows executables through WSL interop.
@@ -93,6 +108,16 @@ jobs:
           name: playwright-report
           path: work/${{ github.run_id }}-${{ github.run_attempt }}-${{ github.job }}-${{ strategy.job-index || 0 }}/playwright-report/
           retention-days: 7
+      - name: Remove this job's Linux temporary directory
+        if: always() && runner.os == 'Linux'
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        run: |
+          case "${CI_JOB_TEMP:-}" in
+            /tmp/gha.*) rm -rf -- "$CI_JOB_TEMP" ;;
+            '') ;;
+            *) echo "Unexpected temporary directory; refusing cleanup" >&2; exit 1 ;;
+          esac
 
   deploy:
     needs: build
